@@ -1,221 +1,175 @@
 #pragma once
-//
-//#include <stdarg.h>
-//#include <string.h>
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <vector>
-//#include "Logger.h"
-//
-//#include <MathLib/V3D.h>
-//#include <MathLib/Plane.h>
-//#include "Assert.h"
-//
-//#include <vector>
-//#include <string>
-//#include <fstream>
-//
-//#pragma warning( disable : 4996)
-//
-//#define DynamicArray std::vector
-//typedef unsigned int uint;
-//
-//
-//class Globals {
-//public:
-//	// gravitational acceleration 
-//	static double g;
-//	//this is the direction of the up-vector
-//	static V3D worldUp;
-//	//and the ground plane
-//	static Plane groundPlane;
-//	//this is the total ellapsed sim time
-//	static double currentSimulationTime;
-//};
-//
-//typedef struct key_word {
-//	char keyWord[50];
-//	int retVal;
-//}KeyWord;
-//
-//// given a list of keywords that map strings to integer values denoting types of keywords, this method will determine the type of command that is passed in
-//// 'line' will be modified after this function call to point to the first character after the keyword. If no keywords are matched, the method returns -1
-//int getLineType(char* &line, KeyWord* keywords, int nKeywords);
-//
-//// given a list of keywords that map strings to integer values denoting types of keywords, this method will determine the string corresponding to the token passed in
-//char* getKeyword(int lineType, KeyWord* keywords, int nKeywords);
-//
-///**
-//	This method throws an error with a specified text and arguments 
-//*/
-//inline void throwError(const char *fmt, ...){		// Custom error creation method
-//	char *pBuffer = NULL;
-//	GET_STRING_FROM_ARGUMENT_LIST(fmt, pBuffer);
-//
-//	Logger::print("Error Thrown: %s\n", pBuffer);
-//	
-//	throw pBuffer;
-//
-//	RELEASE_STRING_FROM_ARGUMENT_LIST(pBuffer);
-//}
-//
-////interpret the array of characters as a sequence of strings...
-//inline void getCharSeparatedStringList(const char* cString, std::vector<std::string>& lines, char separator = '\n') {
-//	lines.clear();
-//	std::string line;
-//	for (const char *c = cString;*c;c++) {
-//		if (*c && *c != separator)
-//			line.append(1, *c);
-//		else {
-//			lines.push_back(line);
-//			line.clear();
-//		}
-//	}
-//	if (line.size() > 0)
-//		lines.push_back(line);
-//}
-//
-///**
-//	This method reads all the doubles from the given file and stores them in the array of doubles that is passed in
-//*/
-//inline void readDoublesFromFile(FILE* f, DynamicArray<double> *d){
-//	double temp;
-//	char line[200];
-////	while (fscanf(f, "%lf\n", &temp) == 1)
-////		d->push_back(temp);
-//
-//	while (!feof(f)){
-//		if (fscanf(f, "%lf\n", &temp) == 1)
-//			d->push_back(temp);
-//		else
-//			fgets(line, sizeof(line)/sizeof(line[0])-1, f);
-//	}
-//}
-//
-///**
-//	This method returns a pointer to the first non-white space character location in the provided buffer
-//*/
-//inline char* lTrim(char* buffer){
-//	while (*buffer==' ' || *buffer=='\t' || *buffer=='\n' || *buffer=='\r')
-//		buffer++;
-//	return buffer;
-//}
-//
-//inline char* rTrim(char* buffer){
-//	int index = (int)strlen(buffer) - 1;
-//	while (index>=0){
-//		if (buffer[index]==' ' || buffer[index]=='\t' || buffer[index]=='\n' || buffer[index]=='\r'){
-//			buffer[index] = '\0';
-//			index--;
-//		}
-//		else
-//			break;
-//	}
-//	return buffer;
-//}
-//
-//inline char* trim(char* buffer){
-//	return rTrim(lTrim(buffer));
-//}
-//
-///**
-//	This method reads a line from a file. It does not return empty lines or ones that start with a pound key - those are assumed to be comments.
-//	This method returns true if a line is read, false otherwise (for instance the end of file is met).
-//*/
-//inline bool readValidLine(char* line, int nChars, FILE* fp){
-//	line[0] = '\0';
-//	while (!feof(fp)){
-//		fgets(line, nChars, fp);
-//		if ((int)strlen(line)>=nChars)
-//			throwError("The input file contains a line that is longer than the buffer - not allowed");
-//		char* tmp = trim(line);
-//		if (tmp[0]!='#' && tmp[0]!='\0')
-//			return true;
-//	}
-//
-//	return false;
-//}
-//
-//
-///**
-//	This method reads a line from a file. It does not return empty lines or ones that start with a pound key - those are assumed to be comments.
-//	This method returns true if a line is read, false otherwise (for instance the end of file is met).
-//*/
-//inline bool readValidLine(char* line, FILE* fp, int n){
-//	line[0] = '\0';
-//	while (!feof(fp)){
-//		fgets(line, n, fp);
-//		if ((int)strlen(line) > n-5)
-//			Logger::print("rearValidLine: Warning. The read file exceeds the buffer limits. The line was probably not read in its entirety.");
-//		char* tmp = trim(line);
-//		if (tmp[0]!='#' && tmp[0]!='\0')
-//			return true;
-//	}
-//
-//	return false;
-//}
-//
-//inline bool isWhiteSpace(char ch){
-//	return (ch==' ' || ch=='\t' || ch=='\n' || ch=='\r' || ch=='\0');
-//}
-//
-//
-///**
-//	This method returns a DynamicArray of char pointers that correspond to the addressed
-//	of the tokens that are separated by white space in the string that is passed in as a pointer.
-//*/
-//inline DynamicArray<char*> getTokens(char* input){
-//	DynamicArray<char*> result;
-//	input = lTrim(input);
-//	//read in the strings one by one - assume that each tokens are less than 100 chars in length
-//	while (input[0]!='\0'){
-//		result.push_back(input);
-//		char tempStr[100];
-//		sscanf(input, "%s", tempStr);
-//		input = lTrim(input + strlen(tempStr));
-//	}
-//	return result;
-//}
-//
-///**
-//	Checks extension (for loading files).
-//*/
-//bool StringExtensionHas(const char* _csName, const char* _ext);
-//
-///**
-//	Checks if pointer is null before deleting.
-//	Pass a reference to pointer (not a copy!)
-//*/
-//
-//template<class T>
-//void SafeDelete(T** _ppT)
-//{
-//	if (*_ppT)
-//	{
-//		delete *_ppT;
-//		*_ppT = NULL;
-//	}
-//		
-//}
-//
-//template<class T>
-//void SafeDeleteArray(T** _ppT)
-//{
-//	if (*_ppT)
-//	{
-//		delete[] *_ppT;
-//		*_ppT = NULL;
-//	}
-//}
-//
-//inline bool TestFileExists(const std::string& name) {
-//	std::ifstream f(name.c_str());
-//	return f.good();
-//}
-//
-//// *************************************************************************************************************************
-//std::istringstream readValidLineAsStream(std::ifstream& stream);
-//std::string readValidLine(std::ifstream& stream);
-//std::string boolToString(bool boolValue);
-//bool stringToBool(std::string boolString);
-//
+
+#include <fstream>
+#include <string>
+
+std::string readValidLine(std::ifstream& stream); 
+
+typedef struct key_word {
+	char keyWord[50];
+	int retVal;
+}KeyWord;
+
+/**
+This method returns a pointer to the first non-white space character location in the provided buffer
+*/
+inline char* lTrim(char* buffer) {
+	while (*buffer == ' ' || *buffer == '\t' || *buffer == '\n' || *buffer == '\r')
+		buffer++;
+	return buffer;
+}
+
+inline char* rTrim(char* buffer) {
+	int index = (int)strlen(buffer) - 1;
+	while (index >= 0) {
+		if (buffer[index] == ' ' || buffer[index] == '\t' || buffer[index] == '\n' || buffer[index] == '\r') {
+			buffer[index] = '\0';
+			index--;
+		}
+		else
+			break;
+	}
+	return buffer;
+}
+
+inline char* trim(char* buffer) {
+	return rTrim(lTrim(buffer));
+}
+
+inline bool isWhiteSpace(char ch) {
+	return (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\0');
+}
+
+/**
+	This method reads a line from a file. It does not return empty lines or ones that start with a pound key - those are assumed to be comments.
+	This method returns true if a line is read, false otherwise (for instance the end of file is met).
+**/
+inline bool readValidLine(char* line, int nChars, FILE* fp){
+	line[0] = '\0';
+	while (!feof(fp)){
+		fgets(line, nChars, fp);
+		if ((int)strlen(line)>=nChars)
+			throw("The input file contains a line that is longer than the buffer - not allowed");
+		char* tmp = trim(line);
+		if (tmp[0]!='#' && tmp[0]!='\0')
+			return true;
+	}
+
+	return false;
+}
+// given a list of keywords that map strings to integer values denoting keyword types, this method will determine the type of command that is passed in
+int getLineType(char* &line, KeyWord* keywords, int nKeywords) {
+	for (int i = 0; i < nKeywords; i++) {
+		if (strncmp(line, keywords[i].keyWord, strlen(keywords[i].keyWord)) == 0 && isWhiteSpace(line[strlen(keywords[i].keyWord)])) {
+			line += strlen(keywords[i].keyWord);
+			return keywords[i].retVal;
+		}
+	}
+	return -1;
+}
+
+enum RB_KEYWORDS {
+	RB_NOT_IMPORTANT = -1,
+	RB_RB,
+	RB_END_RB,
+	RB_NAME,
+	RB_MASS,
+	RB_MOI,
+	RB_POSITION,
+	RB_ORIENTATION,
+	RB_VELOCITY,
+	RB_ANGULAR_VELOCITY,
+	RB_FRICTION_COEFF,
+	RB_RESTITUTION_COEFF,
+	RB_IS_FROZEN,
+	RB_CDP,
+	RB_MESH_NAME,
+	RB_MATERIAL,
+	RB_MATERIAL_DEFINITION,
+	RB_COLOR,
+	RB_CHILD,
+	RB_PARENT,
+	RB_PPOS,
+	RB_CPOS,
+	RB_HINGE_JOINT,
+	RB_UNIVERSAL_JOINT,
+	RB_BALL_AND_SOCKET_JOINT,
+	RB_WELDED_JOINT,
+	RB_JOINT_LIMITS,
+	RB_JOINT_ROT_AXES,
+	RB_JOINT_CONTROL_MODE,
+	RB_JOINT_END,
+	RB_END_EFFECTOR,
+	RB_BODY_POINT_FEATURE,
+	RB_THICKNESSS,
+	RB_MOTOR_ID,
+	RB_FLIPMOTORAXISDIR,
+	RB_MESH_TRANSFORMATION,
+	RB_MAPPING_INFO,
+	RB_MESH_DESCRIPTION,
+	RB_DEFAULT_ANGLE,
+	RB_COMPLIANT_JOINT,
+	RB_COMPLIANT_JOINT_STIFFNESS
+};
+
+KeyWord RBkeywords[] = {
+	{ "RigidBody", RB_RB },
+	{ "/End", RB_END_RB },
+	{ "name", RB_NAME },
+	{ "mass", RB_MASS },
+	{ "moi", RB_MOI },
+	{ "position", RB_POSITION },
+	{ "orientation", RB_ORIENTATION },
+	{ "velocity", RB_VELOCITY },
+	{ "angularVelocity", RB_ANGULAR_VELOCITY },
+	{ "frictionCoefficient", RB_FRICTION_COEFF },
+	{ "restitutionCoefficient", RB_RESTITUTION_COEFF },
+	{ "frozen", RB_IS_FROZEN },
+	{ "CDP", RB_CDP },
+	{ "mesh", RB_MESH_NAME },
+	{ "material", RB_MATERIAL },
+	{ "defineMaterial", RB_MATERIAL_DEFINITION },
+	{ "colour", RB_COLOR },
+	{ "child", RB_CHILD },
+	{ "parent", RB_PARENT },
+	{ "jointPPos", RB_PPOS },
+	{ "jointCPos", RB_CPOS },
+	{ "hingeJoint", RB_HINGE_JOINT },
+	{ "universalJoint", RB_UNIVERSAL_JOINT },
+	{ "ballAndSocketJoint", RB_BALL_AND_SOCKET_JOINT },
+	{ "weldedJoint", RB_WELDED_JOINT },
+	{ "jointLimits", RB_JOINT_LIMITS },
+	{ "jointAxes", RB_JOINT_ROT_AXES },
+	{ "controlMode", RB_JOINT_CONTROL_MODE },
+	{ "/Joint", RB_JOINT_END },
+	{ "endEffector", RB_END_EFFECTOR },
+	{ "bodyPointFeature", RB_BODY_POINT_FEATURE },
+	{ "thickness", RB_THICKNESSS },
+	{ "motorID", RB_MOTOR_ID },
+	{ "flipMotorAxis", RB_FLIPMOTORAXISDIR },
+	{ "meshTransformation", RB_MESH_TRANSFORMATION },
+	{ "mappingInfo", RB_MAPPING_INFO },
+	{ "meshDescription", RB_MESH_DESCRIPTION },
+	{ "defaultAngle", RB_DEFAULT_ANGLE },
+	{ "compliantJoint",RB_COMPLIANT_JOINT },
+	{ "stiffness", RB_COMPLIANT_JOINT_STIFFNESS }
+};
+
+// given a list of keywords that map strings to integer values denoting keyword types, this method will determine the string corresponding to the token passed in
+char* getKeyword(int lineType, KeyWord* keywords, int nKeywords) {
+	for (int i = 0; i<nKeywords; i++) {
+		if (lineType == keywords[i].retVal)
+			return keywords[i].keyWord;
+	}
+	return NULL;
+}
+
+// determine the type of a line that was used in the input file for a rigid body
+int getRBLineType(char* &buffer) {
+	return getLineType(buffer, RBkeywords, sizeof(RBkeywords) / sizeof(RBkeywords[0]));
+}
+
+// returns the string associated with the given token
+char* getRBString(int token) {
+	return getKeyword(token, RBkeywords, sizeof(RBkeywords) / sizeof(RBkeywords[0]));
+}
