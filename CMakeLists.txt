@@ -12,5 +12,12 @@ find_package(LIBIGL REQUIRED QUIET)
 
 # Add your project files
 file(GLOB SRCFILES *.cpp)
+
+file(GLOB SRCFILES
+		${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
+	)
+
 add_executable(${PROJECT_NAME}_bin ${SRCFILES})
 target_link_libraries(${PROJECT_NAME}_bin igl::core igl::opengl_glfw)
