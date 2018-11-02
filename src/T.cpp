@@ -1,6 +1,7 @@
 
 #include "..\include\Utils.h"
 #include "..\include\T.h"
+#include "..\include\Quaternion.h"
 
 
 
@@ -39,11 +40,11 @@ void T::loadFromFile(FILE* fp) {
 		}
 		break;
 		case RB_MESH_TRANSFORMATION: {
-			/*Quaternion q;
+			Quaternion q;
 			V3D T;
 			sscanf(line, "%lf %lf %lf %lf %lf %lf %lf",
 			&q[0], &q[1], &q[2], &q[3], &T[0], &T[1], &T[2]);
-			meshTransformations.push_back(Transformation(q.getRotationMatrix(), T));*/
+			//meshTransformations.push_back(Transformation(q.getRotationMatrix(), T));
 			break;
 		}
 		case RB_MATERIAL:			
