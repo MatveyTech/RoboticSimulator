@@ -1,7 +1,6 @@
 #include <igl/opengl/glfw/Viewer.h>
 #include <igl/readOBJ.h>
 #include <igl/opengl/gl.h>
-#include "main.h"
 //#include <igl/opengl2/draw_mesh.h>
 
 using namespace Eigen;
