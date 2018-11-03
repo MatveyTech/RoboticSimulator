@@ -1,10 +1,9 @@
 
 #include "..\include\Utils.h"
 #include "..\include\T.h"
-#include "..\include\Quaternion.h"
+#include <Eigen/Dense>
 
-
-
+using namespace Eigen;
 
 T::T(void){
 
@@ -40,10 +39,15 @@ void T::loadFromFile(FILE* fp) {
 		}
 		break;
 		case RB_MESH_TRANSFORMATION: {
-			Quaternion q;
-			V3D T;
+			Eigen::Vector4d vec(1, 2, 3, 4);
+			double q1, q2, q3, q4;
 			sscanf(line, "%lf %lf %lf %lf %lf %lf %lf",
-			&q[0], &q[1], &q[2], &q[3], &T[0], &T[1], &T[2]);
+			&q1, &q2, &q3, &q4, &vec(0), &vec(1), &vec(2));
+			Quaterniond d(q1, q2, q3, q4);
+			d.normalize();
+			Matrix3d rot = d.toRotationMatrix();
+			
+			rot.block<1, 4>(0, 3) = vec;
 			//meshTransformations.push_back(Transformation(q.getRotationMatrix(), T));
 			break;
 		}
