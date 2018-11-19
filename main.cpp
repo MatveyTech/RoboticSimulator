@@ -89,6 +89,9 @@ void DrawFirst2Joints()
 	viewer.data_list[1].set_colors(color);
 	viewer.data_list[2].set_colors(color);
 	
+	const Eigen::MatrixXd P = (Eigen::MatrixXd(2, 3) <<
+		0,0,0).finished();
+	viewer.data().add_points(P, Eigen::RowVector3d(255, 0, 0));
 
 	viewer.launch();
 }
@@ -99,7 +102,7 @@ int main(int argc, char *argv[])
 	return 1;
 	Eigen::MatrixXd V;
 	Eigen::MatrixXi F;
-	igl::readOBJ("C:/Users/matvey/Documents/CS2/Graphics project/SCP/SCP/data/rbs/yumi/meshes/simplified/body.obj", V, F);
+	igl::readOBJ("C:/Users/matvey/Documents/CS2/Graphics project/SCP/SCP/data/rbs/yumi/meshes/simplified/link_1_r.obj", V, F);
 	//igl::readOBJ("C:/Users/matvey/Documents/CS2/Graphics project/SCP/SCP/data/rbs/yumi/meshes/simplified/link_1_r.obj", V, F);
 
 	igl::opengl::glfw::Viewer viewer;
