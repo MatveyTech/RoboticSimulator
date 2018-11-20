@@ -1,0 +1,130 @@
+IKSolver.h
++clean #include <MathLib/MathLib.h>
++#include <MathLib/P3D.h>
++#include <MathLib/V3D.h>
++#include <MathLib/MathLib.h>
++#include <MathLib/Trajectory.h>
++#include <ControlLib/Robot.h> 
++#include <ControlLib/GeneralizedCoordinatesRobotRepresentation.h>
+
++#include <ControlLib/IK_RobotStateRegularizer.h>
++#include <ControlLib/IK_Optimizer.h>
++#include <ControlLib/IK_Plan.h>
+
+IKSolver.cpp:
++#include "..\include\IK_Solver.h""
++//#include <ControlLib/BodyFrame.h>
++//#include <ControlLib/GenericLimb.h>
+
+Robot.h:
++#include <RBSimLib/RigidBody.h>
++#include <RBSimLib/Joint.h>
++#include <Utils/Utils.h>
++#include <ControlLib/BodyFrame.h>
+
+p3d.h:
++#include "Matrix.h"
+
+V3D.h:
++#include "MathLib.h"
++#include "Matrix.h"
++#include "AutoDiff.h"
+
+Trajectory.h:
++#include "Utils/Utils.h"
++#include <MathLib/V3D.h>
++#include "MathLib.h"
+
+GeneralizedCoordinatesRobotRepresentation.h:
++#include <ControlLib/Robot.h>
++#include <MathLib/Matrix.h>
+
+IK_RobotStateRegularizer.h:
++#include <OptimizationLib/ObjectiveFunction.h>
++#include <MathLib/Matrix.h>
++#include <ControlLib/IK_Plan.h>
+
+IK_Optimizer.h:
++#include <ControlLib/IK_EnergyFunction.h>
++#include <ControlLib/IK_Plan.h>
+
+IK_Plan.h
++#include <MathLib/MathLib.h>
++#include <MathLib/P3D.h>
++#include <MathLib/V3D.h>
++#include <MathLib/Trajectory.h>
++#include <ControlLib/Robot.h>
++#include <ControlLib/GeneralizedCoordinatesRobotRepresentation.h>
+
+BodyFrame.h:
++#include <RBSimLib/RigidBody.h>
+
+GenericLimb.h
++#include <MathLib/Quaternion.h>
++#include <MathLib/Trajectory.h>
++#include <RBSimLib/RigidBody.h>
++#include <RBSimLib/Joint.h>
++#include <ControlLib/BodyFrame.h>
+
+RigidBody.h
++#include <Utils/Utils.h>
++#include <RBSimLib/RBState.h>
++#include <RBSimLib/RBProperties.h>
++#include <GUILib/GLMesh.h> TRY no to use this
++#include <RBSimLib/CollisionDetectionPrimitive.h>
++#include <MathLib/Transformation.h>
+
+Joint.h
++#include <MathLib/V3D.h>
++#include <RBSimLib/RigidBody.h>
++#include <RBSimLib/RBUtils.h>
+
+Quaternion.h:
++#include "MathLib.h"
++#include "V3D.h"
++#include <Utils/Logger.h>
+
+Transformation.h
++#include "Quaternion.h"
++#include "P3D.h"
+
+RBState.h
++#include <MathLib/P3D.h>
++#include <MathLib/V3D.h>
++#include <MathLib/Quaternion.h>
+
+RBProperties.h:
++#include <MathLib/Matrix.h>
++#include <MathLib/P3D.h>
++#include <MathLib/V3D.h>
++#include <MathLib/MathLib.h>
++#include <MathLib/Transformation.h>
+
+GLMesh.h
++#include <MathLib/MathLib.h>
++#include <Utils/Utils.h>
++#include <MathLib/P3D.h>
++#include <MathLib/V3D.h>
++#include <MathLib/Ray.h>
++#include <MathLib/Quaternion.h>
++#include <MathLib/Transformation.h>
++#include <MathLib/boundingBox.h>
++#include "GLShaderMaterial.h"
+
+boundingBox.h
++#include "Ray.h"
++#include "P3D.h"
++#include "V3D.h"
+
+Ray.h
++#include "P3D.h"
++#include "V3D.h"
++#include "Plane.h"
+
+GLShaderMaterial.h
+#include "GLTexture.h"
+#include "GLShader.h"
+
+
+
+
