@@ -3,9 +3,9 @@
 
 #include <limits>
 
-#include "Utils/Utils.h"
-#include <MathLib/V3D.h>
-#include "MathLib.h"
+#include "../include/Utils.h"
+#include "../include/V3D.h"
+#include "../include/MathLib.h"
 
 /*==============================================================================================================================================*
 	This class is used to represent generic trajectories. The class parameter T can be anything that provides basic operation such as addition 
