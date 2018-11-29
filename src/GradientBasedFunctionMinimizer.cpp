@@ -1,4 +1,4 @@
-#include <OptimizationLib/GradientBasedFunctionMinimizer.h>
+#include "../include/GradientBasedFunctionMinimizer.h"
 
 #include <iostream>
 

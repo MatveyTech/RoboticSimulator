@@ -5,7 +5,7 @@
 #include <iostream>
 using namespace std;
 
-#include "../include/MathLib/boundingBox.h"
+#include "../include/boundingBox.h"
 //#include <GUILib/GLUtils.h>
 
 void AxisAlignedBoundingBox::addPoint(const P3D& p) {

@@ -1,16 +1,16 @@
 #pragma once
 
-#include <MathLib/MathLib.h>
-#include <MathLib/P3D.h>
-#include <MathLib/V3D.h>
-#include <MathLib/MathLib.h>
-#include <MathLib/Trajectory.h>
-#include <ControlLib/Robot.h>
-#include <ControlLib/GeneralizedCoordinatesRobotRepresentation.h>
+#include "../include/MathLib.h"
+#include "../include/P3D.h"
+#include "../include/V3D.h"
+#include "../include/MathLib.h"
+#include "../include/Trajectory.h"
+#include "../include/Robot.h"
+#include "../include/GeneralizedCoordinatesRobotRepresentation.h"
 #include <vector>
-#include <ControlLib/IK_RobotStateRegularizer.h>
-#include <ControlLib/IK_Optimizer.h>
-#include <ControlLib/IK_Plan.h>
+#include "../include/IK_RobotStateRegularizer.h"
+#include "../include/IK_Optimizer.h"
+#include "../include/IK_Plan.h"
 
 
 

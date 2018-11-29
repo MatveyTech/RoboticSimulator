@@ -1,6 +1,6 @@
-#include "../include/MathLib/P3D.h"
-#include "../include/MathLib/V3D.h"
-#include "../include/MathLib/MathLib.h"
+#include "../include/P3D.h"
+#include "../include/V3D.h"
+#include "../include/MathLib.h"
 
 P3D::P3D() {
 	at(0) = at(1) = at(2) = 0;

@@ -1,6 +1,6 @@
-#include <ControlLib/IK_Solver.h>
-#include <ControlLib/BodyFrame.h>
-#include <ControlLib/GenericLimb.h>
+#include "../include/IK_Solver.h"
+#include "../include/BodyFrame.h"
+#include "../include/GenericLimb.h"
 
 IK_Solver::IK_Solver(Robot* robot){
 	ikPlan = new IK_Plan(robot);

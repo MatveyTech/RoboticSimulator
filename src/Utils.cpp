@@ -1,4 +1,4 @@
-#include <Utils/Utils.h>
+#include "../include/Utils.h"
 
 //assume that the gravity is in the y-direction (this can easily be changed if need be), and this value gives its magnitude. 
 double Globals::g = -9.8;
