@@ -1,49 +1,49 @@
-#include "..\include\Utils.h"
+#include <Utils/Utils.h>
 
-KeyWord RBkeywords[] = {
-	{ "RigidBody", RB_RB },
-	{ "/End", RB_END_RB },
-	{ "name", RB_NAME },
-	{ "mass", RB_MASS },
-	{ "moi", RB_MOI },
-	{ "position", RB_POSITION },
-	{ "orientation", RB_ORIENTATION },
-	{ "velocity", RB_VELOCITY },
-	{ "angularVelocity", RB_ANGULAR_VELOCITY },
-	{ "frictionCoefficient", RB_FRICTION_COEFF },
-	{ "restitutionCoefficient", RB_RESTITUTION_COEFF },
-	{ "frozen", RB_IS_FROZEN },
-	{ "CDP", RB_CDP },
-	{ "mesh", RB_MESH_NAME },
-	{ "material", RB_MATERIAL },
-	{ "defineMaterial", RB_MATERIAL_DEFINITION },
-	{ "colour", RB_COLOR },
-	{ "child", RB_CHILD },
-	{ "parent", RB_PARENT },
-	{ "jointPPos", RB_PPOS },
-	{ "jointCPos", RB_CPOS },
-	{ "hingeJoint", RB_HINGE_JOINT },
-	{ "universalJoint", RB_UNIVERSAL_JOINT },
-	{ "ballAndSocketJoint", RB_BALL_AND_SOCKET_JOINT },
-	{ "weldedJoint", RB_WELDED_JOINT },
-	{ "jointLimits", RB_JOINT_LIMITS },
-	{ "jointAxes", RB_JOINT_ROT_AXES },
-	{ "controlMode", RB_JOINT_CONTROL_MODE },
-	{ "/Joint", RB_JOINT_END },
-	{ "endEffector", RB_END_EFFECTOR },
-	{ "bodyPointFeature", RB_BODY_POINT_FEATURE },
-	{ "thickness", RB_THICKNESSS },
-	{ "motorID", RB_MOTOR_ID },
-	{ "flipMotorAxis", RB_FLIPMOTORAXISDIR },
-	{ "meshTransformation", RB_MESH_TRANSFORMATION },
-	{ "mappingInfo", RB_MAPPING_INFO },
-	{ "meshDescription", RB_MESH_DESCRIPTION },
-	{ "defaultAngle", RB_DEFAULT_ANGLE },
-	{ "compliantJoint",RB_COMPLIANT_JOINT },
-	{ "stiffness", RB_COMPLIANT_JOINT_STIFFNESS }
-};
+//assume that the gravity is in the y-direction (this can easily be changed if need be), and this value gives its magnitude. 
+double Globals::g = -9.8;
+//this is the direction of the up-vector
+V3D Globals::worldUp = V3D(0, 1, 0);
+//and the ground plane
+Plane Globals::groundPlane = Plane(P3D(0,0,0), Globals::worldUp);
+//this is the total ellapsed sim time
+double Globals::currentSimulationTime = 0;
+
+// given a list of keywords that map strings to integer values denoting keyword types, this method will determine the type of command that is passed in
+int getLineType(char* &line, KeyWord* keywords, int nKeywords){
+	for (int i = 0;i < nKeywords;i++) {
+		if (strncmp(line, keywords[i].keyWord, strlen(keywords[i].keyWord)) == 0 && isWhiteSpace(line[strlen(keywords[i].keyWord)])) {
+			line += strlen(keywords[i].keyWord);
+			return keywords[i].retVal;
+		}
+	}
+	return -1;
+}
+
+// given a list of keywords that map strings to integer values denoting keyword types, this method will determine the string corresponding to the token passed in
+char* getKeyword(int lineType, KeyWord* keywords, int nKeywords) {
+	for (int i = 0;i<nKeywords;i++) {
+		if (lineType == keywords[i].retVal)
+			return keywords[i].keyWord;
+	}
+
+	return NULL;
+}
+
+bool StringExtensionHas(const char* _csName, const char* _ext)
+{
+	std::string fileName(_csName);
+	std::string fNameExt = fileName.substr(fileName.find_last_of('.') + 1);
+
+	return (fNameExt.compare(_ext) == 0);
+}
 
 
+// *************************************************************************************************************************
+/**
+*	Skip comment lines and empty lines
+*	Returns a string containing the line.
+*/
 std::string readValidLine(std::ifstream& stream) {
 	std::string line;
 	while (std::getline(stream, line) && (line[0] == '#' || line[0] == '\0')) {
@@ -51,31 +51,24 @@ std::string readValidLine(std::ifstream& stream) {
 	return line;
 }
 
-// given a list of keywords that map strings to integer values denoting keyword types, this method will determine the string corresponding to the token passed in
-char* getKeyword(int lineType, KeyWord* keywords, int nKeywords) {
-	for (int i = 0; i<nKeywords; i++) {
-		if (lineType == keywords[i].retVal)
-			return keywords[i].keyWord;
+/**
+*	Skip comment lines and empty lines
+*	Returns a string stream containing the line.
+*/
+std::istringstream readValidLineAsStream(std::ifstream& stream) {
+	return std::istringstream(readValidLine(stream));
+}
+
+std::string boolToString(bool boolValue) {
+	return (boolValue ? "True" : "False");
+}
+
+bool stringToBool(std::string boolString) {
+	if (boolString == "True") {
+		return true;
+	} else if (boolString == "False") {
+		return false;
+	} else {
+		throw("String does not represent a bool!!");
 	}
-	return NULL;
-}
-
-// determine the type of a line that was used in the input file for a rigid body
-int getRBLineType(char* &buffer) {
-	return getLineType(buffer, RBkeywords, sizeof(RBkeywords) / sizeof(RBkeywords[0]));
-}
-
-// returns the string associated with the given token
-char* getRBString(int token) {
-	return getKeyword(token, RBkeywords, sizeof(RBkeywords) / sizeof(RBkeywords[0]));
-}
-
-int getLineType(char* &line, KeyWord* keywords, int nKeywords) {
-	for (int i = 0; i < nKeywords; i++) {
-		if (strncmp(line, keywords[i].keyWord, strlen(keywords[i].keyWord)) == 0 && isWhiteSpace(line[strlen(keywords[i].keyWord)])) {
-			line += strlen(keywords[i].keyWord);
-			return keywords[i].retVal;
-		}
-	}
-	return -1;
 }

@@ -1,5 +1,5 @@
 
-#include "..\include\Utils.h"
+//#include "..\include\Utils_my.h"
 #include "..\include\T.h"
 #include <Eigen/Dense>
 
@@ -9,7 +9,7 @@ T::T(void){
 
 }
 
-void T::loadFromFile(FILE* fp) {
+/*void T::loadFromFile(FILE* fp) {
 	if (fp == NULL)
 		throw("Invalid file pointer.");
 
@@ -79,4 +79,4 @@ void T::loadFromFile(FILE* fp) {
 	throw("Incorrect articulated body input file! No /End found");
 	
 }
-
+*/
