@@ -5,7 +5,7 @@
 #include "../include/Utils.h"
 #include "../include/RigidBody.h"
 #include "../include/Joint.h"
-//#include "../include/ContactForce.h"
+#include "../include/ContactForce.h"
 #include "../include/Utils.h"
 
 /*--------------------------------------------------------------------------------------------------------------------------------------------*
@@ -20,7 +20,7 @@ public:
 	//and we'll keep a list of all the joints in the world as well - they impose constraints on the relative movement between the rigid bodies they connet
 	DynamicArray<Joint*> joints;
 	//this is a list of all the contact points - gets written from scratch whenever a new simulation step is taken
-	//DynamicArray<ContactForce> contactForces;
+	DynamicArray<ContactForce> contactForces;
 
 
 
@@ -97,6 +97,6 @@ public:
 	*/
 	virtual void applyTorqueTo(RigidBody* b, const V3D& t)=0;
 
-	//virtual DynamicArray<ContactForce> getContactForceOnRB(RigidBody* b)=0;
+	virtual DynamicArray<ContactForce> getContactForceOnRB(RigidBody* b)=0;
 };
 

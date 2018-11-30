@@ -37,7 +37,7 @@ void AbstractRBEngine::destroy() {
 	Marks if the RBs are in contact (inContact variable is set for each RB)
 */
 void AbstractRBEngine::markRBContacts(double fMagTreshold) {
-	for (uint i = 0; i < rbs.size(); i++)
+	/*for (uint i = 0; i < rbs.size(); i++)
 		rbs[i]->inContact = false;
 
 	for (uint i = 0; i < contactForces.size(); i++) {
@@ -45,7 +45,7 @@ void AbstractRBEngine::markRBContacts(double fMagTreshold) {
 			if (contactForces[i].rb1) contactForces[i].rb1->inContact = true;
 			if (contactForces[i].rb2) contactForces[i].rb2->inContact = true;
 		}
-	}
+	}*/
 }
 
 void AbstractRBEngine::drawContactForces(){
@@ -158,23 +158,24 @@ void AbstractRBEngine::loadRBsFromFile(const char* fName){
 				j->loadFromFile(f, this);
 				addJointToEngine(j);
 				break;
-			case RB_MATERIAL_DEFINITION: {
+			/*case RB_MATERIAL_DEFINITION: {
 					GLShaderMaterial* material = new GLShaderMaterial();
 					material->readFromFile(f);
 					GLContentManager::addShaderMaterial(material->getMaterialName().c_str(), material);
 				}
-				break;
+				break;*/
 			case RB_NOT_IMPORTANT:
 				if (strlen(line)!=0 && line[0] != '#')
 					Logger::consolePrint("Ignoring input line: \'%s\'\n", line);
 				break;
 
 			//NEW
-			case RB_COMPLIANT_JOINT:
+			/*case RB_COMPLIANT_JOINT:
 				j = new CompliantJoint();
 				j->loadFromFile(f, this);
 				addJointToEngine(j);
 				break;
+				*/
 			default:
 				throwError("Incorrect rigid body input file: \'%s\' - unexpected line.", buffer);
 		}

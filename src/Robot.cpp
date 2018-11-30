@@ -6,7 +6,6 @@
 #include "../include/HingeJoint.h"
 #include "../include/UniversalJoint.h"
 #include "../include/BallAndSocketJoint.h"
-#include "../include/AbstractRBEngine.h"
 
 /**
 	the constructor
@@ -220,55 +219,4 @@ RigidBody* Robot::getRBByName(const char* jName) {
 			return jointList[i]->child;
 	}
 	return NULL;
-}
-
-void Robot::addWheelsAsAuxiliaryRBs(AbstractRBEngine* rbEngine) {
-	for (int i = 0; i < getRigidBodyCount(); i++) {
-		RigidBody* rb = getRigidBody(i);
-		for (uint j = 0; j < rb->rbProperties.endEffectorPoints.size(); j++) {
-			RBEndEffector* ee = &(rb->rbProperties.endEffectorPoints[j]);
-			if (ee->isActiveWheel() || ee->isFreeToMoveWheel()) {
-				//must create a new joint and a new rigid body...
-				RigidBody* wheelRB = new RigidBody();
-				double radius = ee->featureSize;
-				V3D axis = ee->localCoordsWheelAxis;
-				double volume = 2 * PI * radius * radius * 0.01;
-				wheelRB->rbProperties.mass = volume * 500;
-				wheelRB->rbProperties.MOI_local.coeffRef(0, 0) = wheelRB->rbProperties.MOI_local.coeffRef(1, 1) = wheelRB->rbProperties.MOI_local.coeffRef(2, 2) = 2.0/5.0 * wheelRB->rbProperties.mass * radius * radius;
-				wheelRB->name = rb->name + "_wheel_" + std::to_string(j);
-//				wheelRB->cdps.push_back(new SphereCDP(P3D(), radius));
-				wheelRB->cdps.push_back(new CapsuleCDP(P3D() - axis * 0.003, P3D() + axis * 0.003, radius, true));
-
-				wheelRB->state.orientation = rb->state.orientation;
-
-				HingeJoint* newJoint = new HingeJoint();
-
-				newJoint->jIndex = auxiliaryJointList.size();
-
-				newJoint->rotationAxis = ee->localCoordsWheelAxis;
-				newJoint->child = wheelRB;
-				newJoint->cJPos = P3D();
-				newJoint->parent = rb;
-				newJoint->pJPos = ee->coords;
-				newJoint->child->pJoints.push_back(newJoint);
-				newJoint->parent->cJoints.push_back(newJoint);
-				newJoint->name = newJoint->child->name + "_" + newJoint->parent->name;
-
-				newJoint->fixJointConstraints(true, false, false, false);
-
-				if (ee->isActiveWheel())
-					newJoint->controlMode = VELOCITY_MODE;
-				else
-					newJoint->controlMode = PASSIVE;
-
-				rbEngine->addRigidBodyToEngine(wheelRB);
-				rbEngine->addJointToEngine(newJoint);
-
-				auxiliaryJointList.push_back(newJoint);
-				ee->wheelJoint = newJoint;
-				if (ee->meshIndex >= 0)
-					ee->initialMeshTransformation = rb->meshTransformations[ee->meshIndex];
-			}
-		}
-	}
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <RBSimLib/Joint.h>
+#include "../include/Joint.h"
 
 /*======================================================================================================================================*
  * This class implements a fixed joint type.                                                                                            *

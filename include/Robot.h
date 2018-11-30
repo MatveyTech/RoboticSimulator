@@ -221,8 +221,6 @@ public:
 		return mass;
 	}
 
-	virtual void addWheelsAsAuxiliaryRBs(AbstractRBEngine* rbEngine);
-
 };
 
 class JointState {

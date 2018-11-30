@@ -1,6 +1,10 @@
 #include <igl/opengl/glfw/Viewer.h>
 #include <igl/readOBJ.h>
 #include <igl/opengl/gl.h>
+//#include "include/AbstractRBEngine.h"
+//#include "include/ODERBEngine.h"
+#include <memory>
+
 
 using namespace Eigen;
 using namespace std;
@@ -98,6 +102,15 @@ void DrawFirst2Joints()
 
 int main(int argc, char *argv[])
 {
+	/*AbstractRBEngine* rbEngine = new ODERBEngine();
+	rbEngine->loadRBsFromFile(fName);
+	robot = new Robot(rbEngine->rbs[0]);
+	startState = RobotState(robot);
+	setupSimpleRobotStructure(robot);
+
+	delete ikSolver;
+	ikSolver = new IK_Solver(robot, true);*/
+
 	DrawFirst2Joints();
 	return 1;
 	Eigen::MatrixXd V;
