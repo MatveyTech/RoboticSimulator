@@ -36,7 +36,7 @@ private:
 	dVector q, qDot;
 
 	//store the (world) orientation for each q, for much quicker processing...
-	DynamicArray<Quaternion> worldRotations;
+	DynamicArray<QuaternionR> worldRotations;
 
 public:
 
@@ -51,7 +51,7 @@ public:
 
 	//updates the world-coords rotation axes. This method should be called whenever the state of the robot changes.
 	void updateWorldOrientations();
-	Quaternion getWorldRotationForQ(int qIndex);
+	QuaternionR getWorldRotationForQ(int qIndex);
 	V3D getWorldCoordsAxisForQ(int qIndex);
 
 	//returns the local position of the point that rb pivots about (i.e. location of the parent joint), in coordinate frame of rb
@@ -173,7 +173,7 @@ public:
 	V3D getAngularVelocityFor(RigidBody* rb);
 
 	//returns the world-relative orientation for rb
-	Quaternion getOrientationFor(RigidBody* rb);
+	QuaternionR getOrientationFor(RigidBody* rb);
 
 	//computes the jacobian dp/dq that tells you how the world coordinates of p change with q. p is expressed in the local coordinates of rb
 	void compute_dpdq(const P3D& p, RigidBody* rb, MatrixNxM &dpdq);
@@ -332,8 +332,8 @@ inline void testGeneralizedCoordinateRepresentation(Robot* robot) {
 		if ((wv1 - wv2).length() > TINY)
 			Logger::consolePrint("TESTING GENERALIZED COORDINATES: angular velocities of rigid body do not match up... error: %2.20lf\n", (wv1 - wv2).length());
 
-		Quaternion q1 = robot->getJoint(i)->child->getOrientation();
-		Quaternion q2 = gcrrNew.getOrientationFor(robot->getJoint(i)->child);
+		QuaternionR q1 = robot->getJoint(i)->child->getOrientation();
+		QuaternionR q2 = gcrrNew.getOrientationFor(robot->getJoint(i)->child);
 		if (q1 != q2 && q1 != (q2 * -1)) {
 			Logger::consolePrint("TESTING GENERALIZED COORDINATES: orientations of rigid body do not match up... error: %lf %lf\n", q1.s, q2.s);
 		}

@@ -29,7 +29,7 @@ public:
 	//keep track of the estimated state of the body frame
 	RBState bodyState;
 	//and its heading, which transforms vectors from a coordinate frame aligned with the heading of the body to world
-	Quaternion bodyHeading;
+	QuaternionR bodyHeading;
 
 	//and the estimated moment of inertia (in world frame) for the body
 	Matrix3x3 bodyMomentOfInertia, bodyMomentOfInertia_local;

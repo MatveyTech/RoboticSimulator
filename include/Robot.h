@@ -73,7 +73,7 @@ public:
 	/**
 		This method is used to populate the relative orientation of the parent and child bodies of joint i.
 	*/
-	Quaternion getRelativeOrientationForJoint(Joint* joint) {
+	QuaternionR getRelativeOrientationForJoint(Joint* joint) {
 		return joint->computeRelativeOrientation();
 	}
 
@@ -86,7 +86,7 @@ public:
 		return joint->parent->getLocalCoordinates(joint->child->state.angularVelocity - joint->parent->state.angularVelocity);
 	}
 
-	void setRelativeOrientationForJoint(Joint* joint, const Quaternion& qRel) {
+	void setRelativeOrientationForJoint(Joint* joint, const QuaternionR& qRel) {
 		joint->child->state.orientation = joint->parent->state.orientation * qRel;
 	}
 
@@ -159,7 +159,7 @@ public:
 	/**
 		this method is used to return the current heading of the robot
 	*/
-	inline Quaternion getHeading(){
+	inline QuaternionR getHeading(){
 		return computeHeading(root->state.orientation, Globals::worldUp);
 	}
 
@@ -225,13 +225,13 @@ public:
 
 class JointState {
 public:
-	Quaternion qRel;
+	QuaternionR qRel;
 	V3D angVelRel;
 };
 
 class RobotState{
 private:
-	Quaternion rootQ;
+	QuaternionR rootQ;
 	P3D rootPos;
 	V3D rootVel;
 	V3D rootAngVel;
@@ -297,11 +297,11 @@ public:
 		rootPos = p;
 	}
 
-	Quaternion getOrientation() const{
+	QuaternionR getOrientation() const{
 		return rootQ;
 	}
 
-	void setOrientation(Quaternion q){
+	void setOrientation(QuaternionR q){
 		rootQ = q;
 	}
 
@@ -321,11 +321,11 @@ public:
 		rootAngVel = v;
 	}
 	
-	Quaternion getJointRelativeOrientation(int jIndex) const{
+	QuaternionR getJointRelativeOrientation(int jIndex) const{
 		if ((uint)jIndex < joints.size())
 			return joints[jIndex].qRel;
 	//	exit(0);
-		return Quaternion();
+		return QuaternionR();
 	}
 
 	V3D getJointRelativeAngVelocity(int jIndex) const {
@@ -335,7 +335,7 @@ public:
 		return V3D();
 	}
 
-	void setJointRelativeOrientation(Quaternion q, int jIndex){
+	void setJointRelativeOrientation(QuaternionR q, int jIndex){
 		if ((uint)jIndex < joints.size())
 			joints[jIndex].qRel = q;
 	//	else
@@ -350,11 +350,11 @@ public:
 	//		exit(0);
 	}
 
-	Quaternion getAuxiliaryJointRelativeOrientation(int jIndex) const {
+	QuaternionR getAuxiliaryJointRelativeOrientation(int jIndex) const {
 		if ((uint)jIndex < auxiliaryJoints.size())
 			return auxiliaryJoints[jIndex].qRel;
 	//	exit(0);
-		return Quaternion();
+		return QuaternionR();
 	}
 
 	V3D getAuxiliaryJointRelativeAngVelocity(int jIndex) const {
@@ -364,7 +364,7 @@ public:
 		return V3D();
 	}
 
-	void setAuxiliaryJointRelativeOrientation(Quaternion q, int jIndex) {
+	void setAuxiliaryJointRelativeOrientation(QuaternionR q, int jIndex) {
 		if ((uint)jIndex < auxiliaryJoints.size())
 			auxiliaryJoints[jIndex].qRel = q;
 	//	else
@@ -389,7 +389,7 @@ public:
 			throwError("cannot open the file \'%s\' for reading...", fName);
 
 		V3D velocity = getVelocity();
-		Quaternion orientation = getOrientation();
+		QuaternionR orientation = getOrientation();
 		V3D angVelocity = getAngularVelocity();
 		P3D position = getPosition();
 
@@ -459,7 +459,7 @@ public:
 		setPosition(P3D(temp1, temp2, temp3));
 		readValidLine(line, 100, fp);
 		sscanf(line, "%lf %lf %lf %lf", &temp1, &temp2, &temp3, &temp4);
-		setOrientation(Quaternion(temp1, temp2, temp3, temp4).toUnit());
+		setOrientation(QuaternionR(temp1, temp2, temp3, temp4).toUnit());
 		readValidLine(line, 100, fp);
 		sscanf(line, "%lf %lf %lf", &temp1, &temp2, &temp3);
 		setVelocity(V3D(temp1, temp2, temp3));
@@ -476,7 +476,7 @@ public:
 		for (int i = 0; i<jCount; i++) {
 			readValidLine(line, 100, fp);
 			sscanf(line, "%lf %lf %lf %lf", &temp1, &temp2, &temp3, &temp4);
-			setJointRelativeOrientation(Quaternion(temp1, temp2, temp3, temp4).toUnit(), i);
+			setJointRelativeOrientation(QuaternionR(temp1, temp2, temp3, temp4).toUnit(), i);
 			readValidLine(line, 100, fp);
 			sscanf(line, "%lf %lf %lf", &temp1, &temp2, &temp3);
 			setJointRelativeAngVelocity(V3D(temp1, temp2, temp3), i);
@@ -491,7 +491,7 @@ public:
 		for (int i = 0; i<auxJCount; i++) {
 			readValidLine(line, 100, fp);
 			sscanf(line, "%lf %lf %lf %lf", &temp1, &temp2, &temp3, &temp4);
-			setAuxiliaryJointRelativeOrientation(Quaternion(temp1, temp2, temp3, temp4).toUnit(), i);
+			setAuxiliaryJointRelativeOrientation(QuaternionR(temp1, temp2, temp3, temp4).toUnit(), i);
 			readValidLine(line, 100, fp);
 			sscanf(line, "%lf %lf %lf", &temp1, &temp2, &temp3);
 			setAuxiliaryJointRelativeAngVelocity(V3D(temp1, temp2, temp3), i);
@@ -506,7 +506,7 @@ public:
 	//setting the heading...
 	void setHeading(double heading) {
 		//this means we must rotate the angular and linear velocities of the COM, and augment the orientation
-		Quaternion oldHeading, newHeading, qRoot;
+		QuaternionR oldHeading, newHeading, qRoot;
 		//get the current root orientation, that contains information regarding the current heading
 		qRoot = getOrientation();
 		//get the twist about the vertical axis...
@@ -538,8 +538,8 @@ public:
 			return false;
 		}
 
-		Quaternion q1 = getOrientation();
-		Quaternion q2 = other.getOrientation();
+		QuaternionR q1 = getOrientation();
+		QuaternionR q2 = other.getOrientation();
 
 		if (q1 != q2 && q1 != (q2 * -1)) {
 //			Logger::consolePrint("orientation: %lf %lf %lf %lf vs %lf %lf %lf %lf\n", q1.s, q1.v.x(), q1.v.y(), q1.v.z(), q2.s, q2.v.x(), q2.v.y(), q2.v.z());
@@ -570,8 +570,8 @@ public:
 				return false;
 			}
 
-			Quaternion q1 = getJointRelativeOrientation(i);
-			Quaternion q2 = other.getJointRelativeOrientation(i);
+			QuaternionR q1 = getJointRelativeOrientation(i);
+			QuaternionR q2 = other.getJointRelativeOrientation(i);
 
 			if (q1 != q2 && q1 != (q2 * -1)) {
 //				Logger::consolePrint("joint %d orientation: %lf %lf %lf %lf vs %lf %lf %lf %lf\n", i, q1.s, q1.v.x(), q1.v.y(), q1.v.z(), q2.s, q2.v.x(), q2.v.y(), q2.v.z());

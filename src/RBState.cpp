@@ -6,7 +6,7 @@
 RBState::RBState(void){
 	//guess some default values if this constructor is used...
 	this->position = P3D(0,0,0);
-	this->orientation = Quaternion(1,V3D(0,0,0));
+	this->orientation = QuaternionR(1,V3D(0,0,0));
 	this->velocity = V3D(0,0,0);
 	this->angularVelocity = V3D(0,0,0);
 }

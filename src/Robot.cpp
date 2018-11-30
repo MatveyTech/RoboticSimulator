@@ -76,7 +76,7 @@ void Robot::populateState(RobotState* state, bool useDefaultAngles) {
 			state->setJointRelativeAngVelocity(getRelativeLocalCoordsAngularVelocityForJoint(jointList[i]), i);
 		}
 		else {
-			state->setJointRelativeOrientation(Quaternion(), i);
+			state->setJointRelativeOrientation(QuaternionR(), i);
 			state->setJointRelativeAngVelocity(V3D(), i);
 			HingeJoint* hj = dynamic_cast<HingeJoint*>(jointList[i]);
 			if (hj)
@@ -90,7 +90,7 @@ void Robot::populateState(RobotState* state, bool useDefaultAngles) {
 			state->setAuxiliaryJointRelativeAngVelocity(getRelativeLocalCoordsAngularVelocityForJoint(auxiliaryJointList[i]), i);
 		}
 		else {
-			state->setAuxiliaryJointRelativeOrientation(Quaternion(), i);
+			state->setAuxiliaryJointRelativeOrientation(QuaternionR(), i);
 			state->setAuxiliaryJointRelativeAngVelocity(V3D(), i);
 		}
 	}

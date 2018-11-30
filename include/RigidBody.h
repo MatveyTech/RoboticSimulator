@@ -146,7 +146,7 @@ public:
 	/**
 		This method returns the rigid body's orientation
 	*/
-	inline Quaternion getOrientation() {
+	inline QuaternionR getOrientation() {
 		return state.orientation;
 	}
 
@@ -207,7 +207,7 @@ public:
 	Matrix3x3 getWorldMOI();
 
 	// returns the world coords moment of inertia of the rigid body
-	Matrix3x3 getWorldMOI(const Quaternion& orientation);
+	Matrix3x3 getWorldMOI(const QuaternionR& orientation);
 
 	/**
 		This method loads all the pertinent information regarding the rigid body from a file.

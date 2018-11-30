@@ -2,49 +2,49 @@
 #include "../include/Utils.h"
 
 //	A constructor. Intuitive...
-Quaternion::Quaternion(double s, const V3D& v) {
+QuaternionR::QuaternionR(double s, const V3D& v) {
 	this->s = s;
 	this->v = v;
 }
 
 // A copy constructor
-Quaternion::Quaternion(const Quaternion& other) {
+QuaternionR::QuaternionR(const QuaternionR& other) {
 	this->s = other.s;
 	this->v = other.v;
 }
 
 // Default constructor - no rotation
-Quaternion::Quaternion() {
+QuaternionR::QuaternionR() {
 	this->s = 1;
 	this->v = V3D(0, 0, 0);
 }
 
 // Another constructor.
-Quaternion::Quaternion(double w, double x, double y, double z) {
+QuaternionR::QuaternionR(double w, double x, double y, double z) {
 	this->s = w;
 	this->v = V3D(x, y, z);
 }
 
 // destructor.
-Quaternion::~Quaternion(void) {
+QuaternionR::~QuaternionR(void) {
 }
 
 // A copy operator
-Quaternion& Quaternion::operator = (const Quaternion &rhs) {
+QuaternionR& QuaternionR::operator = (const QuaternionR &rhs) {
 	this->s = rhs.s;
 	this->v = rhs.v;
 	return *this;
 }
 
 // returns the result of multiplying the current quaternion by rhs
-Quaternion Quaternion::operator * (const Quaternion &rhs) const{
-	Quaternion q = *this;
+QuaternionR QuaternionR::operator * (const QuaternionR &rhs) const{
+	QuaternionR q = *this;
 	q *= rhs;
 	return q;
 }
 
 // multiply the current quaternion by the rhs one.
-Quaternion& Quaternion::operator *= (const Quaternion &rhs) {
+QuaternionR& QuaternionR::operator *= (const QuaternionR &rhs) {
 	double newS = this->s * rhs.s - this->v.dot(rhs.v);
 	V3D newV = rhs.v * this->s + this->v * rhs.s + this->v.cross(rhs.v);
 	this->s = newS;
@@ -53,35 +53,35 @@ Quaternion& Quaternion::operator *= (const Quaternion &rhs) {
 }
 
 // multiplies the quaternion by a scalar
-Quaternion& Quaternion::operator *= (double scalar) {
+QuaternionR& QuaternionR::operator *= (double scalar) {
 	this->s *= scalar;
 	this->v *= scalar;
 	return *this;
 }
 
 // divides the quaternion by a scalar
-Quaternion& Quaternion::operator /= (double scalar) {
+QuaternionR& QuaternionR::operator /= (double scalar) {
 	this->s /= scalar;
 	this->v /= scalar;
 	return *this;
 }
 
 // return a copy of the quaternion, multiplied by a scalar
-Quaternion Quaternion::operator * (double scalar) const {
-	return Quaternion(s * scalar, v * scalar);
+QuaternionR QuaternionR::operator * (double scalar) const {
+	return QuaternionR(s * scalar, v * scalar);
 }
 
 // returns the result of dividing the current quaternion by rhs
-Quaternion Quaternion::operator / (double scalar) const {
-	return Quaternion(s / scalar, v * scalar);
+QuaternionR QuaternionR::operator / (double scalar) const {
+	return QuaternionR(s / scalar, v * scalar);
 }
 
 // returns sum of *this and rhs
-Quaternion Quaternion::operator + (const Quaternion &rhs) const {
-	return Quaternion(s + rhs.s, v + rhs.v);
+QuaternionR QuaternionR::operator + (const QuaternionR &rhs) const {
+	return QuaternionR(s + rhs.s, v + rhs.v);
 }
 
-double& Quaternion::operator[](const int _id)
+double& QuaternionR::operator[](const int _id)
 {
 	assert(_id >= 0 && _id <= 3);
 	if (_id == 0)
@@ -90,7 +90,7 @@ double& Quaternion::operator[](const int _id)
 		return v[_id - 1];
 }
 
-bool Quaternion::operator==(const Quaternion& _q)
+bool QuaternionR::operator==(const QuaternionR& _q)
 {
 	bool bAns = true;
 	bAns &= abs(_q.s - s)<TINY;
@@ -98,31 +98,31 @@ bool Quaternion::operator==(const Quaternion& _q)
 	return bAns;
 }
 
-bool Quaternion::operator!=(const Quaternion& _q)
+bool QuaternionR::operator!=(const QuaternionR& _q)
 {
 	return !(*this == _q);
 }
 
 // adds rhs to this quaternion
-Quaternion& Quaternion::operator += (const Quaternion &rhs) {
+QuaternionR& QuaternionR::operator += (const QuaternionR &rhs) {
 	this->s += rhs.s;
 	this->v += rhs.v;
 	return *this;
 }
 
 // rotates vector v by this quaternion
-V3D Quaternion::operator * (const V3D &v) const {
+V3D QuaternionR::operator * (const V3D &v) const {
 	return rotate(v);
 }
 
 // normalize the quaternion
-Quaternion& Quaternion::toUnit() {
+QuaternionR& QuaternionR::toUnit() {
 	*this /= this->length();
 	return *this;
 }
 
 // returns the rotation angle represented by this quaternion - in the range -pi to pi. Since q and -q are the same rotation, we need to know which side is "up" explicitly
-double Quaternion::getRotationAngle(const V3D& positiveRotAxis) {
+double QuaternionR::getRotationAngle(const V3D& positiveRotAxis) {
 	int sinSign = SGN(positiveRotAxis.dot(v));
 	double result = 2 * safeACOS(s);
 	if (sinSign < 0)
@@ -133,49 +133,49 @@ double Quaternion::getRotationAngle(const V3D& positiveRotAxis) {
 }
 
 // Returns the complex conjugate of the current quaternion.
-Quaternion Quaternion::getComplexConjugate() const {
-	return Quaternion(s, -v);
+QuaternionR QuaternionR::getComplexConjugate() const {
+	return QuaternionR(s, -v);
 }
 
 //	Returns the inverse of the current quaternion: q * q^-1 = identity quaternion: s = 1, v = (0,0,0)
-Quaternion Quaternion::getInverse() const {
+QuaternionR QuaternionR::getInverse() const {
 	return this->getComplexConjugate() / length2();
 }
 
 //	Returns the length of this quaternion.
-double Quaternion::length() const {
+double QuaternionR::length() const {
 	return sqrt(s*s + v.dot(v));
 }
 
-double Quaternion::length2() const {
+double QuaternionR::length2() const {
 	return s*s + v.dot(v);
 }
 
 // Computes the dot product between the current quaternion and the one given as parameter.
-double Quaternion::dot(const Quaternion &other) const {
+double QuaternionR::dot(const QuaternionR &other) const {
 	return (this->s * other.s + this->v.dot(other.v));
 }
 
 // linear interpolation (don't do it!). If t = 0, the result is *this. If t = 1, result is other.
-Quaternion Quaternion::linearlyInterpolateWith(const Quaternion &other, double t) const {
+QuaternionR QuaternionR::linearlyInterpolateWith(const QuaternionR &other, double t) const {
 	if (t<0) t = 0;
 	if (t>1) t = 1;
-	Quaternion result = (*this)*(1 - t) + other*t;
+	QuaternionR result = (*this)*(1 - t) + other*t;
 	return result * (1 / result.length());
 }
 
 // SLERP (spherical linear interpolation). If t = 0, the result is *this. If t = 1, result is other.
-Quaternion Quaternion::sphericallyInterpolateWith(const Quaternion &other, double t) const {
-	Quaternion result;
+QuaternionR QuaternionR::sphericallyInterpolateWith(const QuaternionR &other, double t) const {
+	QuaternionR result;
 	sphericallyInterpolateWith(other, t, result);
 	return result;
 }
 
 // SLERP (spherical linear interpolation). If t = 0, the result is *this. If t = 1, result is other.
-void Quaternion::sphericallyInterpolateWith(const Quaternion &other, double t, Quaternion &result) const {
+void QuaternionR::sphericallyInterpolateWith(const QuaternionR &other, double t, QuaternionR &result) const {
 	//make sure that we return the same value if either of the quaternions involved is q or -q 
 	if (this->dot(other) < 0) {
-		Quaternion temp;
+		QuaternionR temp;
 		temp.s = -other.s;
 		temp.v = -other.v;
 		this->sphericallyInterpolateWith(temp, t, result);
@@ -200,21 +200,21 @@ void Quaternion::sphericallyInterpolateWith(const Quaternion &other, double t, Q
 }
 
 // return a rotated version of u
-V3D Quaternion::rotate(const V3D& u) const {
+V3D QuaternionR::rotate(const V3D& u) const {
 	V3D res;
 	rotate(u, &res);
 	return res;
 }
 
 // rotate u by the inverse of the quaternion
-V3D Quaternion::inverseRotate(const V3D& u) const {
+V3D QuaternionR::inverseRotate(const V3D& u) const {
 	V3D res;
 	inverseRotate(u, &res);
 	return res;
 }
 
 // target will be set to u rotated by this quaternion. 'target' cannot point at u
-void Quaternion::rotate(const V3D& u, V3D* target) const {
+void QuaternionR::rotate(const V3D& u, V3D* target) const {
 	//uRot = q * (0, u) * q' = (s, v) * (0, u) * (s, -v)
 	//working it out we get:
 	V3D t = v.cross(u) + u * s;
@@ -222,7 +222,7 @@ void Quaternion::rotate(const V3D& u, V3D* target) const {
 }
 
 // target will be set to u rotated by this quaternion. 'target' cannot point at u
-void Quaternion::inverseRotate(const V3D& u, V3D *target) const {
+void QuaternionR::inverseRotate(const V3D& u, V3D *target) const {
 	//uRot = q * (0, u) * q' = (s, -v) * (0, u) * (s, v)
 	//working it out we get:
 	V3D t = u.cross(v) + u * s;
@@ -230,7 +230,7 @@ void Quaternion::inverseRotate(const V3D& u, V3D *target) const {
 }
 
 // This method returns the quaternion in axis-angle representation.
-void Quaternion::getAxisAngle(V3D &axis, double &angle) const {
+void QuaternionR::getAxisAngle(V3D &axis, double &angle) const {
 	if (fabs(fabs(s) - 1.0) < TINY){
 		angle = 0.0;
 		axis = V3D(1,0,0);
@@ -243,13 +243,13 @@ void Quaternion::getAxisAngle(V3D &axis, double &angle) const {
 }
 
 // sets value of rotation quaternion from arguments
-void Quaternion::setRotationFrom(double angle, const V3D& axis) {
+void QuaternionR::setRotationFrom(double angle, const V3D& axis) {
 	s = cos(angle / 2.0);
 	v = axis * sin(angle / 2.0);
 }
 
 // sets value of rotation quaternion from arguments - the magnitude of the vector encodes the rotation angle
-void Quaternion::setRotationFrom(const V3D& vec) {
+void QuaternionR::setRotationFrom(const V3D& vec) {
 	double len = vec.length();
 	if (IS_ZERO(len)) {
 		s = 1;
@@ -259,28 +259,28 @@ void Quaternion::setRotationFrom(const V3D& vec) {
 		setRotationFrom(len, vec / len);
 }
 
-Quaternion Quaternion::partial(double _dt) const
+QuaternionR QuaternionR::partial(double _dt) const
 {
 	return SetRotationFrom(logMap()*_dt, v.normalized());
 }
 
-const Quaternion Quaternion::SetRotationFrom(const double _a, const V3D& _axis)
+const QuaternionR QuaternionR::SetRotationFrom(const double _a, const V3D& _axis)
 {
-	Quaternion q;
+	QuaternionR q;
 	q.setRotationFrom(_a, _axis);
 	return q;
 }
 
-const Quaternion Quaternion::SetRotationFrom(const V3D& _axis)
+const QuaternionR QuaternionR::SetRotationFrom(const V3D& _axis)
 {
-	Quaternion q;
+	QuaternionR q;
 	q.setRotationFrom(_axis);
 	return q;
 }
 
 // sets value of rotation quaternion from coordinate frame passed in as arguments. The vectors passed in are the x, y and z axis of a local 
 //coordinate frame expressed in the global coordinate frame. The resulting quaternion will convert vectors from the local frame to the global frame
-void Quaternion::setRotationFrom(const V3D& xRot, const V3D& yRot, const V3D& zRot) {
+void QuaternionR::setRotationFrom(const V3D& xRot, const V3D& yRot, const V3D& zRot) {
 	assert(IS_ZERO(xRot.length()-1) && IS_ZERO(yRot.length()-1) && IS_ZERO(zRot.length()-1) && IS_ZERO(xRot.dot(yRot)) && IS_ZERO(yRot.dot(zRot)) && IS_ZERO(zRot.dot(xRot)));
 
 	double mat[9] = {xRot[0], yRot[0], zRot[0], 
@@ -325,7 +325,7 @@ void Quaternion::setRotationFrom(const V3D& xRot, const V3D& yRot, const V3D& zR
 }
 
 //sets the 3x3 top-left corner of a matrix with a rotation cooresponding to this quaternion
-Matrix3x3 Quaternion::getRotationMatrix() const{
+Matrix3x3 QuaternionR::getRotationMatrix() const{
 	double w = s, x = v[0], y = v[1], z = v[2];
 
 	Matrix3x3 res;
@@ -335,7 +335,7 @@ Matrix3x3 Quaternion::getRotationMatrix() const{
 	return res;
 }
 
-Vector3d Quaternion::toAxisAngle() const
+Vector3d QuaternionR::toAxisAngle() const
 {
 	double l = v.length();
 	if (IS_ZERO(l))
@@ -345,7 +345,7 @@ Vector3d Quaternion::toAxisAngle() const
 }
 
 //sets value of rotation quaternion from the matrix that is passed in as a parameter
-void Quaternion::setRotationFrom(const Matrix3x3& mat){
+void QuaternionR::setRotationFrom(const Matrix3x3& mat){
 	double tr = mat(0, 0) + mat(1, 1) + mat(2, 2);
 
 	if (tr > 0) {
@@ -380,13 +380,13 @@ void Quaternion::setRotationFrom(const Matrix3x3& mat){
 	toUnit();
 }
 
-Quaternion getRotationAxisThatAlignsVectors(const V3D& a, const V3D& b) {
+QuaternionR getRotationAxisThatAlignsVectors(const V3D& a, const V3D& b) {
 	V3D aUnit = a.unit();
 	V3D bUnit = b.unit();
 	//we first need a rotation that gets dir to be aligned with the y-axis...
 	V3D rotAxis = aUnit.cross(bUnit);
 	if (IS_ZERO(rotAxis.length()))
-		return Quaternion();
+		return QuaternionR();
 	rotAxis.toUnit();
 	double rotAngle = a.angleWith(b, rotAxis);
 	return getRotationQuaternion(rotAngle, rotAxis);

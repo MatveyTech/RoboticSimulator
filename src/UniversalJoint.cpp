@@ -16,7 +16,7 @@ UniversalJoint::~UniversalJoint(void){
 void UniversalJoint::fixOrientationConstraint() {
 	double rotAngleParent = 0, rotAngleChild = 0;
 	//qRel is the orientation from child frame to parent frame
-	Quaternion qRel = computeRelativeOrientation();
+	QuaternionR qRel = computeRelativeOrientation();
 	computeEulerAnglesFromQuaternion(qRel, rotAxisChild, rotAxisParent, rotAngleChild, rotAngleParent);
 	child->state.orientation = parent->state.orientation * getRotationQuaternion(rotAngleParent, rotAxisParent) * getRotationQuaternion(rotAngleChild, rotAxisChild);
 }

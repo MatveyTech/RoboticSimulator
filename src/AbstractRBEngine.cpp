@@ -126,8 +126,9 @@ void AbstractRBEngine::loadRBsFromFile(const char* fName){
 	while (!feof(f)){
 		//get a line from the file...
 		readValidLine(buffer, f, 200);
-		if (strlen(buffer)>195)
+		if (strlen(buffer) > 195)
 			throwError("The input file contains a line that is longer than ~200 characters - not allowed");
+			
 		char *line = lTrim(buffer);
 		if (strlen(line) == 0) continue;
 		int lineType = getRBLineType(line);
@@ -177,7 +178,8 @@ void AbstractRBEngine::loadRBsFromFile(const char* fName){
 				break;
 				*/
 			default:
-				throwError("Incorrect rigid body input file: \'%s\' - unexpected line.", buffer);
+				//throwError("Incorrect rigid body input file: \'%s\' - unexpected line.", buffer);
+				Logger::print("Do nothing with line: %s\n", buffer);
 		}
 	}
 
@@ -226,7 +228,7 @@ void AbstractRBEngine::setState(DynamicArray<double>* state, int start){
 	for (uint j=0;j<this->rbs.size();j++){
 		rbs[j]->state.position = P3D((*state)[i+0], (*state)[i+1], (*state)[i+2]);
 		i+=3;
-		rbs[j]->state.orientation = Quaternion((*state)[i+0], (*state)[i+1], (*state)[i+2], (*state)[i+3]);
+		rbs[j]->state.orientation = QuaternionR((*state)[i+0], (*state)[i+1], (*state)[i+2], (*state)[i+3]);
 		i+=4;
 		rbs[j]->state.velocity = V3D((*state)[i+0], (*state)[i+1], (*state)[i+2]);
 		i+=3;

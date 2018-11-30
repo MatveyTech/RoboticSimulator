@@ -1,5 +1,5 @@
 #include "../include/Joint.h"
-//#include "../include/AbstractRBEngine.h"
+#include "../include/AbstractRBEngine.h"
 
 Joint::Joint(void){
 }
@@ -18,7 +18,7 @@ P3D Joint::getWorldPosition(){
 	This method is used to compute the relative orientation between the parent and the child rigid bodies, expressed in 
 	the frame coordinate of the parent.
 */
-Quaternion Joint::computeRelativeOrientation(){
+QuaternionR Joint::computeRelativeOrientation(){
 	//if qp is the quaternion that gives the orientation of the parent, and qc gives the orientation of the child, then  qp^-1 * qc gives the relative
 	//orientation between the child and the parent (child to parent)
 	return (parent->state.orientation.getComplexConjugate() * child->state.orientation).toUnit();
@@ -126,22 +126,22 @@ void Joint::loadFromFile(FILE* f, AbstractRBEngine* rbEngine){
 			case RB_NAME:
 				this->name = std::string() + trim(line);
 				break;
-			/*case RB_PARENT:
+			case RB_PARENT:
 				sscanf(line, "%s", tempName);
 				if (parent != NULL)
 					throwError("This joint already has a parent");
 				parent = rbEngine->getRBByName(tempName);
 				if (parent == NULL)
 					throwError("The articulated rigid body \'%s\' cannot be found!", tempName);
-				break;*/
-			/*case RB_CHILD:
+				break;
+			case RB_CHILD:
 				sscanf(line, "%s", tempName);
 				if (child != NULL)
 					throwError("This joint already has a parent");
 				child = rbEngine->getRBByName(tempName);
 				if (child == NULL)
 					throwError("The articulated rigid body \'%s\' cannot be found!", tempName);
-				break;*/
+				break;
 			case RB_CPOS:
 				sscanf(line, "%lf %lf %lf", &cJPos[0], &cJPos[1], &cJPos[2]);
 				break;
@@ -168,7 +168,8 @@ void Joint::loadFromFile(FILE* f, AbstractRBEngine* rbEngine){
 					Logger::consolePrint("Ignoring input line: \'%s\'\n", line);
 				break;
 			default:
-				throwError("Incorrect articulated body input file: \'%s\' - unexpected line.", buffer);
+				//throwError("Incorrect articulated body input file: \'%s\' - unexpected line.", buffer);
+				Logger::print("Joint.cpp,Load from file - Do nothing with line: %s\n", buffer);
 		}
 	}
 	throwError("Incorrect articulated body input file! No /ArticulatedFigure found");

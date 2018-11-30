@@ -7,7 +7,7 @@
 /*=====================================================================================================================================*
  	Quaternion class. Rather than a general implementation, this class is geared towards representing rotations.                                                                                                                                                 |
  *=====================================================================================================================================*/
-class Quaternion  {
+class QuaternionR  {
 public:
 	//the scalar part of the quaternion
 	double s;
@@ -20,53 +20,53 @@ public:
 */
 
 	//	A constructor. Intuitive...
-	Quaternion(double s, const V3D& v);
+	QuaternionR(double s, const V3D& v);
 
 	// A copy constructor
-	Quaternion(const Quaternion& other);
+	QuaternionR(const QuaternionR& other);
 
 	// Default constructor - no rotation
-	Quaternion();
+	QuaternionR();
 
 	// Another constructor.
-	Quaternion(double w, double x, double y, double z);
+	QuaternionR(double w, double x, double y, double z);
 	
 	// destructor.
-	~Quaternion(void);
+	~QuaternionR(void);
 
 /**
 	Operators
 */
 	// A copy operator
-	Quaternion& operator = (const Quaternion &rhs);
+	QuaternionR& operator = (const QuaternionR &rhs);
 
 	// returns the result of multiplying the current quaternion by rhs
-	Quaternion operator * (const Quaternion &rhs) const;
+	QuaternionR operator * (const QuaternionR &rhs) const;
 
 	// multiply the current quaternion by the rhs one.
-	Quaternion& operator *= (const Quaternion &rhs);
+	QuaternionR& operator *= (const QuaternionR &rhs);
 
 	// multiplies the quaternion by a scalar
-	Quaternion& operator *= (double scalar);
+	QuaternionR& operator *= (double scalar);
 
 	// multiplies the quaternion by a scalar
-	Quaternion& operator /= (double scalar);
+	QuaternionR& operator /= (double scalar);
 
 	// return a copy of the quaternion, multiplied by a scalar
-	Quaternion operator * (double scalar) const;
+	QuaternionR operator * (double scalar) const;
 
 	// returns the result of dividing the current quaternion by rhs
-	Quaternion operator / (double scalar) const;
+	QuaternionR operator / (double scalar) const;
 
 	// returns sum of *this and rhs
-	Quaternion operator + (const Quaternion &rhs) const;
+	QuaternionR operator + (const QuaternionR &rhs) const;
 
 	// adds rhs to this quaternion
-	Quaternion& operator += (const Quaternion &rhs);
+	QuaternionR& operator += (const QuaternionR &rhs);
 	
 
-	bool operator==(const Quaternion& _q);
-	bool operator!=(const Quaternion& _q);
+	bool operator==(const QuaternionR& _q);
+	bool operator!=(const QuaternionR& _q);
 
 	// rotates vector v by this quaternion
 	V3D operator * (const V3D &v) const;
@@ -78,16 +78,16 @@ public:
 */
 
 	// normalize the quaternion
-	Quaternion& toUnit();
+	QuaternionR& toUnit();
 
 	// returns the rotation angle represented by this quaternion - in the range -pi to pi. Since q and -q are the same rotation, we need to know which side is "up" explicitly
 	double getRotationAngle(const V3D& positiveRotAxis);
 
 	// Returns the complex conjugate of the current quaternion.
-	Quaternion getComplexConjugate() const;
+	QuaternionR getComplexConjugate() const;
 
 	//	Returns the inverse of the current quaternion: q * q^-1 = identity quaternion: s = 1, v = (0,0,0)
-	Quaternion getInverse() const;
+	QuaternionR getInverse() const;
 
 	//	Returns the length of this quaternion.
 	double length() const;
@@ -96,16 +96,16 @@ public:
 	double length2() const;
 
 	// Computes the dot product between the current quaternion and the one given as parameter.
-	double dot(const Quaternion &other) const;
+	double dot(const QuaternionR &other) const;
 
 	// linear interpolation (don't do it!). If t = 0, the result is *this. If t = 1, result is other.
-    Quaternion linearlyInterpolateWith(const Quaternion &other, double t) const;
+    QuaternionR linearlyInterpolateWith(const QuaternionR &other, double t) const;
 
 	// SLERP (spherical linear interpolation). If t = 0, the result is *this. If t = 1, result is other.
-	Quaternion sphericallyInterpolateWith(const Quaternion &other, double t) const;
+	QuaternionR sphericallyInterpolateWith(const QuaternionR &other, double t) const;
 	
 	// SLERP (spherical linear interpolation). If t = 0, the result is *this. If t = 1, result is other.
-	void sphericallyInterpolateWith(const Quaternion &other, double t, Quaternion &result) const;
+	void sphericallyInterpolateWith(const QuaternionR &other, double t, QuaternionR &result) const;
 
 	// return a rotated version of u
 	V3D rotate(const V3D& u) const;
@@ -138,22 +138,22 @@ public:
 	// This method returns the quaternion in axis-angle representation.
 	void getAxisAngle(V3D &axis, double &angle) const;
 
-	static const Quaternion	SetRotationFrom(const double _a, const V3D& _axis);
-	static const Quaternion	SetRotationFrom(const V3D& _axis);
+	static const QuaternionR	SetRotationFrom(const double _a, const V3D& _axis);
+	static const QuaternionR	SetRotationFrom(const V3D& _axis);
 	
-	static Quaternion				ExpMap(const V3D& _x) { return Quaternion::SetRotationFrom(_x); }
+	static QuaternionR				ExpMap(const V3D& _x) { return QuaternionR::SetRotationFrom(_x); }
 	
 	double							logMap() const { return 2.0*atan2(v.length(), s); }
 	Vector3d						toAxisAngle() const;
 
 	///< modulates rotation
-	Quaternion						partial(double _dt) const;	
+	QuaternionR						partial(double _dt) const;	
 };
 
 //	returns a quaternion that represents a rotation of angle radians around the axis (unit vector!) provided as a parameter.
-inline Quaternion getRotationQuaternion(double angle, const V3D &axis) {
+inline QuaternionR getRotationQuaternion(double angle, const V3D &axis) {
 //	assert(IS_EQUAL(axis.length(), 1));
-	Quaternion result(cos(angle / 2), axis.unit() * sin(angle / 2));
+	QuaternionR result(cos(angle / 2), axis.unit() * sin(angle / 2));
 	return result;
 }
 
@@ -170,7 +170,7 @@ inline Quaternion getRotationQuaternion(double angle, const V3D &axis) {
 	Note that qB is a rotation from the C frame into a tmp, twist-free frame T, and qA a rotation from T into P.
 	In the T coordinate frame, v is the same as in C, and qA is a rotation that aligns v from P to that from T.
 */
-inline void decomposeRotation(const Quaternion& PqC, Quaternion* Pq, Quaternion* qC, const V3D& v) {
+inline void decomposeRotation(const QuaternionR& PqC, QuaternionR* Pq, QuaternionR* qC, const V3D& v) {
 	//we need to compute v in P's coordinates
 	V3D vP = PqC * v;
 	//compute the rotation that alligns the vector v in the two coordinate frames (P and T - remember that v has the same coordinates in C and in T)
@@ -187,8 +187,8 @@ inline void decomposeRotation(const Quaternion& PqC, Quaternion* Pq, Quaternion*
 /**
 Same as above. This method directly returns the twist rotation
 */
-inline Quaternion decomposeRotation(const Quaternion& PqC, const V3D& v) {
-	Quaternion Pq, qC;
+inline QuaternionR decomposeRotation(const QuaternionR& PqC, const V3D& v) {
+	QuaternionR Pq, qC;
 	decomposeRotation(PqC, &Pq, &qC, v);
 	return qC;
 }
@@ -197,12 +197,12 @@ inline Quaternion decomposeRotation(const Quaternion& PqC, const V3D& v) {
 decomposes the current quaternion as follows: *this = qHeading * qOther, where qHeading is a rotation about the
 axis passed in as a parameter.
 */
-inline Quaternion computeHeading(const Quaternion& q, const V3D& axis) {
+inline QuaternionR computeHeading(const QuaternionR& q, const V3D& axis) {
 	return decomposeRotation(q.getComplexConjugate(), axis).getComplexConjugate();
 }
 
 //compute a set of euler angle axes given the q - there are many choices here, so one that minimizes the rotation angles is chosen
-inline void computeEulerAxesFromQuaternion(const Quaternion &q, V3D& a, V3D& b, V3D& c) {
+inline void computeEulerAxesFromQuaternion(const QuaternionR &q, V3D& a, V3D& b, V3D& c) {
 	//assume q is a rotation transforming vectors from coordinate frame A to B (i.e. B_q_A). We want a sequence of Euler rotations that take you from B to A (i.e. B_q_A = rot(c) * rot(b) * rot(a). There are many options, so just choose one of them...
 	a = q.v.unit();
 	//then b and c should be orthogonal to a - find a rotation between a and the x-axis, and then apply the same rotation to the y and z axes to get b and c...
@@ -222,7 +222,7 @@ inline void computeEulerAxesFromQuaternion(const Quaternion &q, V3D& a, V3D& b, 
 }
 
 //decompose the quaternion q as: q = R(c, gamma) * R(b, beta) * R(a, alpha). Unknowns are: alpha, beta, gamma
-inline void computeEulerAnglesFromQuaternion(const Quaternion &q, const V3D &a, const V3D &b, const V3D &c, double& alpha, double& beta, double& gamma) {
+inline void computeEulerAnglesFromQuaternion(const QuaternionR &q, const V3D &a, const V3D &b, const V3D &c, double& alpha, double& beta, double& gamma) {
 	//the idea here is that the a axis only gets rotated about b and c, which are assumed to be orthogonal to each other. Based on this info, we can first compute the angles beta and gamma
 	assert(IS_ZERO(a.dot(b)) && IS_ZERO(b.dot(c)));
 	assert(IS_ZERO(a.length() - 1) && IS_ZERO(b.length() - 1) && IS_ZERO(c.length() - 1));
@@ -254,7 +254,7 @@ inline void computeEulerAnglesFromQuaternion(const Quaternion &q, const V3D &a, 
 		return;
 	}
 
-	Quaternion qLeft = getRotationQuaternion(-beta, b) * getRotationQuaternion(-gamma, c) * q;
+	QuaternionR qLeft = getRotationQuaternion(-beta, b) * getRotationQuaternion(-gamma, c) * q;
 	alpha = qLeft.getRotationAngle(a);
 
 //	Quaternion residual = (getRotationQuaternion(gamma, c) * getRotationQuaternion(beta, b) * getRotationQuaternion(alpha, a) * q.getComplexConjugate());
@@ -263,17 +263,17 @@ inline void computeEulerAnglesFromQuaternion(const Quaternion &q, const V3D &a, 
 }
 
 //compute the rotation angle about axis a such as to most closely match the orientation in q
-inline void computeRotationAngleFromQuaternion(const Quaternion &q, const V3D &a, double& alpha) {
+inline void computeRotationAngleFromQuaternion(const QuaternionR &q, const V3D &a, double& alpha) {
 	alpha = decomposeRotation(q, a).getRotationAngle(a);
 }
 
 //decompose the quaternion q as: q = R(b, beta) * R(a, alpha). Unknowns are: alpha and beta. In general, there will be some residual 
-inline void computeEulerAnglesFromQuaternion(const Quaternion &q, const V3D &a, const V3D &b, double &alpha, double &beta) {
+inline void computeEulerAnglesFromQuaternion(const QuaternionR &q, const V3D &a, const V3D &b, double &alpha, double &beta) {
 	//we assume the quaternion corresponds to a rotation about the two axes only... therefore the axis a gets rotated about b by angle beta...
 	assert(IS_ZERO(a.dot(b)));
 	assert(IS_ZERO(a.length() - 1) && IS_ZERO(b.length() - 1));
 
-	Quaternion qA, qB;
+	QuaternionR qA, qB;
 	decomposeRotation(q, &qB, &qA, a);
 	alpha = qA.getRotationAngle(a);
 
@@ -284,13 +284,13 @@ inline void computeEulerAnglesFromQuaternion(const Quaternion &q, const V3D &a, 
 	//	assert( IS_ZERO((Quaternion::getRotationQuaternion(beta, b) * Quaternion::getRotationQuaternion(alpha, a) * q.getComplexConjugate()).v.length()));
 }
 
-Quaternion getRotationAxisThatAlignsVectors(const V3D& a, const V3D& b);
+QuaternionR getRotationAxisThatAlignsVectors(const V3D& a, const V3D& b);
 
 
 /**
 	returns the orientation obtained by applying a constant-angular-velocity rotation starting from q
 */
-inline Quaternion updateRotationGivenAngularVelocity(const Quaternion& q, const V3D& angularVelocity, double dt) {
+inline QuaternionR updateRotationGivenAngularVelocity(const QuaternionR& q, const V3D& angularVelocity, double dt) {
 	//q_p = rot(w, dt) * q
 	double angularVelocityMagnitude = angularVelocity.length();
 	//avoid divide by close to zero...
@@ -307,9 +307,9 @@ inline Quaternion updateRotationGivenAngularVelocity(const Quaternion& q, const 
 /**
 	returns the angular velocity that explains how we got from qStart to qEnd in dt time (qEnd = qDueToAngVelOverDT * qStart)
 */
-inline V3D estimateAngularVelocity(const Quaternion& qStart, const Quaternion& qEnd, double dt) {
+inline V3D estimateAngularVelocity(const QuaternionR& qStart, const QuaternionR& qEnd, double dt) {
 	//qEnd = rot(w_p, dt) * qStart
-	Quaternion qRot = qEnd * qStart.getComplexConjugate();
+	QuaternionR qRot = qEnd * qStart.getComplexConjugate();
 
 	V3D rotAxis = qRot.v;
 	if (rotAxis.length() < TINY)
@@ -331,9 +331,9 @@ inline void testQuaternionDecomposition() {
 		double aVal = getRandomNumberInRange(-PI*0.98, PI*0.98);
 		double bVal = getRandomNumberInRange(-PI*0.98, PI*0.98);
 		double aValTest = 0, bValTest = 0;
-		Quaternion qTest = getRotationQuaternion(bVal, b) * getRotationQuaternion(aVal, a);
+		QuaternionR qTest = getRotationQuaternion(bVal, b) * getRotationQuaternion(aVal, a);
 		computeEulerAnglesFromQuaternion(qTest, a, b, aValTest, bValTest);
-		Quaternion qErr = getRotationQuaternion(bValTest, b) * getRotationQuaternion(aValTest, a) * qTest.getComplexConjugate();
+		QuaternionR qErr = getRotationQuaternion(bValTest, b) * getRotationQuaternion(aValTest, a) * qTest.getComplexConjugate();
 		assert(qErr.v.length() < 0.000001);
 		assert(IS_EQUAL(aVal, aValTest) && IS_EQUAL(bVal, bValTest));
 	}
@@ -341,7 +341,7 @@ inline void testQuaternionDecomposition() {
 
 inline Matrix3x3 getRotationMatrixFromEulerAngles(const V3D& eulerAngles, const V3D& axis_1, const V3D& axis_2, const V3D& axis_3)
 {
-	Quaternion q0 = getRotationQuaternion(eulerAngles[0], axis_1) *
+	QuaternionR q0 = getRotationQuaternion(eulerAngles[0], axis_1) *
 		getRotationQuaternion(eulerAngles[1], axis_2) *
 		getRotationQuaternion(eulerAngles[2], axis_3);
 

@@ -14,7 +14,7 @@ public:
 	// the position of the center of mass of the rigid body, in world coords
 	P3D position;
 	// its orientation - rotates from local coordinate frame to world coordinate frame
-	Quaternion orientation;
+	QuaternionR orientation;
 	// the velocity of the center of mass, in world coords
 	V3D velocity;
 	// and finally, the angular velocity about the center of mass, in world coords

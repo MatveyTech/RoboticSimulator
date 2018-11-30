@@ -135,13 +135,13 @@ void GeneralizedCoordinatesRobotRepresentation::setupDOFAxes() {
 
 //updates the world-coords rotation axes. This method should be called when the state or structure of the robot changes.
 void GeneralizedCoordinatesRobotRepresentation::updateWorldOrientations(){
-	worldRotations[0] = worldRotations[1] = worldRotations[2] = Quaternion(1, 0, 0, 0);
+	worldRotations[0] = worldRotations[1] = worldRotations[2] = QuaternionR(1, 0, 0, 0);
 
 	for (int j = 3; j<6; j++)
 		worldRotations[j] = worldRotations[j - 1] * getRotationQuaternion(q[j], getQAxis(j));
 
 	for (uint i = 0; i<robot->jointList.size(); i++) {
-		Quaternion parentOrientation = getOrientationFor(robot->jointList[i]->parent);
+		QuaternionR parentOrientation = getOrientationFor(robot->jointList[i]->parent);
 		for (int j = 0; j<jointCoordsDimSize[i]; j++) {
 			int jIndex = jointCoordStartIndex[i] + j;
 			worldRotations[jIndex] = parentOrientation * getRotationQuaternion(q[jIndex], getQAxis(jIndex));
@@ -175,7 +175,7 @@ void GeneralizedCoordinatesRobotRepresentation::syncGeneralizedCoordinatesWithRo
 	//write out the position of the root...
 	RobotState state(robot);
 	P3D pos = state.getPosition();
-	Quaternion orientation = state.getOrientation();
+	QuaternionR orientation = state.getOrientation();
 
 	q[0] = pos[0];
 	q[1] = pos[1];
@@ -217,7 +217,7 @@ void GeneralizedCoordinatesRobotRepresentation::syncGeneralizedCoordinatesWithRo
 }
 
 
-Quaternion GeneralizedCoordinatesRobotRepresentation::getWorldRotationForQ(int qIndex) {
+QuaternionR GeneralizedCoordinatesRobotRepresentation::getWorldRotationForQ(int qIndex) {
 	return worldRotations[qIndex];
 }
 
@@ -311,7 +311,7 @@ void GeneralizedCoordinatesRobotRepresentation::getReducedRobotState(RobotState&
 	state.setOrientation(getWorldRotationForQ(5));
 
 	for (uint i = 0; i<robot->jointList.size(); i++) {
-		Quaternion jointOrientation;
+		QuaternionR jointOrientation;
 		V3D jointAngularVel;
 		for (int j = 0; j<jointCoordsDimSize[i]; j++) {
 			int jIndex = jointCoordStartIndex[i] + j;
@@ -479,7 +479,7 @@ V3D GeneralizedCoordinatesRobotRepresentation::getAngularVelocityFor(RigidBody* 
 }
 
 //returns the world-relative orientation for rb
-Quaternion GeneralizedCoordinatesRobotRepresentation::getOrientationFor(RigidBody* rb) {
+QuaternionR GeneralizedCoordinatesRobotRepresentation::getOrientationFor(RigidBody* rb) {
 	//	return Quaternion();
 	if (rb->pJoints.size() == 0)
 		return getWorldRotationForQ(5);
@@ -893,17 +893,17 @@ void GeneralizedCoordinatesRobotRepresentation::estimate_angular_jacobian(RigidB
 
 		q[i] = val + h;
 		updateWorldOrientations();
-		Quaternion R_p = getOrientationFor(rb);
+		QuaternionR R_p = getOrientationFor(rb);
 
 		q[i] = val - h;
 		updateWorldOrientations();
-		Quaternion R_m = getOrientationFor(rb);
+		QuaternionR R_m = getOrientationFor(rb);
 
 		q[i] = val;
 		updateWorldOrientations();
 		V3D axis;
 		double angle;
-		Quaternion rotate = R_p * R_m.getInverse();
+		QuaternionR rotate = R_p * R_m.getInverse();
 		rotate.getAxisAngle(axis, angle);
 		axis.normalize();
 		axis *= angle;

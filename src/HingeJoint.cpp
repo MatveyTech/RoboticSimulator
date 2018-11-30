@@ -13,7 +13,7 @@ HingeJoint::~HingeJoint(void){
 	Projects the orientation of the child onto the constraint manifold that satisfies the type of joint this is
 */
 void HingeJoint::fixOrientationConstraint() {
-	Quaternion qRel = computeRelativeOrientation();
+	QuaternionR qRel = computeRelativeOrientation();
 	//make sure that the relative rotation between the child and the parent is around the a axis
 	V3D axis = qRel.v; axis.toUnit();
 	//this is the rotation angle around the axis above, which may not be the rotation axis

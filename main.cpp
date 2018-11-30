@@ -1,8 +1,11 @@
 #include <igl/opengl/glfw/Viewer.h>
 #include <igl/readOBJ.h>
 #include <igl/opengl/gl.h>
-//#include "include/AbstractRBEngine.h"
-//#include "include/ODERBEngine.h"
+
+#include "include/AbstractRBEngine.h"
+#include "include/RBEngine.h"
+#include "include/Robot.h"
+#include "include/IK_Solver.h"
 #include <memory>
 
 
@@ -102,16 +105,16 @@ void DrawFirst2Joints()
 
 int main(int argc, char *argv[])
 {
-	/*AbstractRBEngine* rbEngine = new ODERBEngine();
+	const char* fName = "C:/Users/matvey/Documents/CS2/Graphics project/RoboticSimulator/yumi/yumi.rbs";//TODOMATVEY:Change this
+	AbstractRBEngine* rbEngine = new RBEngine();
 	rbEngine->loadRBsFromFile(fName);
-	robot = new Robot(rbEngine->rbs[0]);
-	startState = RobotState(robot);
+	Robot* robot = new Robot(rbEngine->rbs[0]);
+	RobotState startState = RobotState(robot);
 	setupSimpleRobotStructure(robot);
 
-	delete ikSolver;
-	ikSolver = new IK_Solver(robot, true);*/
+	IK_Solver* ikSolver = new IK_Solver(robot, true);
 
-	DrawFirst2Joints();
+	//DrawFirst2Joints();
 	return 1;
 	Eigen::MatrixXd V;
 	Eigen::MatrixXi F;

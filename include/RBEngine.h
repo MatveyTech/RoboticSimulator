@@ -11,4 +11,5 @@ class RBEngine : public AbstractRBEngine
 	virtual void applyForceTo(RigidBody* b, const V3D& f, const P3D& p);
 	virtual void applyTorqueTo(RigidBody* b, const V3D& t);
 	virtual void applyRelativeTorqueTo(RigidBody* b, const V3D& t);
+	virtual DynamicArray<ContactForce> getContactForceOnRB(RigidBody* b);
 };

@@ -39,7 +39,7 @@ public:
 	//torque applied to this joint, set by a controller acting on this joint.
 	V3D desiredJointTorque;
 	//target relative orientation
-	Quaternion desiredRelativeOrientation;
+	QuaternionR desiredRelativeOrientation;
 	//target relative angular velocity axis, unit length expected
 	V3D desiredRelativeAngularVelocity;
 
@@ -55,7 +55,7 @@ public:
 	/**
 		computes the relative orientation between the parent and the child rigid bodies
 	*/
-	Quaternion computeRelativeOrientation();
+	QuaternionR computeRelativeOrientation();
 
 
 
