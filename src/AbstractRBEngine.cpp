@@ -72,7 +72,7 @@ void AbstractRBEngine::drawRBs(int flags){
 	cout<< "Joints:{";
 	for (uint i = 0; i < rbs.size(); i++)
 	{
-		rbs[i]->draw(flags);
+		//rbs[i]->draw(flags);
 		rbs[i]->state.orientation.getAxisAngle(rotAxis, rotAngle);
 		cout << DEG(rotAngle) << ",";
 	}

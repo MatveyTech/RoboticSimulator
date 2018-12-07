@@ -231,7 +231,7 @@ inline void computeEulerAnglesFromQuaternion(const QuaternionR &q, const V3D &a,
 
 	if (IS_ZERO(a.dot(c))) {
 		bool circular = a.cross(b).dot(c) > 0;
-		//the three axes form an orthonormal basis (i.e. Tait-Bryan)... singularity around beta = -PI/2 or PI/2
+		//the three axes form an orthonormal basis (i.e. Tait-Bryan)... singularity around beta = -IK_PI/2 or IK_PI/2
 		if (circular) {
 			beta = -safeASIN(aRot.dot(c));
 			gamma = atan2(aRot.dot(b), aRot.dot(a));
@@ -242,7 +242,7 @@ inline void computeEulerAnglesFromQuaternion(const QuaternionR &q, const V3D &a,
 		}
 	}
 	else if (IS_ZERO(a.dot(c) - 1)) {
-		//these are "proper" euler axes, where the first and the last one are the same... singularity around beta = 0 or PI
+		//these are "proper" euler axes, where the first and the last one are the same... singularity around beta = 0 or IK_PI
 		V3D lastAxis = a.cross(b);
 		beta = safeACOS(aRot.dot(a));
 		gamma = atan2(aRot.dot(b), -aRot.dot(lastAxis));
@@ -328,8 +328,8 @@ inline void testQuaternionDecomposition() {
 		V3D v = getRandomUnitVector();
 		V3D a, b;
 		v.getOrthogonalVectors(a, b);
-		double aVal = getRandomNumberInRange(-PI*0.98, PI*0.98);
-		double bVal = getRandomNumberInRange(-PI*0.98, PI*0.98);
+		double aVal = getRandomNumberInRange(-IK_PI*0.98, IK_PI*0.98);
+		double bVal = getRandomNumberInRange(-IK_PI*0.98, IK_PI*0.98);
 		double aValTest = 0, bValTest = 0;
 		QuaternionR qTest = getRotationQuaternion(bVal, b) * getRotationQuaternion(aVal, a);
 		computeEulerAnglesFromQuaternion(qTest, a, b, aValTest, bValTest);

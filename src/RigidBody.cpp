@@ -416,7 +416,9 @@ void RigidBody::loadFromFile(FILE* fp){
 			case RB_MESH_NAME: {
 					char tmpStr[200];
 					sscanf(line, "%s", tmpStr);
-					std::string str(tmpStr);
+					//std::string str(tmpStr);
+					string folder = "C:/Users/matvey/Documents/CS2/Graphics project/RoboticSimulator/data/";//TODOMATVEY:Change this
+					this->meshFileName = folder + string(tmpStr);
 					/*if (str != "None") {
 						tmpMesh = GLContentManager::getGLMesh(tmpStr);
 						tmpMesh->computeNormals();

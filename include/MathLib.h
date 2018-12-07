@@ -34,9 +34,7 @@ typedef unsigned int uint;
 #endif
 
 #define TINY 0.0000001
-
-#define PI 3.1415926535897932
-
+#define IK_PI 3.1415926535897932
 /**
 	This macro checks to see if the value of x is zero within epsilon: -epsilon<x<epsilon
 */
@@ -47,13 +45,13 @@ typedef unsigned int uint;
 /**
 	Computes the value of x in radians
 */
-#define RAD(x) (((x) * PI)/180.0)
-#define RADF(x) (((x) * static_cast<float>(PI))/180.0f)
+#define RAD(x) (((x) * IK_PI)/180.0)
+#define RADF(x) (((x) * static_cast<float>(IK_PI))/180.0f)
 
 /**
 	And this computes the value of x in degrees
 */
-#define DEG(x) (((x) * 180)/PI)
+#define DEG(x) (((x) * 180)/IK_PI)
 
 #define SQR(x) ((x)*(x))
 
@@ -71,7 +69,7 @@ inline void boundToRange(double& v, double min, double max) {
 
 inline double safeACOS(double val){
 	if (val<-1)
-		return PI;
+		return IK_PI;
 	if (val>1)
 		return 0;
 	return acos(val);

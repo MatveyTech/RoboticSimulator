@@ -127,8 +127,8 @@ double QuaternionR::getRotationAngle(const V3D& positiveRotAxis) {
 	double result = 2 * safeACOS(s);
 	if (sinSign < 0)
 		result = -result;
-	if (result > PI) result -= 2 * PI;
-	if (result < -PI) result += 2 * PI;
+	if (result > IK_PI) result -= 2 * IK_PI;
+	if (result < -IK_PI) result += 2 * IK_PI;
 	return result;
 }
 

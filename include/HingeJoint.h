@@ -59,7 +59,7 @@ public:
 
 	//the units of speed returned here are measured in radians per sec
 	double speedPerPWMunit() {
-		return (2 * PI / 60.0) * 50 / (pwmFor50RPM - (pwmFor0Deg + pwmDeadBand));
+		return (2 * IK_PI / 60.0) * 50 / (pwmFor50RPM - (pwmFor0Deg + pwmDeadBand));
 	}
 
 	//speed is measured in RAD/S

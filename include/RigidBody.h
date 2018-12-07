@@ -49,6 +49,8 @@ public:
 
 	// name of the rigid body
 	std::string name;
+	// the file with the mesh model
+	std::string meshFileName;
 	// id of the rigid body
 	int id = -1;
 

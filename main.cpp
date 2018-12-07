@@ -6,6 +6,9 @@
 #include "include/RBEngine.h"
 #include "include/Robot.h"
 #include "include/IK_Solver.h"
+
+#include "include\RSApp.h"
+
 #include <memory>
 
 
@@ -103,16 +106,40 @@ void DrawFirst2Joints()
 	viewer.launch();
 }
 
+RigidBody * GetRigidBody(Robot* robot)
+{
+	for (int i = 0; i < robot->getRigidBodyCount(); i++)
+		if (robot->getRigidBody(i)->name.compare("link_2_l") == 0)
+			return robot->getRigidBody(i);
+	return nullptr;
+}
+
 int main(int argc, char *argv[])
 {
-	const char* fName = "C:/Users/matvey/Documents/CS2/Graphics project/RoboticSimulator/yumi/yumi.rbs";//TODOMATVEY:Change this
-	AbstractRBEngine* rbEngine = new RBEngine();
-	rbEngine->loadRBsFromFile(fName);
-	Robot* robot = new Robot(rbEngine->rbs[0]);
-	RobotState startState = RobotState(robot);
-	setupSimpleRobotStructure(robot);
+	RSApp app;
+	return 0;
+	igl::opengl::glfw::Viewer viewer2;	
+	/*viewer2.callback_key_down =
+		[&](igl::opengl::glfw::Viewer &, unsigned int key, int mod)
+	{
+		if (key == GLFW_KEY_ENTER)
+		{
+			RigidBody* rb = GetRigidBody(robot);
+			ikSolver->ikPlan->endEffectors.clear();
+			ikSolver->ikPlan->endEffectors.push_back(IK_EndEffector());
+			ikSolver->ikPlan->endEffectors.back().endEffectorLocalCoords = P3D(0, 0, 0);
+			ikSolver->ikPlan->endEffectors.back().endEffectorRB = rb;
+			ikSolver->ikPlan->endEffectors.back().targetEEPos = P3D(0.5, 0.5, 0);
+			ikSolver->ikEnergyFunction->regularizer = 100;
+			ikSolver->ikOptimizer->checkDerivatives = true;
+			ikSolver->solve(10, false, false);
 
-	IK_Solver* ikSolver = new IK_Solver(robot, true);
+			rbEngine->drawRBs();
+			return true;
+		}
+		return false;
+	};
+	viewer2.launch();*/
 
 	//DrawFirst2Joints();
 	return 1;
