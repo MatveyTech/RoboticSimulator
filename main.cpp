@@ -114,10 +114,41 @@ RigidBody * GetRigidBody(Robot* robot)
 	return nullptr;
 }
 
+MatrixXd TransformP2(Eigen::MatrixXd &V, Eigen::Matrix4d &tr)
+{
+	MatrixXd th = V.rowwise().homogeneous().transpose();
+	return (tr * th).transpose().leftCols(3);
+}
+
 int main(int argc, char *argv[])
 {
 	RSApp app;
 	return 0;
+	double arrVertices[] = { 0 , 0 , 0 , 1.0 , 0.0 , 0 };
+	MatrixXd mVertices = Map < Matrix <double, 3, 2 > >(arrVertices);
+	//cout << mVertices.homogeneous() << endl;
+	cout << mVertices.colwise().homogeneous() << endl;
+	Eigen::MatrixXd V3;
+	Eigen::MatrixXi F3;
+	igl::readOBJ("C:/Users/matvey/Documents/CS2/Graphics project/SCP/SCP/data/rbs/yumi/meshes/simplified/link_1_r.obj", V3, F3);
+	Eigen::MatrixXd V4 = Matrix3d::Zero();//V3.block<3, 3>(0, 0);
+	V4(0,1) = 1;
+	V4(1,0) = 1;
+	V4(2, 2) = 1;
+	cout << V4 << endl;
+	cout << "-------------" << endl;
+	cout << V4.rowwise().homogeneous().transpose() << endl;
+	cout << "-------------" << endl;
+
+	Matrix4d tr2(Matrix4d::Identity());
+	tr2(0, 3) = 30;
+	tr2(1, 3) = 50;
+	MatrixXd V5 = V4.rowwise().homogeneous().transpose();
+	cout << TransformP2(V5, tr2) << endl;
+
+	return 0;
+
+	
 	igl::opengl::glfw::Viewer viewer2;	
 	/*viewer2.callback_key_down =
 		[&](igl::opengl::glfw::Viewer &, unsigned int key, int mod)

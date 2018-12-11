@@ -49,13 +49,32 @@ void RSApp::loadRobot(const char* fName) {
 	ikSolver = new IK_Solver(robot, true);
 }
 
+MatrixXd TransformP(Eigen::MatrixXd &V, Eigen::Matrix4d &tr)
+{
+	MatrixXd th = V.rowwise().homogeneous().transpose();
+	return (tr * th).transpose().leftCols(3);
+}
+
 void RSApp::LoadMeshModelsIntoViewer()
 {
+	int ii = 0;
 	for (auto&& i : rbEngine->rbs)
 	{
 		cout << i->meshFileName << endl;
 		igl::readOBJ(i->meshFileName, V, F);
-		break;
-	}
-	viewer.data_list[0].set_mesh(V, F);
+		if (ii != 0)
+		{
+			Matrix4d tr(Matrix4d::Identity());
+			tr(2,3) = 0.3;
+			//tr(3, 1) = 5;
+			//tr(3, 2) = p(2);
+			V = TransformP(V, tr);
+		}
+		viewer.data_list[ii].set_mesh(V, F);
+		viewer.append_mesh();
+		ii++;
+
+		/*if (ii == 3)
+			break;*/
+	}	
 }
