@@ -23,10 +23,6 @@ private:
 	IK_Solver* ikSolver = nullptr;
 	Viewer viewer;
 	
-	MatrixXd V;
-	MatrixXi F;
-	MatrixXd V2;
-	MatrixXi F2;
 	//shared_ptr<Robot*> robot;
 
 

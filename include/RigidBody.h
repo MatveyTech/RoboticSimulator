@@ -55,6 +55,10 @@ public:
 	std::string name;
 	// the file with the mesh model
 	std::string meshFileName;
+
+	Eigen::MatrixXd vertices;
+	Eigen::MatrixXi faces;
+
 	// id of the rigid body
 	int id = -1;
 

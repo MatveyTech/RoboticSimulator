@@ -9,12 +9,50 @@
 
 using namespace Eigen;
 
+RigidBody * GetRigidBody(Robot* robot)
+{
+	for (int i = 0; i < robot->getRigidBodyCount(); i++)
+		if (robot->getRigidBody(i)->name.compare("link_2_l") == 0)
+			return robot->getRigidBody(i);
+	return nullptr;
+}
+
 RSApp::RSApp(void)
 {
 	const char* fName = "C:/Users/matvey/Documents/CS2/Graphics project/RoboticSimulator/data/rbs/yumi/yumi.rbs";//TODOMATVEY:Change this
 	loadFile(fName);
 	LoadMeshModelsIntoViewer();
-	viewer.core.camera_eye = Vector3f(3,3,0);
+	//viewer.core.camera_eye = Vector3f(3,3,0);
+
+	viewer.callback_key_down =
+		[&](igl::opengl::glfw::Viewer &, unsigned int key, int mod)
+	{
+		if (key == GLFW_KEY_J)
+		{
+			rbEngine->drawRBs();
+			return true;
+		}
+
+		if (key == GLFW_KEY_ENTER)
+		{
+			RigidBody* rb = GetRigidBody(robot);
+			ikSolver->ikPlan->endEffectors.clear();
+			ikSolver->ikPlan->endEffectors.push_back(IK_EndEffector());
+			ikSolver->ikPlan->endEffectors.back().endEffectorLocalCoords = P3D(0, 0, 0);
+			ikSolver->ikPlan->endEffectors.back().endEffectorRB = rb;
+			ikSolver->ikPlan->endEffectors.back().targetEEPos = P3D(0.5, 0.5, 0);
+			ikSolver->ikEnergyFunction->regularizer = 100;
+			ikSolver->ikOptimizer->checkDerivatives = true;
+			ikSolver->solve(10, false, false);
+
+			rbEngine->drawRBs();
+			return true;
+		}
+		return false;
+	};
+
+	
+
 	viewer.launch();
 }
 
@@ -76,25 +114,18 @@ void RSApp::LoadMeshModelsIntoViewer()
 
 		if (!isFileExists(VFile))
 		{
-			igl::readOBJ(i->meshFileName, V, F);
-			/*igl::serialize(V, "V", VFile);
-			igl::serialize(F, "F", FFile);*/
+			igl::readOBJ(i->meshFileName, i->vertices, i->faces);
+			/*igl::serialize(i->vertices, "V", VFile);
+			igl::serialize(F, "i->faces", FFile);*/
 		}
 		else
 		{
-			igl::deserialize(V, "V", VFile);
-			igl::deserialize(F, "F", FFile);
+			igl::deserialize(i->vertices, "V", VFile);
+			igl::deserialize(i->faces, "F", FFile);
 		}
-		if (ii != 0)
-		{
-			/*Matrix4d tr(Matrix4d::Identity());
-			tr(2,3) = 0.3;
-			//tr(3, 1) = 5;
-			//tr(3, 2) = p(2);
-			V = TransformP(V, tr);*/
-		}
-		V = TransformP(V, i->meshtransformation);
-		viewer.data_list[ii].set_mesh(V, F);
+
+		MatrixXd transformed_vert = TransformP(i->vertices, i->meshtransformation);
+		viewer.data_list[ii].set_mesh(transformed_vert, i->faces);
 		viewer.data_list[ii].show_lines = false;
 		if (ii==0)
 			//viewer.data_list[ii].set_colors(COLOR(105, 105, 105));

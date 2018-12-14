@@ -106,13 +106,6 @@ void DrawFirst2Joints()
 	viewer.launch();
 }
 
-RigidBody * GetRigidBody(Robot* robot)
-{
-	for (int i = 0; i < robot->getRigidBodyCount(); i++)
-		if (robot->getRigidBody(i)->name.compare("link_2_l") == 0)
-			return robot->getRigidBody(i);
-	return nullptr;
-}
 
 MatrixXd TransformP2(Eigen::MatrixXd &V, Eigen::Matrix4d &tr)
 {
