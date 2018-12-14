@@ -7,6 +7,7 @@
 #include "Robot.h"
 #include "IK_Solver.h"
 #include <igl/opengl/glfw/Viewer.h>
+#include <igl/serialize.h>
 
 using namespace std;
 using namespace igl::opengl::glfw;

@@ -2,6 +2,7 @@
 //#include "..\include\Utils_my.h"
 #include "..\include\RSApp.h"
 #include <Eigen/Dense>
+#include <fstream>
 
 #define COLOR(r,g,b) RowVector3d(r / 255., g / 255., b / 225.)
 
@@ -13,7 +14,13 @@ RSApp::RSApp(void)
 	const char* fName = "C:/Users/matvey/Documents/CS2/Graphics project/RoboticSimulator/data/rbs/yumi/yumi.rbs";//TODOMATVEY:Change this
 	loadFile(fName);
 	LoadMeshModelsIntoViewer();
+	viewer.core.camera_eye = Vector3f(3,3,0);
 	viewer.launch();
+}
+
+bool isFileExists(const std::string& filename) {
+	std::ifstream ifile(filename.c_str());
+	return (bool)ifile;
 }
 
 void RSApp::loadFile(const char* fName) {
@@ -64,7 +71,20 @@ void RSApp::LoadMeshModelsIntoViewer()
 	{
 		Eigen::Matrix4d m = i->meshtransformation;
 		cout << i->meshFileName << endl;
-		igl::readOBJ(i->meshFileName, V, F);
+		string VFile = "../RoboticSimulator/data/rbs/yumi/meshes_ser/V_link_" + std::to_string(ii);
+		string FFile = "../RoboticSimulator/data/rbs/yumi/meshes_ser/F_link_" + std::to_string(ii);
+
+		if (!isFileExists(VFile))
+		{
+			igl::readOBJ(i->meshFileName, V, F);
+			/*igl::serialize(V, "V", VFile);
+			igl::serialize(F, "F", FFile);*/
+		}
+		else
+		{
+			igl::deserialize(V, "V", VFile);
+			igl::deserialize(F, "F", FFile);
+		}
 		if (ii != 0)
 		{
 			/*Matrix4d tr(Matrix4d::Identity());
