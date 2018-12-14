@@ -31,6 +31,7 @@ struct MappingInfo {
 /*==================================================================================================================================================*
  | Rigid Body Class. It is assumed that the location of the center of mass of the rigid body corresponds to local coordinates (0,0,0).              |
  *==================================================================================================================================================*/
+class Matrix4d;
 class Joint;
 class RigidBody  {
 public:
@@ -43,7 +44,10 @@ public:
 	// meshes that are used to visualize the rigid body
 	//DynamicArray<GLMesh*> meshes;
 	// meshTransformation corresponding to meshes.
-	DynamicArray<Transformation> meshTransformations;
+	//DynamicArray<Transformation> meshTransformations;
+	//DynamicArray<Transformation> meshTransformations;
+
+	Eigen::Matrix4d meshtransformation = Eigen::Matrix4d::Identity();
 	// discriptions of the each mesh
 	DynamicArray<std::string> meshDescriptions;
 

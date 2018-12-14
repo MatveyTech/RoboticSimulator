@@ -3,6 +3,8 @@
 #include "..\include\RSApp.h"
 #include <Eigen/Dense>
 
+#define COLOR(r,g,b) RowVector3d(r / 255., g / 255., b / 225.)
+
 
 using namespace Eigen;
 
@@ -60,21 +62,32 @@ void RSApp::LoadMeshModelsIntoViewer()
 	int ii = 0;
 	for (auto&& i : rbEngine->rbs)
 	{
+		Eigen::Matrix4d m = i->meshtransformation;
 		cout << i->meshFileName << endl;
 		igl::readOBJ(i->meshFileName, V, F);
 		if (ii != 0)
 		{
-			Matrix4d tr(Matrix4d::Identity());
+			/*Matrix4d tr(Matrix4d::Identity());
 			tr(2,3) = 0.3;
 			//tr(3, 1) = 5;
 			//tr(3, 2) = p(2);
-			V = TransformP(V, tr);
+			V = TransformP(V, tr);*/
 		}
+		V = TransformP(V, i->meshtransformation);
 		viewer.data_list[ii].set_mesh(V, F);
+		viewer.data_list[ii].show_lines = false;
+		if (ii==0)
+			//viewer.data_list[ii].set_colors(COLOR(105, 105, 105));
+			viewer.data_list[ii].set_colors(COLOR(227, 100, 33));//orange
+		else if (ii<8 && ii%2==1 || ii>=8 && ii % 2 == 0)
+			viewer.data_list[ii].set_colors(COLOR(230, 230, 227));
+		else
+			viewer.data_list[ii].set_colors(COLOR(227, 100, 33));//orange
+
 		viewer.append_mesh();
 		ii++;
 
-		/*if (ii == 3)
+		/*if (ii == 1)
 			break;*/
 	}	
 }
