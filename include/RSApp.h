@@ -8,6 +8,9 @@
 #include "IK_Solver.h"
 #include <igl/opengl/glfw/Viewer.h>
 #include <igl/serialize.h>
+#include <igl/readOBJ.h>
+#include <GLFW/glfw3.h>
+
 
 using namespace std;
 using namespace igl::opengl::glfw;
@@ -31,5 +34,6 @@ public:
 	virtual void loadFile(const char* fName);
 	void loadRobot(const char* fName);
 	void LoadMeshModelsIntoViewer();
+	void DrawAll();
 };
 

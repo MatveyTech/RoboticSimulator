@@ -112,11 +112,12 @@ void RSApp::LoadMeshModelsIntoViewer()
 		string VFile = "../RoboticSimulator/data/rbs/yumi/meshes_ser/V_link_" + std::to_string(ii);
 		string FFile = "../RoboticSimulator/data/rbs/yumi/meshes_ser/F_link_" + std::to_string(ii);
 
-		if (!isFileExists(VFile))
+		//if (!isFileExists(VFile))
+		if(false)
 		{
 			igl::readOBJ(i->meshFileName, i->vertices, i->faces);
 			/*igl::serialize(i->vertices, "V", VFile);
-			igl::serialize(F, "i->faces", FFile);*/
+			igl::serialize(i->faces, "F", FFile);*/
 		}
 		else
 		{
@@ -141,4 +142,17 @@ void RSApp::LoadMeshModelsIntoViewer()
 		/*if (ii == 1)
 			break;*/
 	}	
+}
+
+void RSApp::DrawAll()
+{
+	int ii = 0;
+	for (auto&& i : rbEngine->rbs)
+	{
+		QuaternionR q = i->state.orientation;
+		// add here the transformation from joints, move these calculations to other function, may be Rigidbody
+		MatrixXd transformed_vert = TransformP(i->vertices, i->meshtransformation);
+		viewer.data_list[ii].set_mesh(transformed_vert, i->faces);
+		ii++;
+	}
 }

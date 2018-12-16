@@ -119,6 +119,6 @@ public:
 	}
 
 	int getEndEffectorPointCount() {
-		return endEffectorPoints.size();
+		return (int)	endEffectorPoints.size();
 	}
 };

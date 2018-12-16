@@ -282,11 +282,11 @@ public:
 	}
 
 	int getJointCount() const{
-		return joints.size();
+		return (int)joints.size();
 	}
 
 	int getAuxiliaryJointCount() const {
-		return auxiliaryJoints.size();
+		return (int)auxiliaryJoints.size();
 	}
 
 	P3D getPosition() const{
