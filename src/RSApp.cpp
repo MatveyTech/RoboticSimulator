@@ -24,12 +24,26 @@ RSApp::RSApp(void)
 	LoadMeshModelsIntoViewer();
 	//viewer.core.camera_eye = Vector3f(3,3,0);
 
+	viewer.callback_pre_draw =
+		[&](igl::opengl::glfw::Viewer & v)
+	{
+		//DrawAll();
+		return false;
+	};
+	viewer.core.is_animating = true;
+
 	viewer.callback_key_down =
 		[&](igl::opengl::glfw::Viewer &, unsigned int key, int mod)
 	{
 		if (key == GLFW_KEY_J)
 		{
 			rbEngine->drawRBs();
+			return true;
+		}
+
+		if (key == GLFW_KEY_D)
+		{
+			DrawAll();
 			return true;
 		}
 
