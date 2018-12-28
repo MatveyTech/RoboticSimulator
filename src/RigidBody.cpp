@@ -543,26 +543,15 @@ void RigidBody::loadFromFile(FILE* fp){
 			}
 				break;
 			case RB_MESH_TRANSFORMATION: {
-				/*QuaternionR q;
-				V3D T;
-				sscanf(line, "%lf %lf %lf %lf %lf %lf %lf",
-					&q[0], &q[1], &q[2], &q[3], &T[0], &T[1], &T[2]);
-				meshTransformations.push_back(Transformation(q.getRotationMatrix(), T));
-				break;*/
-
-
 				Vector3d p;
 				double q1, q2, q3, q4;
 				sscanf(line, "%lf %lf %lf %lf %lf %lf %lf", &q1, &q2, &q3, &q4, &p(0), &p(1), &p(2));
 				Quaterniond d(q1, q2, q3, q4);
 				d.normalize();
 				Matrix3d rot = d.toRotationMatrix();
-				Eigen::Matrix4d tr(Eigen::Matrix4d::Identity());
-				tr.block<3, 3>(0, 0) = rot;
-				tr(3, 0) = p(0);
-				tr(3, 1) = p(1);
-				tr(3, 2) = p(2);
-				meshtransformation = tr;
+				meshtransformation = Eigen::Matrix4d::Identity();
+				meshtransformation.topLeftCorner(3, 3) = rot;
+				meshtransformation.topRightCorner(3, 1) = p;
 				break;
 			}
 			case RB_MAPPING_INFO:
