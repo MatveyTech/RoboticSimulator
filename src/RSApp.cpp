@@ -3,6 +3,7 @@
 #include "..\include\RSApp.h"
 #include <Eigen/Dense>
 #include <fstream>
+#include <chrono>
 
 #define COLOR(r,g,b) RowVector3d(r / 255., g / 255., b / 225.)
 
@@ -19,15 +20,25 @@ RigidBody * GetRigidBody(Robot* robot)
 
 RSApp::RSApp(void)
 {
-	const char* fName = "C:/Users/matvey/Documents/CS2/Graphics project/RoboticSimulator/data/rbs/yumi/yumi.rbs";//TODOMATVEY:Change this
+	bool useSimpleRobot = true;
+	bool useSerializedModels = false;
+	char* fName;
+	if (useSimpleRobot)
+		fName = "C:/Users/matvey/Documents/CS2/Graphics project/RoboticSimulator/data/rbs/yumi/yumi_simplified.rbs";//TODOMATVEY:Change this
+	else
+		fName = "C:/Users/matvey/Documents/CS2/Graphics project/RoboticSimulator/data/rbs/yumi/yumi.rbs";//TODOMATVEY:Change this
 	loadFile(fName);
-	LoadMeshModelsIntoViewer();
+	LoadMeshModelsIntoViewer(useSerializedModels);
 	//viewer.core.camera_eye = Vector3f(3,3,0);
 
 	viewer.callback_pre_draw =
 		[&](igl::opengl::glfw::Viewer & v)
 	{
-		//DrawAll();
+		auto now = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double, milli> diff_ms = now - last_rendered;
+		last_rendered = now;
+		//cout << diff_ms.count() << endl;
+		DrawAll();
 		return false;
 	};
 	viewer.core.is_animating = true;
@@ -65,7 +76,7 @@ RSApp::RSApp(void)
 		return false;
 	};
 
-	
+
 
 	viewer.launch();
 }
@@ -96,7 +107,7 @@ void RSApp::loadFile(const char* fName) {
 void RSApp::loadRobot(const char* fName) {
 	delete robot;
 	delete rbEngine;
-	
+
 	rbEngine = new RBEngine();
 	rbEngine->loadRBsFromFile(fName);
 	robot = new Robot(rbEngine->rbs[0]);
@@ -116,7 +127,7 @@ MatrixXd TransformP(Eigen::MatrixXd &V, Eigen::Matrix4d &tr)
 	return (tr * th).transpose().leftCols(3);
 }
 
-void RSApp::LoadMeshModelsIntoViewer()
+void RSApp::LoadMeshModelsIntoViewer(bool useSerializedModels)
 {
 	int ii = 0;
 	for (auto&& i : rbEngine->rbs)
@@ -127,25 +138,25 @@ void RSApp::LoadMeshModelsIntoViewer()
 		string FFile = "../RoboticSimulator/data/rbs/yumi/meshes_ser/F_link_" + std::to_string(ii);
 
 		//if (!isFileExists(VFile))
-		if(false)
+		if (useSerializedModels)
 		{
-			igl::readOBJ(i->meshFileName, i->vertices, i->faces); 
-			/*igl::serialize(i->vertices, "V", VFile);
-			igl::serialize(i->faces, "F", FFile);*/
+			igl::deserialize(i->vertices, "V", VFile);
+			igl::deserialize(i->faces, "F", FFile);			
 		}
 		else
 		{
-			igl::deserialize(i->vertices, "V", VFile);
-			igl::deserialize(i->faces, "F", FFile);
+			igl::readOBJ(i->meshFileName, i->vertices, i->faces);
+			/*igl::serialize(i->vertices, "V", VFile);
+			igl::serialize(i->faces, "F", FFile);*/
 		}
 
-		MatrixXd transformed_vert = TransformP(i->vertices, i->meshtransformation); 
+		MatrixXd transformed_vert = TransformP(i->vertices, i->meshtransformation);
 		viewer.data_list[ii].set_mesh(transformed_vert, i->faces);
 		viewer.data_list[ii].show_lines = false;
-		if (ii==0)
+		if (ii == 0)
 			//viewer.data_list[ii].set_colors(COLOR(105, 105, 105));
 			viewer.data_list[ii].set_colors(COLOR(227, 100, 33));//orange
-		else if (ii<8 && ii%2==1 || ii>=8 && ii % 2 == 0)
+		else if (ii < 8 && ii % 2 == 1 || ii >= 8 && ii % 2 == 0)
 			viewer.data_list[ii].set_colors(COLOR(230, 230, 227));
 		else
 			viewer.data_list[ii].set_colors(COLOR(227, 100, 33));//orange
@@ -164,14 +175,17 @@ void RSApp::DrawAll()
 	int ii = 0;
 	for (auto&& i : rbEngine->rbs)
 	{
-		QuaternionR q = i->state.orientation;		
-		Matrix3x3 rotationM = q.getRotationMatrix();
-		Matrix4x4 m = Matrix4x4::Identity();
-		m.topLeftCorner(3,3) = rotationM;
-		m.topRightCorner(3, 1) = Vector3d(i->state.position[0], i->state.position[1], i->state.position[2]);
-		Matrix4x4 res = m * i->meshtransformation;
-		MatrixXd transformed_vert = TransformP(i->vertices, res);
-		viewer.data_list[ii].set_mesh(transformed_vert, i->faces);
+		if (ii > 0) // base isn't moving so no need to redraw it
+		{
+			QuaternionR q = i->state.orientation;
+			Matrix3x3 rotationM = q.getRotationMatrix();
+			Matrix4x4 m = Matrix4x4::Identity();
+			m.topLeftCorner(3, 3) = rotationM;
+			m.topRightCorner(3, 1) = Vector3d(i->state.position[0], i->state.position[1], i->state.position[2]);
+			Matrix4x4 res = m * i->meshtransformation;
+			MatrixXd transformed_vert = TransformP(i->vertices, res);
+			viewer.data_list[ii].set_mesh(transformed_vert, i->faces);
+		}
 		ii++;
 	}
 }

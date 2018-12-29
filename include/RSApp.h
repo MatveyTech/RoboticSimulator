@@ -10,6 +10,7 @@
 #include <igl/serialize.h>
 #include <igl/readOBJ.h>
 #include <GLFW/glfw3.h>
+#include <chrono>
 
 
 using namespace std;
@@ -25,6 +26,7 @@ private:
 	RobotState startState = RobotState(14);
 	IK_Solver* ikSolver = nullptr;
 	Viewer viewer;
+	chrono::steady_clock::time_point last_rendered;
 	
 	//shared_ptr<Robot*> robot;
 
@@ -33,7 +35,7 @@ public:
 	RSApp(void);
 	virtual void loadFile(const char* fName);
 	void loadRobot(const char* fName);
-	void LoadMeshModelsIntoViewer();
+	void LoadMeshModelsIntoViewer(bool useSerializedModels);
 	void DrawAll();
 };
 
