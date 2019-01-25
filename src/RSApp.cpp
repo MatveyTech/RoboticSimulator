@@ -18,7 +18,7 @@ RigidBody * GetCurrentActiveLink(Robot* robot)
 	return nullptr;
 }
 
-void RSApp::PrintRendeingTime()
+void RSApp::PrintRenderingTime()
 {
 	auto now = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double, milli> diff_ms = now - last_rendered;
@@ -49,7 +49,7 @@ void RSApp::DefineViewerCallbacks()
 	viewer.callback_pre_draw =
 		[&](igl::opengl::glfw::Viewer & v)
 	{
-		//PrintRendeingTime();
+		PrintRenderingTime();
 		ikSolver->solve(10, false, false);
 		DrawAll();
 		return false;

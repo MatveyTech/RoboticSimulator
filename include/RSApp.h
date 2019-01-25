@@ -29,7 +29,7 @@ private:
 	chrono::steady_clock::time_point last_rendered;
 	
 	//shared_ptr<Robot*> robot;
-	void PrintRendeingTime();
+	void PrintRenderingTime();
 	void MoveActiveLink(P3D delta);
 	void DefineViewerCallbacks();
 
