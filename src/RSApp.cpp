@@ -1,5 +1,4 @@
 
-//#include "..\include\Utils_my.h"
 #include "..\include\RSApp.h"
 #include <Eigen/Dense>
 #include <fstream>
@@ -10,12 +9,89 @@
 
 using namespace Eigen;
 
-RigidBody * GetRigidBody(Robot* robot)
+//always returns 7nth left link
+RigidBody * GetCurrentActiveLink(Robot* robot)
 {
 	for (int i = 0; i < robot->getRigidBodyCount(); i++)
-		if (robot->getRigidBody(i)->name.compare("link_2_l") == 0)
+		if (robot->getRigidBody(i)->name.compare("link_7_l") == 0)
 			return robot->getRigidBody(i);
 	return nullptr;
+}
+
+void RSApp::PrintRendeingTime()
+{
+	auto now = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double, milli> diff_ms = now - last_rendered;
+	last_rendered = now;
+	cout << diff_ms.count() << endl;
+}
+
+void RSApp::MoveActiveLink(P3D delta)
+{
+	RigidBody* rb = GetCurrentActiveLink(robot);
+	ikSolver->ikPlan->endEffectors.clear();
+	ikSolver->ikPlan->endEffectors.push_back(IK_EndEffector());
+	ikSolver->ikPlan->endEffectors.back().endEffectorLocalCoords = P3D(0, 0, 0);
+	ikSolver->ikPlan->endEffectors.back().endEffectorRB = rb;
+
+	P3D cart = rb->getWorldCoordinates(P3D(0, 0, 0));
+	cout << "new point:(" << cart.x() << ";" << cart.y() << ";" << cart.z() << ")." << endl;
+
+	ikSolver->ikEnergyFunction->regularizer = 100;
+	ikSolver->ikOptimizer->checkDerivatives = true;
+	P3D newPoint = cart + delta;
+	ikSolver->ikPlan->endEffectors.back().targetEEPos = newPoint;
+}
+
+void RSApp::DefineViewerCallbacks()
+{
+	//viewer.core.is_animating = true;
+	viewer.callback_pre_draw =
+		[&](igl::opengl::glfw::Viewer & v)
+	{
+		//PrintRendeingTime();
+		ikSolver->solve(10, false, false);
+		DrawAll();
+		return false;
+	};
+	
+	viewer.callback_key_down =
+		[&](igl::opengl::glfw::Viewer &, unsigned int key, int mod)
+	{
+		double step = 0.035;
+		
+		switch (key)
+		{
+		case GLFW_KEY_UP:
+			MoveActiveLink(P3D(0, step, 0));
+			return true;
+		case GLFW_KEY_DOWN:
+			MoveActiveLink(P3D(0, -step, 0));
+			return true;
+		case GLFW_KEY_LEFT:
+			MoveActiveLink(P3D(0, 0, step));
+			return true;
+		case GLFW_KEY_RIGHT:
+			MoveActiveLink(P3D(0, 0, -step));
+			return true;
+		case GLFW_KEY_PAGE_UP:
+			MoveActiveLink(P3D(-step,0, 0));
+			return true;
+		case GLFW_KEY_PAGE_DOWN:
+			MoveActiveLink(P3D(step, 0, 0));
+			return true;
+		default:
+			return false;
+			break;
+		}		
+		return false;
+	};
+}
+
+void RSApp::CreateIKSolver()
+{
+	delete ikSolver;
+	ikSolver = new IK_Solver(robot, true);
 }
 
 RSApp::RSApp(void)
@@ -29,55 +105,10 @@ RSApp::RSApp(void)
 		fName = "C:/Users/matvey/Documents/CS2/Graphics project/RoboticSimulator/data/rbs/yumi/yumi.rbs";//TODOMATVEY:Change this
 	loadFile(fName);
 	LoadMeshModelsIntoViewer(useSerializedModels);
-	//viewer.core.camera_eye = Vector3f(3,3,0);
+	DefineViewerCallbacks();
 
-	viewer.callback_pre_draw =
-		[&](igl::opengl::glfw::Viewer & v)
-	{
-		auto now = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<double, milli> diff_ms = now - last_rendered;
-		last_rendered = now;
-		//cout << diff_ms.count() << endl;
-		DrawAll();
-		return false;
-	};
-	viewer.core.is_animating = true;
-
-	viewer.callback_key_down =
-		[&](igl::opengl::glfw::Viewer &, unsigned int key, int mod)
-	{
-		if (key == GLFW_KEY_J)
-		{
-			rbEngine->drawRBs();
-			return true;
-		}
-
-		if (key == GLFW_KEY_D)
-		{
-			DrawAll();
-			return true;
-		}
-
-		if (key == GLFW_KEY_ENTER)
-		{
-			RigidBody* rb = GetRigidBody(robot);
-			ikSolver->ikPlan->endEffectors.clear();
-			ikSolver->ikPlan->endEffectors.push_back(IK_EndEffector());
-			ikSolver->ikPlan->endEffectors.back().endEffectorLocalCoords = P3D(0, 0, 0);
-			ikSolver->ikPlan->endEffectors.back().endEffectorRB = rb;
-			ikSolver->ikPlan->endEffectors.back().targetEEPos = P3D(0.5, 0.5, 0);
-			ikSolver->ikEnergyFunction->regularizer = 100;
-			ikSolver->ikOptimizer->checkDerivatives = true;
-			ikSolver->solve(10, false, false);
-
-			rbEngine->drawRBs();
-			return true;
-		}
-		return false;
-	};
-
-
-
+	CreateIKSolver();
+	
 	viewer.launch();
 }
 
@@ -117,8 +148,7 @@ void RSApp::loadRobot(const char* fName) {
 
 	//rbEngine->GetNumOfrbs();
 
-	delete ikSolver;
-	ikSolver = new IK_Solver(robot, true);
+	
 }
 
 MatrixXd TransformP(Eigen::MatrixXd &V, Eigen::Matrix4d &tr)
@@ -137,7 +167,6 @@ void RSApp::LoadMeshModelsIntoViewer(bool useSerializedModels)
 		string VFile = "../RoboticSimulator/data/rbs/yumi/meshes_ser/V_link_" + std::to_string(ii);
 		string FFile = "../RoboticSimulator/data/rbs/yumi/meshes_ser/F_link_" + std::to_string(ii);
 
-		//if (!isFileExists(VFile))
 		if (useSerializedModels)
 		{
 			igl::deserialize(i->vertices, "V", VFile);
@@ -163,9 +192,6 @@ void RSApp::LoadMeshModelsIntoViewer(bool useSerializedModels)
 
 		viewer.append_mesh();
 		ii++;
-
-		/*if (ii == 1)
-			break;*/
 	}
 	DrawAll();
 }

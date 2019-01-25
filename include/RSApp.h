@@ -29,9 +29,14 @@ private:
 	chrono::steady_clock::time_point last_rendered;
 	
 	//shared_ptr<Robot*> robot;
-
+	void PrintRendeingTime();
+	void MoveActiveLink(P3D delta);
+	void DefineViewerCallbacks();
 
 public:
+	
+	void CreateIKSolver();
+
 	RSApp(void);
 	virtual void loadFile(const char* fName);
 	void loadRobot(const char* fName);
