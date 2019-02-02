@@ -30,7 +30,7 @@ private:
 	
 	//shared_ptr<Robot*> robot;
 	void PrintRenderingTime();
-	void MoveActiveLink(P3D delta);
+	void MoveActiveLink(P3D point, bool isAbsolute=false);
 	void DefineViewerCallbacks();
 
 public:

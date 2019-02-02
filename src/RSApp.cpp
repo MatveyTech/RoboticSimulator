@@ -26,7 +26,7 @@ void RSApp::PrintRenderingTime()
 	cout << diff_ms.count() << endl;
 }
 
-void RSApp::MoveActiveLink(P3D delta)
+void RSApp::MoveActiveLink(P3D point, bool isAbsolute)
 {
 	RigidBody* rb = GetCurrentActiveLink(robot);
 	ikSolver->ikPlan->endEffectors.clear();
@@ -39,7 +39,7 @@ void RSApp::MoveActiveLink(P3D delta)
 
 	ikSolver->ikEnergyFunction->regularizer = 100;
 	ikSolver->ikOptimizer->checkDerivatives = true;
-	P3D newPoint = cart + delta;
+	P3D newPoint = isAbsolute ? point : cart + point;
 	ikSolver->ikPlan->endEffectors.back().targetEEPos = newPoint;
 }
 
@@ -49,8 +49,8 @@ void RSApp::DefineViewerCallbacks()
 	viewer.callback_pre_draw =
 		[&](igl::opengl::glfw::Viewer & v)
 	{
-		PrintRenderingTime();
 		ikSolver->solve(10, false, false);
+		//PrintRenderingTime();
 		DrawAll();
 		return false;
 	};
@@ -79,6 +79,11 @@ void RSApp::DefineViewerCallbacks()
 			return true;
 		case GLFW_KEY_PAGE_DOWN:
 			MoveActiveLink(P3D(step, 0, 0));
+		case GLFW_KEY_S:
+			ikSolver->solve(100, false, false);
+			return true;
+		case GLFW_KEY_P:
+			MoveActiveLink(P3D(0.38,0.44,-0.57),true);
 			return true;
 		default:
 			return false;
