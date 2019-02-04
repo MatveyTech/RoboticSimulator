@@ -83,14 +83,15 @@ void RSApp::DefineViewerCallbacks()
 			ikSolver->solve(100, false, false);
 			return true;
 		case GLFW_KEY_P:
-			MoveActiveLink(P3D(0.38,0.44,-0.57),true);
+			//MoveActiveLink(P3D(0.38,0.44,-0.57),true);
+			rbEngine->drawRBs();
 			return true;
 		case GLFW_KEY_A:
 		{
 			DynamicArray<double> newJoints;
 			newJoints.resize(14, 0);
-			newJoints[0] = 30;
-			newJoints[8] = 30;
+			newJoints[1] = 58; newJoints[3] = 15; newJoints[5] = 68; newJoints[7] = 300;
+			newJoints[9] = 258; newJoints[11] = 72; newJoints[13] = 72;
 			robot->MoveByJoints(newJoints);
 			return true;
 		}
