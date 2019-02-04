@@ -220,3 +220,17 @@ RigidBody* Robot::getRBByName(const char* jName) {
 	}
 	return NULL;
 }
+
+bool Robot::MoveByJoints(DynamicArray<double> newJoints)
+{
+	if (jointList.size() != newJoints.size())
+		return false;
+
+	RobotState rs(this);
+	for (uint i = 0; i < jointList.size(); i++) {
+		HingeJoint* joint = dynamic_cast<HingeJoint*>(jointList[i]);
+		QuaternionR jointOrientation = getRotationQuaternion(RAD(newJoints[i]), joint->rotationAxis);
+		rs.setJointRelativeOrientation(jointOrientation, i);
+	}
+	setState(&rs);
+}

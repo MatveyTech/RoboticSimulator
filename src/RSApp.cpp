@@ -49,7 +49,7 @@ void RSApp::DefineViewerCallbacks()
 	viewer.callback_pre_draw =
 		[&](igl::opengl::glfw::Viewer & v)
 	{
-		ikSolver->solve(10, false, false);
+		//ikSolver->solve(10, false, false);
 		//PrintRenderingTime();
 		DrawAll();
 		return false;
@@ -85,6 +85,22 @@ void RSApp::DefineViewerCallbacks()
 		case GLFW_KEY_P:
 			MoveActiveLink(P3D(0.38,0.44,-0.57),true);
 			return true;
+		case GLFW_KEY_A:
+		{
+			DynamicArray<double> newJoints;
+			newJoints.resize(14, 0);
+			newJoints[0] = 30;
+			newJoints[8] = 30;
+			robot->MoveByJoints(newJoints);
+			return true;
+		}
+		case GLFW_KEY_R:
+		{
+			DynamicArray<double> newJoints;
+			newJoints.resize(14, 0);
+			robot->MoveByJoints(newJoints);
+			return true;
+		}
 		default:
 			return false;
 			break;

@@ -221,6 +221,7 @@ public:
 		return mass;
 	}
 
+	bool MoveByJoints(DynamicArray<double> newJoints); //value in degrees , the order is r1 l1 r2 l2 r3 l3... 
 };
 
 class JointState {
