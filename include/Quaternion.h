@@ -148,6 +148,8 @@ public:
 
 	///< modulates rotation
 	QuaternionR						partial(double _dt) const;	
+	
+	string ToString();
 };
 
 //	returns a quaternion that represents a rotation of angle radians around the axis (unit vector!) provided as a parameter.

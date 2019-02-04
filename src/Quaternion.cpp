@@ -1,5 +1,6 @@
 #include "../include/Quaternion.h"
 #include "../include/Utils.h"
+#include <sstream>
 
 //	A constructor. Intuitive...
 QuaternionR::QuaternionR(double s, const V3D& v) {
@@ -262,6 +263,17 @@ void QuaternionR::setRotationFrom(const V3D& vec) {
 QuaternionR QuaternionR::partial(double _dt) const
 {
 	return SetRotationFrom(logMap()*_dt, v.normalized());
+}
+
+string QuaternionR::ToString()
+{
+	V3D axis;
+	double angle;
+	getAxisAngle(axis, angle);
+
+	ostringstream oss;
+	oss << "The axis is:" << axis << " . The angle is : " << DEG(angle);
+	return oss.str();
 }
 
 const QuaternionR QuaternionR::SetRotationFrom(const double _a, const V3D& _axis)
