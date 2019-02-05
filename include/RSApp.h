@@ -32,7 +32,7 @@ private:
 	void PrintRenderingTime();
 	void MoveActiveLink(P3D point, bool isAbsolute=false);
 	void DefineViewerCallbacks();
-
+	bool CartMode = false;
 public:
 	
 	void CreateIKSolver();

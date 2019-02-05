@@ -6,6 +6,7 @@
 #include "../include/HingeJoint.h"
 #include "../include/UniversalJoint.h"
 #include "../include/BallAndSocketJoint.h"
+#include <iostream>
 
 /**
 	the constructor
@@ -233,4 +234,17 @@ bool Robot::MoveByJoints(DynamicArray<double> newJoints)
 		rs.setJointRelativeOrientation(jointOrientation, i);
 	}
 	setState(&rs);
+}
+
+void Robot::PrintJointsValues()
+{
+	V3D rotAxis; double rotAngle;
+	cout << "Joints:{";
+
+	for (uint i = 0; i < jointList.size(); i++) {
+		HingeJoint* joint = dynamic_cast<HingeJoint*>(jointList[i]);
+		joint->computeRelativeOrientation().getAxisAngle(rotAxis, rotAngle);
+		cout << DEG(rotAngle) << ",";
+	}
+	cout << "}" << std::endl;
 }

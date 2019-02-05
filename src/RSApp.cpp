@@ -46,68 +46,129 @@ void RSApp::MoveActiveLink(P3D point, bool isAbsolute)
 void RSApp::DefineViewerCallbacks()
 {
 	//viewer.core.is_animating = true;
-	viewer.callback_pre_draw =
-		[&](igl::opengl::glfw::Viewer & v)
+	viewer.callback_pre_draw = 
+	[&](igl::opengl::glfw::Viewer & v)
 	{
 		//ikSolver->solve(10, false, false);
 		//PrintRenderingTime();
 		DrawAll();
 		return false;
 	};
-	
-	viewer.callback_key_down =
-		[&](igl::opengl::glfw::Viewer &, unsigned int key, int mod)
+	if (CartMode)
 	{
-		double step = 0.035;
-		
-		switch (key)
+		viewer.callback_key_down =
+			[&](igl::opengl::glfw::Viewer &, unsigned int key, int mod)
 		{
-		case GLFW_KEY_UP:
-			MoveActiveLink(P3D(0, step, 0));
-			return true;
-		case GLFW_KEY_DOWN:
-			MoveActiveLink(P3D(0, -step, 0));
-			return true;
-		case GLFW_KEY_LEFT:
-			MoveActiveLink(P3D(0, 0, step));
-			return true;
-		case GLFW_KEY_RIGHT:
-			MoveActiveLink(P3D(0, 0, -step));
-			return true;
-		case GLFW_KEY_PAGE_UP:
-			MoveActiveLink(P3D(-step,0, 0));
-			return true;
-		case GLFW_KEY_PAGE_DOWN:
-			MoveActiveLink(P3D(step, 0, 0));
-		case GLFW_KEY_S:
-			ikSolver->solve(100, false, false);
-			return true;
-		case GLFW_KEY_P:
-			//MoveActiveLink(P3D(0.38,0.44,-0.57),true);
-			rbEngine->drawRBs();
-			return true;
-		case GLFW_KEY_A:
-		{
-			DynamicArray<double> newJoints;
-			newJoints.resize(14, 0);
-			newJoints[1] = 58; newJoints[3] = 15; newJoints[5] = 68; newJoints[7] = 300;
-			newJoints[9] = 258; newJoints[11] = 72; newJoints[13] = 72;
-			robot->MoveByJoints(newJoints);
-			return true;
-		}
-		case GLFW_KEY_R:
-		{
-			DynamicArray<double> newJoints;
-			newJoints.resize(14, 0);
-			robot->MoveByJoints(newJoints);
-			return true;
-		}
-		default:
+			double step = 0.035;
+
+			switch (key)
+			{
+			case GLFW_KEY_UP:
+				MoveActiveLink(P3D(0, step, 0));
+				return true;
+			case GLFW_KEY_DOWN:
+				MoveActiveLink(P3D(0, -step, 0));
+				return true;
+			case GLFW_KEY_LEFT:
+				MoveActiveLink(P3D(0, 0, step));
+				return true;
+			case GLFW_KEY_RIGHT:
+				MoveActiveLink(P3D(0, 0, -step));
+				return true;
+			case GLFW_KEY_PAGE_UP:
+				MoveActiveLink(P3D(-step, 0, 0));
+				return true;
+			case GLFW_KEY_PAGE_DOWN:
+				MoveActiveLink(P3D(step, 0, 0));
+			case GLFW_KEY_S:
+				ikSolver->solve(100, false, false);
+				return true;
+			case GLFW_KEY_P:
+				//MoveActiveLink(P3D(0.38,0.44,-0.57),true);
+				//rbEngine->drawRBs();
+				robot->PrintJointsValues();
+				return true;
+			case GLFW_KEY_A:
+			{
+				DynamicArray<double> newJoints;
+				newJoints.resize(14, 0);
+				//newJoints[1] = 58; newJoints[3] = 15; newJoints[5] = 68; newJoints[7] = 300;
+				//newJoints[9] = 258; newJoints[11] = 72; newJoints[13] = 72;
+				newJoints[0] = 90; newJoints[2] = 50;
+				robot->MoveByJoints(newJoints);
+				return true;
+			}
+			case GLFW_KEY_R:
+			{
+				DynamicArray<double> newJoints;
+				newJoints.resize(14, 0);
+				robot->MoveByJoints(newJoints);
+				return true;
+			}
+			default:
+				return false;
+			}
 			return false;
-			break;
-		}		
-		return false;
-	};
+		};
+	}
+	else
+	{
+		viewer.callback_key_down =
+			[&](igl::opengl::glfw::Viewer &, unsigned int key, int mod)
+		{
+			double step = 0.035;
+
+			switch (key)
+			{
+			case GLFW_KEY_UP:
+				MoveActiveLink(P3D(0, step, 0));
+				return true;
+			case GLFW_KEY_DOWN:
+				MoveActiveLink(P3D(0, -step, 0));
+				return true;
+			case GLFW_KEY_LEFT:
+				MoveActiveLink(P3D(0, 0, step));
+				return true;
+			case GLFW_KEY_RIGHT:
+				MoveActiveLink(P3D(0, 0, -step));
+				return true;
+			case GLFW_KEY_PAGE_UP:
+				MoveActiveLink(P3D(-step, 0, 0));
+				return true;
+			case GLFW_KEY_PAGE_DOWN:
+				MoveActiveLink(P3D(step, 0, 0));
+			case GLFW_KEY_S:
+				ikSolver->solve(100, false, false);
+				return true;
+			case GLFW_KEY_P:
+				//MoveActiveLink(P3D(0.38,0.44,-0.57),true);
+				//rbEngine->drawRBs();
+				robot->PrintJointsValues();
+				return true;
+			case GLFW_KEY_A:
+			{
+				DynamicArray<double> newJoints;
+				newJoints.resize(14, 0);
+				//newJoints[1] = 58; newJoints[3] = 15; newJoints[5] = 68; newJoints[7] = 300;
+				//newJoints[9] = 258; newJoints[11] = 72; newJoints[13] = 72;
+				newJoints[0] = 90; newJoints[2] = 50;
+				robot->MoveByJoints(newJoints);
+				return true;
+			}
+			case GLFW_KEY_R:
+			{
+				DynamicArray<double> newJoints;
+				newJoints.resize(14, 0);
+				robot->MoveByJoints(newJoints);
+				return true;
+			}
+			default:
+				return false;
+			}
+			return false;
+		};
+	}
+
 }
 
 void RSApp::CreateIKSolver()
