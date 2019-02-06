@@ -222,6 +222,18 @@ RigidBody* Robot::getRBByName(const char* jName) {
 	return NULL;
 }
 
+bool Robot::MoveByJointsR(Eigen::VectorXd vec)
+{
+	//quick and dirty
+	DynamicArray<double> newJoints;
+	newJoints.resize(14, 0);
+	for (size_t i = 0; i < 7; i++)
+	{
+		newJoints[2 * i] = vec(i);
+	}
+	return MoveByJoints(newJoints);
+}
+
 bool Robot::MoveByJoints(DynamicArray<double> newJoints)
 {
 	if (jointList.size() != newJoints.size())
@@ -234,6 +246,7 @@ bool Robot::MoveByJoints(DynamicArray<double> newJoints)
 		rs.setJointRelativeOrientation(jointOrientation, i);
 	}
 	setState(&rs);
+	return true;
 }
 
 void Robot::PrintJointsValues()

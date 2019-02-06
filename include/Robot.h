@@ -4,8 +4,10 @@
 #include "../include/Joint.h"
 #include "../include/Utils.h"
 #include "../include/BodyFrame.h"
+#include <Eigen/Dense>
 
 class RobotState;
+
 
 /**
 	Robots are articulated figures (i.e. tree structures starting at a root).
@@ -220,7 +222,7 @@ public:
 	double getMass(){
 		return mass;
 	}
-
+	bool MoveByJointsR(Eigen::VectorXd vec);
 	bool MoveByJoints(DynamicArray<double> newJoints); //value in degrees , the order is r1 l1 r2 l2 r3 l3... 
 	void PrintJointsValues();
 };

@@ -120,40 +120,33 @@ void RSApp::DefineViewerCallbacks()
 
 			switch (key)
 			{
-			case GLFW_KEY_UP:
-				MoveActiveLink(P3D(0, step, 0));
-				return true;
-			case GLFW_KEY_DOWN:
-				MoveActiveLink(P3D(0, -step, 0));
-				return true;
 			case GLFW_KEY_LEFT:
 				MoveActiveLink(P3D(0, 0, step));
 				return true;
 			case GLFW_KEY_RIGHT:
 				MoveActiveLink(P3D(0, 0, -step));
 				return true;
-			case GLFW_KEY_PAGE_UP:
-				MoveActiveLink(P3D(-step, 0, 0));
-				return true;
-			case GLFW_KEY_PAGE_DOWN:
-				MoveActiveLink(P3D(step, 0, 0));
 			case GLFW_KEY_S:
 				ikSolver->solve(100, false, false);
 				return true;
 			case GLFW_KEY_P:
-				//MoveActiveLink(P3D(0.38,0.44,-0.57),true);
-				//rbEngine->drawRBs();
 				robot->PrintJointsValues();
 				return true;
 			case GLFW_KEY_A:
 			{
-				DynamicArray<double> newJoints;
-				newJoints.resize(14, 0);
-				//newJoints[1] = 58; newJoints[3] = 15; newJoints[5] = 68; newJoints[7] = 300;
-				//newJoints[9] = 258; newJoints[11] = 72; newJoints[13] = 72;
-				newJoints[0] = 90; newJoints[2] = 50;
-				robot->MoveByJoints(newJoints);
+				VectorXd v(7);
+				v << 0,90,0,0,0,0,0;
+				robot->MoveByJointsR(v);
+				robot->PrintJointsValues();
 				return true;
+
+				//DynamicArray<double> newJoints;
+				//newJoints.resize(14, 0);
+				////newJoints[1] = 58; newJoints[3] = 15; newJoints[5] = 68; newJoints[7] = 300;
+				////newJoints[9] = 258; newJoints[11] = 72; newJoints[13] = 72;
+				//newJoints[0] = 90; newJoints[2] = 50;
+				//robot->MoveByJoints(newJoints);
+				//return true;
 			}
 			case GLFW_KEY_R:
 			{
