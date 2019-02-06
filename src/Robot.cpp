@@ -252,12 +252,12 @@ bool Robot::MoveByJoints(DynamicArray<double> newJoints)
 void Robot::PrintJointsValues()
 {
 	V3D rotAxis; double rotAngle;
-	cout << "Joints:{";
+	std::cout << "Joints:{";
 
 	for (uint i = 0; i < jointList.size(); i++) {
 		HingeJoint* joint = dynamic_cast<HingeJoint*>(jointList[i]);
 		joint->computeRelativeOrientation().getAxisAngle(rotAxis, rotAngle);
-		cout << DEG(rotAngle) << ",";
+		std::cout << DEG(rotAngle) << ",";
 	}
-	cout << "}" << std::endl;
+	std::cout << "}" << std::endl;
 }

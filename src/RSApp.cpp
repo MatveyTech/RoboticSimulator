@@ -275,7 +275,7 @@ void RSApp::LoadMeshModelsIntoViewer(bool useSerializedModels)
 void RSApp::DrawAll()
 {
 	int ii = 0;
-	for (auto&& i : rbEngine->rbs)
+	for (auto&& i : rbEngine->rbs) 
 	{
 		if (ii > 0) // base isn't moving so no need to redraw it
 		{
@@ -284,7 +284,7 @@ void RSApp::DrawAll()
 			Matrix4x4 m = Matrix4x4::Identity();
 			m.topLeftCorner(3, 3) = rotationM;
 			m.topRightCorner(3, 1) = Vector3d(i->state.position[0], i->state.position[1], i->state.position[2]);
-			Matrix4x4 res = m * i->meshtransformation;
+			Eigen::Matrix4d res = m * i->meshtransformation;
 			MatrixXd transformed_vert = TransformP(i->vertices, res);
 			viewer.data_list[ii].set_mesh(transformed_vert, i->faces);
 		}

@@ -265,15 +265,16 @@ QuaternionR QuaternionR::partial(double _dt) const
 	return SetRotationFrom(logMap()*_dt, v.normalized());
 }
 
-string QuaternionR::ToString()
+std::string QuaternionR::ToString()
 {
 	V3D axis;
 	double angle;
 	getAxisAngle(axis, angle);
 
-	ostringstream oss;
+	std::ostringstream oss;
 	oss << "The axis is:" << axis << " . The angle is : " << DEG(angle);
 	return oss.str();
+	return std::string();
 }
 
 const QuaternionR QuaternionR::SetRotationFrom(const double _a, const V3D& _axis)

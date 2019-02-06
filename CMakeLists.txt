@@ -11,7 +11,7 @@ option(LIBIGL_WITH_VIEWER            "Use OpenGL viewer"  ON)
 find_package(LIBIGL REQUIRED QUIET)
 
 # Add your project files
-file(GLOB SRCFILES *.cpp)
+# file(GLOB SRCFILES *.cpp)
 
 file(GLOB SRCFILES
 		${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
