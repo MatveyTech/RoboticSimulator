@@ -1,0 +1,2 @@
+1. Add IGL_STATIC_LIBRARY define to project->preprocessor definitions
+2. Add these libs as additional dependencies glad.lib glfw3.lib igl.lib igl_opengl.lib igl_opengl_glfw.lib

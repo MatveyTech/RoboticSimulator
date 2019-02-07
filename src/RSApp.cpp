@@ -13,7 +13,7 @@ using namespace Eigen;
 RigidBody * GetCurrentActiveLink(Robot* robot)
 {
 	for (int i = 0; i < robot->getRigidBodyCount(); i++)
-		if (robot->getRigidBody(i)->name.compare("link_7_l") == 0)
+		if (robot->getRigidBody(i)->name.compare("link_7_r") == 0)
 			return robot->getRigidBody(i);
 	return nullptr;
 }
@@ -49,7 +49,8 @@ void RSApp::DefineViewerCallbacks()
 	viewer.callback_pre_draw = 
 	[&](igl::opengl::glfw::Viewer & v)
 	{
-		//ikSolver->solve(10, false, false);
+		if (CartMode)
+			ikSolver->solve(10, false, false);
 		//PrintRenderingTime();
 		DrawAll();
 		return false;
@@ -135,18 +136,10 @@ void RSApp::DefineViewerCallbacks()
 			case GLFW_KEY_A:
 			{
 				VectorXd v(7);
-				v << 0,90,0,0,0,0,0;
+				v << 50 ,-50,0,-50,0,0,0;
 				robot->MoveByJointsR(v);
 				robot->PrintJointsValues();
 				return true;
-
-				//DynamicArray<double> newJoints;
-				//newJoints.resize(14, 0);
-				////newJoints[1] = 58; newJoints[3] = 15; newJoints[5] = 68; newJoints[7] = 300;
-				////newJoints[9] = 258; newJoints[11] = 72; newJoints[13] = 72;
-				//newJoints[0] = 90; newJoints[2] = 50;
-				//robot->MoveByJoints(newJoints);
-				//return true;
 			}
 			case GLFW_KEY_R:
 			{

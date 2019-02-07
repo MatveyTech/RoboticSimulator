@@ -33,6 +33,7 @@ private:
 	void MoveActiveLink(P3D point, bool isAbsolute=false);
 	void DefineViewerCallbacks();
 	bool CartMode = false;
+	//int joints[7] = { 0,0,0,0,0,0,0 };
 public:
 	
 	void CreateIKSolver();
