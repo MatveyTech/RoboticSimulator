@@ -7,6 +7,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 option(LIBIGL_WITH_OPENGL            "Use OpenGL"         ON)
 option(LIBIGL_WITH_OPENGL_GLFW       "Use GLFW"           ON)
 option(LIBIGL_WITH_VIEWER            "Use OpenGL viewer"  ON)
+option(USE_STATIC_LIB            "Use static libigl"  OFF)
 
 find_package(LIBIGL REQUIRED QUIET)
 
@@ -19,5 +20,24 @@ file(GLOB SRCFILES
 		${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
 	)
 
+if(USE_STATIC_LIB)
+	add_definitions(-DIGL_STATIC_LIBRARY)
+	link_directories(${CMAKE_SOURCE_DIR}/libs/$(ConfigurationName)/)
+endif(USE_STATIC_LIB)
+
+
 add_executable(${PROJECT_NAME}_bin ${SRCFILES})
-target_link_libraries(${PROJECT_NAME}_bin igl::core igl::opengl_glfw)
+
+if(USE_STATIC_LIB)
+	target_link_libraries(${PROJECT_NAME}_bin 
+	igl::core 
+	igl::opengl_glfw
+	glad.lib
+	glfw3.lib
+	igl.lib
+	igl_opengl.lib
+	igl_opengl_glfw.lib
+	)
+else(USE_STATIC_LIB)
+	target_link_libraries(${PROJECT_NAME}_bin igl::core igl::opengl_glfw)
+endif(USE_STATIC_LIB)
