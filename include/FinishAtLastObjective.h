@@ -1,0 +1,21 @@
+#pragma once
+
+#include "ObjectiveFunction.h"
+
+using namespace Eigen;
+
+class FinishAtLastObjective : ObjectiveFunction
+{
+public:
+	FinishAtLastObjective(const VectorXd & endPos, const std::string & objectiveDescription);
+	~FinishAtLastObjective();
+
+	virtual double computeValue(const dVector& p);
+	virtual void addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector& p);
+	virtual void addGradientTo(dVector& grad, const dVector& p);
+
+private:
+	VectorXd m_endPos;
+	int m_numOfJoints;
+};
+

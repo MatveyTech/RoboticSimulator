@@ -1,5 +1,8 @@
 
 #include "..\include\RSApp.h"
+#include "..\include\StartFromFirstObjective.h"
+#include "..\include\FinishAtLastObjective.h"
+#include "..\include\EqualDistributionObjective.h"
 #include <fstream>
 #include <chrono>
 
