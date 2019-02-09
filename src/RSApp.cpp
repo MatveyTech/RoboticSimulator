@@ -173,9 +173,9 @@ RSApp::RSApp(void)
 	bool useSerializedModels = false;
 	char* fName;
 	if (useSimpleRobot)
-		fName = "C:/Users/matvey/Documents/CS2/Graphics project/RoboticSimulator/data/rbs/yumi/yumi_simplified.rbs";//TODOMATVEY:Change this
+		fName = "../RoboticSimulator/data/rbs/yumi/yumi_simplified.rbs";//TODOMATVEY:Change this
 	else
-		fName = "C:/Users/matvey/Documents/CS2/Graphics project/RoboticSimulator/data/rbs/yumi/yumi.rbs";//TODOMATVEY:Change this
+		fName = "../RoboticSimulator/data/rbs/yumi/yumi.rbs";//TODOMATVEY:Change this
 	loadFile(fName);
 	LoadMeshModelsIntoViewer(useSerializedModels);
 	DefineViewerCallbacks();
