@@ -1,15 +1,12 @@
 
 #include "..\include\RSApp.h"
-#include <Eigen/Dense>
 #include <fstream>
 #include <chrono>
 
 #define COLOR(r,g,b) RowVector3d(r / 255., g / 255., b / 225.)
 
 
-using namespace Eigen;
-
-//always returns 7nth left link
+//always returns 7nth right link
 RigidBody * GetCurrentActiveLink(Robot* robot)
 {
 	for (int i = 0; i < robot->getRigidBodyCount(); i++)
@@ -122,10 +119,10 @@ void RSApp::DefineViewerCallbacks()
 			switch (key)
 			{
 			case GLFW_KEY_LEFT:
-				MoveActiveLink(P3D(0, 0, step));
+				robot->MoveByJointsR(simulation->MoveToPrevAndGet());
 				return true;
 			case GLFW_KEY_RIGHT:
-				MoveActiveLink(P3D(0, 0, -step));
+				robot->MoveByJointsR(simulation->MoveToNextAndGet());
 				return true;
 			case GLFW_KEY_S:
 				ikSolver->solve(100, false, false);
@@ -163,6 +160,13 @@ void RSApp::CreateIKSolver()
 	ikSolver = new IK_Solver(robot, true);
 }
 
+void RSApp::CreateSimulation()
+{
+	VectorXd v1(7); v1 << 0, 0, 0, 0, 0, 0, 0;
+	VectorXd v2(7); v2 << 50, -50, 0, -50, 0, 0, 0;
+	simulation = new Simulation(v1, v2, 15);
+}
+
 RSApp::RSApp(void)
 {
 	bool useSimpleRobot = true;
@@ -177,6 +181,7 @@ RSApp::RSApp(void)
 	DefineViewerCallbacks();
 
 	CreateIKSolver();
+	CreateSimulation();
 	
 	viewer.launch();
 }

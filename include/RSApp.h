@@ -11,6 +11,8 @@
 #include <igl/readOBJ.h>
 #include <GLFW/glfw3.h>
 #include <chrono>
+#include "Simulation.h"
+//#include <Eigen/Sparse>
 
 
 using namespace std;
@@ -26,17 +28,19 @@ private:
 	RobotState startState = RobotState(14);
 	IK_Solver* ikSolver = nullptr;
 	Viewer viewer;
+	Simulation* simulation;
 	chrono::steady_clock::time_point last_rendered;
 	
 	//shared_ptr<Robot*> robot;
 	void PrintRenderingTime();
 	void MoveActiveLink(P3D point, bool isAbsolute=false);
 	void DefineViewerCallbacks();
-	bool CartMode = false;
+	bool CartMode = true;
 	//int joints[7] = { 0,0,0,0,0,0,0 };
 public:
 	
 	void CreateIKSolver();
+	void CreateSimulation();
 
 	RSApp(void);
 	virtual void loadFile(const char* fName);
