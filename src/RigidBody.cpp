@@ -419,7 +419,7 @@ void RigidBody::loadFromFile(FILE* fp){
 					char tmpStr[200];
 					sscanf(line, "%s", tmpStr);
 					//std::string str(tmpStr);
-					string folder = "../RoboticSimulator/data/";//TODOMATVEY:Change this
+					string folder = "../RoboticSimulator/data/";
 					this->meshFileName = folder + string(tmpStr);
 					/*if (str != "None") {
 						tmpMesh = GLContentManager::getGLMesh(tmpStr);

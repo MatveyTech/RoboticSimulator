@@ -3,10 +3,10 @@
 
 using namespace Eigen;
 
-class StartFromFirstObjective : ObjectiveFunction
+class StartFromFirstObjective : public ObjectiveFunction
 {
 public:
-	StartFromFirstObjective(const VectorXd& startPos, const std::string& objectiveDescription);
+	StartFromFirstObjective(const VectorXd& startPos);
 	virtual ~StartFromFirstObjective(void);
 
 	virtual double computeValue(const dVector& p);

@@ -1,7 +1,19 @@
 #include "..\include\StartFromFirstObjective.h"
+#include <iostream>
+using namespace std;
+
+void printVector1(VectorXd pp)
+{
+	for (size_t i = 0; i < pp.size(); i++)
+	{
+		cout << pp(i) << " ";
+		if (i % 7 == 6)
+			cout << endl;
+	}
+}
 
 
-StartFromFirstObjective::StartFromFirstObjective(const VectorXd & startPos, const std::string & objectiveDescription)
+StartFromFirstObjective::StartFromFirstObjective(const VectorXd & startPos)
 {
 	m_startPos = startPos;
 	m_numOfJoints = m_startPos.rows();
@@ -35,6 +47,8 @@ void StartFromFirstObjective::addGradientTo(dVector & grad, const dVector & p)
 	int stopIndex = p.rows() - 1;*/
 	for (size_t i = 0; i < m_numOfJoints; i++)
 	{
-		grad(i) = 2 * p(i) - 2 * m_startPos(i);
+		grad(i) += 2 * p(i) - 2 * m_startPos(i);
 	}
+
+	//printVector1(grad);
 }

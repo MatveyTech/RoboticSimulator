@@ -4,10 +4,10 @@
 
 using namespace Eigen;
 
-class FinishAtLastObjective : ObjectiveFunction
+class FinishAtLastObjective : public ObjectiveFunction
 {
 public:
-	FinishAtLastObjective(const VectorXd & endPos, const std::string & objectiveDescription);
+	FinishAtLastObjective(const VectorXd & endPos);
 	~FinishAtLastObjective();
 
 	virtual double computeValue(const dVector& p);

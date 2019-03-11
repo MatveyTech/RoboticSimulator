@@ -1,4 +1,6 @@
 #include "..\include\EqualDistributionObjective.h"
+#include "..\include\StartFromFirstObjective.h"
+#include "..\include\FinishAtLastObjective.h"
 
 EqualDistributionObjective::EqualDistributionObjective(int NumOfJoints)
 {
@@ -50,4 +52,36 @@ void EqualDistributionObjective::addGradientTo(dVector & grad, const dVector & p
 			grad(i) += 4 * p(i) - 2 * p(i - m_numOfJoints) - 2 * p(i + m_numOfJoints);
 		}
 	}
+}
+
+
+Basic3::Basic3(const VectorXd& startPos, const VectorXd& finalPos)
+{
+	objectives.push_back(new StartFromFirstObjective(startPos));
+	objectives.push_back(new FinishAtLastObjective(finalPos));
+	int x = startPos.rows();
+	objectives.push_back(new EqualDistributionObjective(startPos.rows()));
+}
+
+
+Basic3::~Basic3()
+{
+}
+
+double Basic3::computeValue(const dVector & p)
+{
+	double res=0;
+	for (ObjectiveFunction* objective : objectives)
+		res += objective->computeValue(p);
+	return res;
+}
+
+void Basic3::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & p)
+{
+}
+
+void Basic3::addGradientTo(dVector & grad, const dVector & p)
+{
+	for (ObjectiveFunction* objective : objectives)
+		objective->addGradientTo(grad,p);
 }

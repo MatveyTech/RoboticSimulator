@@ -116,7 +116,7 @@ double GradientBasedFunctionMinimizer::doLineSearchStandard(ObjectiveFunction *f
 		if (!isfinite(newLineSearchValue))
 			newLineSearchValue = initialValue + 1.0;
 
-		if(newLineSearchValue > initialValue && j < maxLineSearchIterations -1) {
+		if(newLineSearchValue >= initialValue && j < maxLineSearchIterations -1) {
 			// restore and try again...
 			alpha /= 2.0;
 		} else {
