@@ -30,7 +30,7 @@ public:
 
 public:
 	Timer timerN;
-	SparseMatrix H;
+	ESparseMatrix H;
 	DynamicArray<MTriplet> hessianEntries;
 
 	int nMaxStabSteps = 10;		// maximum number of stabilization steps

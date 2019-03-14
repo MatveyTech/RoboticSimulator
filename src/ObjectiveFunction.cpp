@@ -98,8 +98,8 @@ void ObjectiveFunction::testHessianWithFD(const dVector& p){
 	double tol = 1e-4;
 	double eps = 1e-10;
 
-	SparseMatrix FDHessian(p.size(), p.size());
-	SparseMatrix analyticHessian(p.size(), p.size());
+	ESparseMatrix FDHessian(p.size(), p.size());
+	ESparseMatrix analyticHessian(p.size(), p.size());
 	DynamicArray<MTriplet> hessianEntries;
 
 	addEstimatedHessianEntriesTo(hessianEntries, p);
@@ -122,7 +122,7 @@ void ObjectiveFunction::testHessianWithFD(const dVector& p){
 }
 
 void ObjectiveFunction::testHessianPSD(const dVector& p) {
-	SparseMatrix H(p.size(), p.size());
+	ESparseMatrix H(p.size(), p.size());
 	DynamicArray<MTriplet> hessianEntries;
 	hessianEntries.clear();
 	addHessianEntriesTo(hessianEntries, p);

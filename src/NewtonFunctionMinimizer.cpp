@@ -47,7 +47,7 @@ void NewtonFunctionMinimizer::computeSearchDirection(ObjectiveFunction *function
 	timerN.restart();
 
 	//dp = Hes^-1 * grad
-	Eigen::SimplicialLDLT<SparseMatrix, Eigen::Lower> solver;
+	Eigen::SimplicialLDLT<ESparseMatrix, Eigen::Lower> solver;
 	//	Eigen::SparseLU<SparseMatrix> solver;
 	solver.compute(H);
 	dp = solver.solve(gradient);

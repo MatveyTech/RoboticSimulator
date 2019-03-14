@@ -10,7 +10,7 @@ typedef Eigen::VectorXd dVector;
 typedef Eigen::Vector3d Vector3d;
 typedef Eigen::MatrixXd MatrixNxM;
 typedef Eigen::Matrix3d Matrix3x3;
-typedef Eigen::SparseMatrix<double> SparseMatrix;
+typedef Eigen::SparseMatrix<double> ESparseMatrix;
 typedef Eigen::Triplet<double> MTriplet;
 
 // TODO: Consolidate `Vector3T` and `V3T`. I think we can only use `V3T`, but with better name (too similar to V3D)
@@ -50,7 +50,7 @@ typedef Eigen::Vector4d Vector4d;
 #endif // _DEBUG
 
 
-inline void resize(SparseMatrix& sm, int rows, int cols) {
+inline void resize(ESparseMatrix& sm, int rows, int cols) {
 	if (sm.rows() != rows || sm.cols() != cols)
 		sm.resize(rows, cols);
 	sm.setZero();
@@ -70,7 +70,7 @@ inline void resize(MatrixNxM& m, int rows, int cols) {
 
 //TODO: want to write only upper (or lower?) values for symmetric matrices
 template<class MATType>
-void writeSparseMatrixDenseBlock(SparseMatrix& hes, int startX, int startY, const MATType& block, bool writeOnlyLowerDiagonalValues = false) {
+void writeSparseMatrixDenseBlock(ESparseMatrix& hes, int startX, int startY, const MATType& block, bool writeOnlyLowerDiagonalValues = false) {
     for (int i = 0; i < block.rows(); i++)
         for (int j = 0; j < block.cols(); j++)
             if (startX + i >= startY + j || !writeOnlyLowerDiagonalValues)
@@ -78,7 +78,7 @@ void writeSparseMatrixDenseBlock(SparseMatrix& hes, int startX, int startY, cons
 }
 
 template<class MATType>
-void writeSparseMatrixDenseBlockAdd(SparseMatrix& hes, int startX, int startY, const MATType& block, bool writeOnlyLowerDiagonalValues = false) {
+void writeSparseMatrixDenseBlockAdd(ESparseMatrix& hes, int startX, int startY, const MATType& block, bool writeOnlyLowerDiagonalValues = false) {
     for (int i = 0; i < block.rows(); i++)
         for (int j = 0; j < block.cols(); j++)
             if (startX + i >= startY + j || !writeOnlyLowerDiagonalValues)
