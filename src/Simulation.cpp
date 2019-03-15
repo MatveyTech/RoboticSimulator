@@ -8,12 +8,22 @@ using namespace std;
 
 void printVector(VectorXd pp, int JointsNum = 7)
 {
-	for (size_t i = 0; i < pp.size(); i++)
+	int numOfPoints = pp.size()/JointsNum;
+	
+	int i = 0;
+	while (i < numOfPoints)
 	{
-		cout << pp(i) << " ";
-		if (i % JointsNum == JointsNum - 1)
-			cout << endl;
+		int currentIndex = i;
+		while (currentIndex < pp.size())
+		{
+			cout << pp(currentIndex) << " ";
+			currentIndex += numOfPoints;
+		}
+		i++;
+		cout << endl;
 	}
+	cout << endl << endl;
+	return;
 }
 
 void Simulation::CalculatePath(VectorXd startPoint, VectorXd endPoint, int numOfPoints)
@@ -126,13 +136,10 @@ void AdvancedSimulation::CalculatePath(VectorXd startPoint, VectorXd endPoint, i
 	}
 
 	ObjectiveFunction* eo = new Basic3(startPoint, endPoint);
-	
-	printVector(pp, numOfJoints);
-
-	cout << endl << endl;
 	double res;
 	GradientDescentFunctionMinimizer gm;
 	gm.minimize(eo, pp, res);
 
-	printVector(pp, numOfJoints);
+	path = pp;
+	printVector(path);
 }
