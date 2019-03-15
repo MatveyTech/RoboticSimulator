@@ -167,8 +167,8 @@ void RSApp::CreateSimulation()
 {
 	VectorXd v1(7); v1 << 0, 0, 0, 0, 0, 0, 0;
 	VectorXd v2(7); v2 << 50, -50, 0, -50, 0, 0, 0;
-	simulation = new BasicSimulation(v1, v2, PathSize);
-	//simulation = new AdvancedSimulation(v1, v2, PathSize);
+	//simulation = new BasicSimulation(v1, v2, PathSize);
+	simulation = new AdvancedSimulation(v1, v2, PathSize);
 }
 
 RSApp::RSApp(void)
@@ -363,9 +363,9 @@ void RSApp::CreateMenu()
 		ImGui::SameLine();
 		ImGui::Text("Simulation");
 
-		if (ImGui::Button("Print Hello", ImVec2(-1, 0)))
+		if (ImGui::Button("Print joints", ImVec2(-1, 0)))
 		{
-			std::cout << "Hello\n";
+			robot->PrintJointsValues();
 		}
 		//}
 	};

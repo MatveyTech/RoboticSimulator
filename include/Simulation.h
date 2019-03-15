@@ -8,11 +8,13 @@ class Simulation
 {
 protected:
 	
-	MatrixXd path;
-
-	virtual void CalculatePath(VectorXd startPoint, VectorXd endPoint, int numOfPoints) = 0;
+	int NumOfJoints;
+	int NumOfPoints;
+	VectorXd path;
+	virtual void CalculatePath(VectorXd startPoint, VectorXd endPoint) = 0;
 
 public:
+	Simulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints);
 	int CurrentIndex = 0;
 	VectorXd GetCurrent();
 	int IncreaseCurrentIndex();
@@ -26,7 +28,7 @@ public:
 class BasicSimulation : public Simulation
 {
 protected:
-	void CalculatePath(VectorXd startPoint, VectorXd endPoint, int numOfPoints);
+	void CalculatePath(VectorXd startPoint, VectorXd endPoint);
 
 public:
 	BasicSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints);
@@ -36,7 +38,7 @@ public:
 class AdvancedSimulation : public Simulation
 {
 protected:
-	void CalculatePath(VectorXd startPoint, VectorXd endPoint, int numOfPoints);
+	void CalculatePath(VectorXd startPoint, VectorXd endPoint);
 public:
 	AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints);
 	

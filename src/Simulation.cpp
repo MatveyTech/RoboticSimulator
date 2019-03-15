@@ -6,50 +6,53 @@
 
 using namespace std;
 
+//void printVector(VectorXd pp, int JointsNum = 7)
+//{
+//	int numOfPoints = pp.size()/JointsNum;
+//	
+//	int i = 0;
+//	while (i < numOfPoints)
+//	{
+//		int currentIndex = i;
+//		while (currentIndex < pp.size())
+//		{
+//			cout << pp(currentIndex) << " ";
+//			currentIndex += numOfPoints;
+//		}
+//		i++;
+//		cout << endl;
+//	}
+//	cout << endl << endl;
+//	return;
+//}
+
 void printVector(VectorXd pp, int JointsNum = 7)
 {
-	int numOfPoints = pp.size()/JointsNum;
-	
-	int i = 0;
-	while (i < numOfPoints)
+	for (size_t i = 0; i < pp.size(); i++)
 	{
-		int currentIndex = i;
-		while (currentIndex < pp.size())
-		{
-			cout << pp(currentIndex) << " ";
-			currentIndex += numOfPoints;
-		}
-		i++;
-		cout << endl;
+		cout << pp(i) << " ";
+		if (i % JointsNum == JointsNum - 1)
+			cout << endl;
 	}
-	cout << endl << endl;
-	return;
 }
 
-void Simulation::CalculatePath(VectorXd startPoint, VectorXd endPoint, int numOfPoints)
+
+
+Simulation::Simulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints)
 {
-	path.resize(numOfPoints, startPoint.size());
-	VectorXd step = (endPoint - startPoint) / (numOfPoints - 1);
-	int numOfJoints = startPoint.size();
-	for (size_t i = 0; i < numOfPoints; i++)
-	{
-		VectorXd roww(numOfJoints);
-		for (size_t j = 0; j < numOfJoints; j++)
-		{
-			roww(j) = startPoint(j) + step(j)*(i);
-		}
-		path.row(i) = roww;
-	}
+	NumOfJoints = startPoint.size();
+	NumOfPoints = numOfPoints;
+	//CalculatePath(startPoint, endPoint);
 }
 
 VectorXd Simulation::GetCurrent()
 {
-	return path.row(CurrentIndex);
+	return path.segment(CurrentIndex*NumOfJoints, NumOfJoints);
 }
 
 int Simulation::IncreaseCurrentIndex()
 {
-	if (CurrentIndex < path.rows() - 1)
+	if (CurrentIndex < NumOfPoints - 1)
 	{
 		CurrentIndex++;
 	}
@@ -94,42 +97,40 @@ void Simulation::Reset()
 
 
 
-
-
-
 BasicSimulation::BasicSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints)
+	:Simulation(startPoint, endPoint, numOfPoints)
 {
-	CalculatePath(startPoint, endPoint, numOfPoints);
+	CalculatePath(startPoint, endPoint);
 }
 
 
-void BasicSimulation::CalculatePath(VectorXd startPoint, VectorXd endPoint, int numOfPoints)
+void BasicSimulation::CalculatePath(VectorXd startPoint, VectorXd endPoint)
 {
-	path.resize(numOfPoints, startPoint.size());
-	VectorXd step = (endPoint - startPoint) / (numOfPoints - 1);
-	int numOfJoints = startPoint.size();
-	for (size_t i = 0; i < numOfPoints; i++)
+	//path.resize(numOfPoints, startPoint.size());
+	VectorXd step = (endPoint - startPoint) / (NumOfPoints - 1);
+	path = VectorXd(NumOfJoints*NumOfPoints);
+	for (size_t i = 0; i < NumOfPoints; i++)
 	{
-		VectorXd roww(numOfJoints);
-		for (size_t j = 0; j < numOfJoints; j++)
+		VectorXd roww(NumOfJoints);
+		for (size_t j = 0; j < NumOfJoints; j++)
 		{
-			roww(j) = startPoint(j) + step(j)*(i);
+			//roww(j) = startPoint(j) + step(j)*(i);
+			path(i*NumOfJoints+j) = startPoint(j) + step(j)*(i);
 		}
-		path.row(i) = roww;
+//		path.row(i) = roww;
 	}
 	printVector(path);
 }
 
 AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints)
+	:Simulation(startPoint, endPoint, numOfPoints)
 {
-	CalculatePath(startPoint, endPoint, numOfPoints);
+	CalculatePath(startPoint, endPoint);
 }
 
-void AdvancedSimulation::CalculatePath(VectorXd startPoint, VectorXd endPoint, int numOfPoints)
+void AdvancedSimulation::CalculatePath(VectorXd startPoint, VectorXd endPoint)
 {
-	int numOfJoints = 7;	
-
-	VectorXd pp(numOfJoints*numOfPoints);
+	VectorXd pp(NumOfJoints*NumOfPoints);
 	for (size_t i = 0; i < pp.size(); i++)
 	{
 		pp(i) = 20;
