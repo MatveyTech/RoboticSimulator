@@ -168,6 +168,7 @@ void RSApp::CreateSimulation()
 	VectorXd v1(7); v1 << 0, 0, 0, 0, 0, 0, 0;
 	VectorXd v2(7); v2 << 50, -50, 0, -50, 0, 0, 0;
 	simulation = new BasicSimulation(v1, v2, PathSize);
+	//simulation = new AdvancedSimulation(v1, v2, PathSize);
 }
 
 RSApp::RSApp(void)
@@ -343,20 +344,20 @@ void RSApp::CreateMenu()
 		//ImGui::Combo("Letter", &idx_choice, choices);
 
 		// Add a button
-		static int i = 1;
+		static int simulationPos = 1;
 
-		ImGui::SliderInt("", &i, 1, PathSize);
-		robot->MoveByJointsR(simulation->MoveToIndAndGet(i-1));
+		ImGui::SliderInt("", &simulationPos, 1, PathSize);
+		robot->MoveByJointsR(simulation->MoveToIndAndGet(simulationPos -1));
 		ImGui::SameLine();
 		if (ImGui::Button("-"))
 		{
-			i = simulation->DecreaseCurrentIndex()+1;
+			simulationPos = simulation->DecreaseCurrentIndex()+1;
 			robot->MoveByJointsR(simulation->GetCurrent());
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("+"))
 		{
-			i = simulation->IncreaseCurrentIndex()+1;
+			simulationPos = simulation->IncreaseCurrentIndex()+1;
 			robot->MoveByJointsR(simulation->GetCurrent());
 		}
 		ImGui::SameLine();
