@@ -7,14 +7,16 @@ using namespace Eigen;
 class Simulation
 {
 protected:
-	int CurrentIndex = 0;
+	
 	MatrixXd path;
 
 	virtual void CalculatePath(VectorXd startPoint, VectorXd endPoint, int numOfPoints) = 0;
 
 public:
-	
+	int CurrentIndex = 0;
 	VectorXd GetCurrent();
+	int IncreaseCurrentIndex();
+	int DecreaseCurrentIndex();
 	VectorXd MoveToNextAndGet();
 	VectorXd MoveToIndAndGet(int i);
 	VectorXd MoveToPrevAndGet();

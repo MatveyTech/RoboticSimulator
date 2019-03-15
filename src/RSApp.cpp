@@ -345,8 +345,22 @@ void RSApp::CreateMenu()
 		// Add a button
 		static int i = 1;
 
-		ImGui::SliderInt("Simulate", &i, 1, PathSize);
+		ImGui::SliderInt("", &i, 1, PathSize);
 		robot->MoveByJointsR(simulation->MoveToIndAndGet(i-1));
+		ImGui::SameLine();
+		if (ImGui::Button("-"))
+		{
+			i = simulation->DecreaseCurrentIndex()+1;
+			robot->MoveByJointsR(simulation->GetCurrent());
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("+"))
+		{
+			i = simulation->IncreaseCurrentIndex()+1;
+			robot->MoveByJointsR(simulation->GetCurrent());
+		}
+		ImGui::SameLine();
+		ImGui::Text("Simulation");
 
 		if (ImGui::Button("Print Hello", ImVec2(-1, 0)))
 		{

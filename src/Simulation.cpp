@@ -37,12 +37,27 @@ VectorXd Simulation::GetCurrent()
 	return path.row(CurrentIndex);
 }
 
-VectorXd Simulation::MoveToNextAndGet()
+int Simulation::IncreaseCurrentIndex()
 {
 	if (CurrentIndex < path.rows() - 1)
 	{
 		CurrentIndex++;
 	}
+	return CurrentIndex;
+}
+
+int Simulation::DecreaseCurrentIndex()
+{
+	if (CurrentIndex > 0)
+	{
+		CurrentIndex--;
+	}
+	return CurrentIndex;
+}
+
+VectorXd Simulation::MoveToNextAndGet()
+{
+	IncreaseCurrentIndex();
 	return GetCurrent();
 }
 
@@ -57,10 +72,7 @@ VectorXd Simulation::MoveToIndAndGet(int i)
 
 VectorXd Simulation::MoveToPrevAndGet()
 {
-	if (CurrentIndex > 0)
-	{
-		CurrentIndex--;
-	}
+	DecreaseCurrentIndex();
 	return GetCurrent();
 }
 
