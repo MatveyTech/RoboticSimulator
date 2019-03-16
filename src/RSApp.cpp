@@ -188,6 +188,8 @@ RSApp::RSApp(void)
 	CreateSimulation();
 	CreateMenu();
 	
+	viewer.core.camera_base_zoom = 2.5;
+	viewer.core.camera_eye = Eigen::Vector3f(5, 3, 0);
 	viewer.launch();
 }
 
@@ -268,7 +270,7 @@ void RSApp::LoadMeshModelsIntoViewer(bool useSerializedModels)
 			viewer.data_list[ii].set_colors(COLOR(230, 230, 227));
 		else
 			viewer.data_list[ii].set_colors(COLOR(227, 100, 33));//orange
-
+		
 		viewer.append_mesh();
 		ii++;
 	}
