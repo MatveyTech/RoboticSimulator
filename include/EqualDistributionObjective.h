@@ -21,7 +21,7 @@ class Basic3 : public ObjectiveFunction
 {	
 	std::vector<ObjectiveFunction*> objectives;
 public:
-	Basic3(const VectorXd& startPos, const VectorXd& finalPos);
+	Basic3(const VectorXd& startPos, const VectorXd& finalPos, double weight=1);
 	~Basic3();
 
 	virtual double computeValue(const dVector& p);

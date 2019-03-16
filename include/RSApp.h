@@ -33,7 +33,7 @@ private:
 	IK_Solver* ikSolver = nullptr;
 	ImGuiMenu menu;
 	Viewer viewer;
-	Simulation* simulation;
+	Simulation* simulation = nullptr;
 	chrono::steady_clock::time_point last_rendered;
 	
 	//shared_ptr<Robot*> robot;
@@ -47,7 +47,7 @@ private:
 public:
 	
 	void CreateIKSolver();
-	void CreateSimulation();
+	void RecreateSimulation(double weight =1);
 
 	RSApp(void);
 	virtual void loadFile(const char* fName);

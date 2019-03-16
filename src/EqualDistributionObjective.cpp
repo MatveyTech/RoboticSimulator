@@ -55,11 +55,10 @@ void EqualDistributionObjective::addGradientTo(dVector & grad, const dVector & p
 }
 
 
-Basic3::Basic3(const VectorXd& startPos, const VectorXd& finalPos)
+Basic3::Basic3(const VectorXd& startPos, const VectorXd& finalPos, double weight)
 {
-	objectives.push_back(new StartFromFirstObjective(startPos));
-	objectives.push_back(new FinishAtLastObjective(finalPos));
-	int x = startPos.rows();
+	objectives.push_back(new StartFromFirstObjective(startPos, weight));
+	objectives.push_back(new FinishAtLastObjective(finalPos, weight));
 	objectives.push_back(new EqualDistributionObjective(startPos.rows()));
 }
 

@@ -13,10 +13,11 @@ void printVector1(VectorXd pp)
 }
 
 
-StartFromFirstObjective::StartFromFirstObjective(const VectorXd & startPos)
+StartFromFirstObjective::StartFromFirstObjective(const VectorXd & startPos, double weight)
 {
 	m_startPos = startPos;
 	m_numOfJoints = m_startPos.rows();
+	this->weight = weight;
 }
 
 StartFromFirstObjective::~StartFromFirstObjective()
@@ -32,7 +33,7 @@ double StartFromFirstObjective::computeValue(const dVector & p)
 		double diff = firstQ(i) - m_startPos(i);
 		res += diff*diff;
 	}
-	return res;
+	return res * weight;
 }
 
 void StartFromFirstObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & p)

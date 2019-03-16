@@ -2,10 +2,11 @@
 
 
 
-FinishAtLastObjective::FinishAtLastObjective(const VectorXd & endPos)
+FinishAtLastObjective::FinishAtLastObjective(const VectorXd & endPos, double weight)
 {
 	m_endPos = endPos;
 	m_numOfJoints = m_endPos.rows();
+	this->weight = weight;
 }
 
 FinishAtLastObjective::~FinishAtLastObjective()
@@ -21,7 +22,7 @@ double FinishAtLastObjective::computeValue(const dVector & p)
 		double diff = lastQ(i) - m_endPos(i);
 		res += diff*diff;
 	}
-	return res;
+	return res * weight;
 }
 
 void FinishAtLastObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & p)

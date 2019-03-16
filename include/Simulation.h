@@ -11,7 +11,7 @@ protected:
 	int NumOfJoints;
 	int NumOfPoints;
 	VectorXd path;
-	virtual void CalculatePath(VectorXd startPoint, VectorXd endPoint) = 0;
+	//virtual void CalculatePath(VectorXd startPoint, VectorXd endPoint) = 0;
 
 public:
 	Simulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints);
@@ -28,7 +28,7 @@ public:
 class BasicSimulation : public Simulation
 {
 protected:
-	void CalculatePath(VectorXd startPoint, VectorXd endPoint);
+	//void CalculatePath(VectorXd startPoint, VectorXd endPoint);
 
 public:
 	BasicSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints);
@@ -38,9 +38,9 @@ public:
 class AdvancedSimulation : public Simulation
 {
 protected:
-	void CalculatePath(VectorXd startPoint, VectorXd endPoint);
+	//void CalculatePath(VectorXd startPoint, VectorXd endPoint);
 public:
-	AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints);
+	AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints,double weight);
 	
 };
 

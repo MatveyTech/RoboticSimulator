@@ -163,12 +163,14 @@ void RSApp::CreateIKSolver()
 	ikSolver = new IK_Solver(robot, true);
 }
 
-void RSApp::CreateSimulation()
+void RSApp::RecreateSimulation(double weight)
 {
 	VectorXd v1(7); v1 << 0, 0, 0, 0, 0, 0, 0;
 	VectorXd v2(7); v2 << 50, -50, 0, -50, 0, 0, 0;
+	if (simulation != nullptr)
+		delete simulation;
 	//simulation = new BasicSimulation(v1, v2, PathSize);
-	simulation = new AdvancedSimulation(v1, v2, PathSize);
+	simulation = new AdvancedSimulation(v1, v2, PathSize, weight);
 }
 
 RSApp::RSApp(void)
@@ -185,7 +187,7 @@ RSApp::RSApp(void)
 	DefineViewerCallbacks();
 
 	CreateIKSolver();
-	CreateSimulation();
+	RecreateSimulation();
 	CreateMenu();
 	
 	viewer.core.camera_base_zoom = 2.5;
@@ -300,14 +302,19 @@ void RSApp::DrawAll()
 
 void RSApp::CreateMenu()
 {
+	
+
 	viewer.plugins.push_back(&menu);
 	double doubleVariable = 0.1f; // Shared between two menus
-	menu.post_resize(200, 200);
+	//menu.post_resize(200, 200);
+	
+	/*ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(0.0, 0.0));
+	ImGui::SetWindowFontScale(1.2);*/
+
 	menu.callback_draw_viewer_menu = [&]()
 	{
-		ImGuiIO& io = ImGui::GetIO();
-		ImFont* pFont = io.Fonts->AddFontFromFileTTF("sansation.ttf", 50.0f);
-		ImGui::PushFont(pFont);
+		
 		//ImGui::Checkbox("bool", &CartMode);
 		// Draw parent menu content
 		//menu.draw_viewer_menu();
@@ -368,13 +375,21 @@ void RSApp::CreateMenu()
 		}
 		ImGui::SameLine();
 		ImGui::Text("Simulation");
+		static float inp=1.0f;
+		ImGui::InputFloat(" ", &inp); 
+		ImGui::SameLine();
+		if (ImGui::Button("Rebuild simulation", ImVec2(-1, 0)))
+		{
+			RecreateSimulation((double)inp);
+		}
+		
 
 		if (ImGui::Button("Print joints", ImVec2(-1, 0)))
 		{
 			robot->PrintJointsValues();
 		}
 
-		ImGui::SetNextWindowPos(ImVec2(300,0), ImGuiCond_Once);
+		ImGui::SetNextWindowPos(ImVec2(470,0), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(0.0, 0.0));
 		ImGui::SetWindowFontScale(1.2);
 		// 1. Show a simple window.

@@ -7,7 +7,7 @@ using namespace Eigen;
 class FinishAtLastObjective : public ObjectiveFunction
 {
 public:
-	FinishAtLastObjective(const VectorXd & endPos);
+	FinishAtLastObjective(const VectorXd & endPos, double weight);
 	~FinishAtLastObjective();
 
 	virtual double computeValue(const dVector& p);

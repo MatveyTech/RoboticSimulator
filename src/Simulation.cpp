@@ -34,6 +34,7 @@ void printVector(VectorXd pp, int JointsNum = 7)
 		if (i % JointsNum == JointsNum - 1)
 			cout << endl;
 	}
+	cout << endl;
 }
 
 
@@ -100,12 +101,6 @@ void Simulation::Reset()
 BasicSimulation::BasicSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints)
 	:Simulation(startPoint, endPoint, numOfPoints)
 {
-	CalculatePath(startPoint, endPoint);
-}
-
-
-void BasicSimulation::CalculatePath(VectorXd startPoint, VectorXd endPoint)
-{
 	VectorXd step = (endPoint - startPoint) / (NumOfPoints - 1);
 	path = VectorXd(NumOfJoints*NumOfPoints);
 	for (size_t i = 0; i < NumOfPoints; i++)
@@ -113,19 +108,18 @@ void BasicSimulation::CalculatePath(VectorXd startPoint, VectorXd endPoint)
 		VectorXd roww(NumOfJoints);
 		for (size_t j = 0; j < NumOfJoints; j++)
 		{
-			path(i*NumOfJoints+j) = startPoint(j) + step(j)*(i);
+			path(i*NumOfJoints + j) = startPoint(j) + step(j)*(i);
 		}
 	}
-	//printVector(path);
 }
 
-AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints)
+
+//void BasicSimulation::CalculatePath(VectorXd startPoint, VectorXd endPoint)
+//{
+//}
+
+AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, double weight)
 	:Simulation(startPoint, endPoint, numOfPoints)
-{
-	CalculatePath(startPoint, endPoint);
-}
-
-void AdvancedSimulation::CalculatePath(VectorXd startPoint, VectorXd endPoint)
 {
 	VectorXd pp(NumOfJoints*NumOfPoints);
 	for (size_t i = 0; i < pp.size(); i++)
@@ -133,11 +127,15 @@ void AdvancedSimulation::CalculatePath(VectorXd startPoint, VectorXd endPoint)
 		pp(i) = 20;
 	}
 
-	ObjectiveFunction* eo = new Basic3(startPoint, endPoint);
+	ObjectiveFunction* eo = new Basic3(startPoint, endPoint,weight);
 	double res;
 	GradientDescentFunctionMinimizer gm;
 	gm.minimize(eo, pp, res);
 
 	path = pp;
-	//printVector(path);
+	printVector(path);
 }
+
+//void AdvancedSimulation::CalculatePath(VectorXd startPoint, VectorXd endPoint)
+//{
+//}
