@@ -106,7 +106,6 @@ BasicSimulation::BasicSimulation(VectorXd startPoint, VectorXd endPoint, int num
 
 void BasicSimulation::CalculatePath(VectorXd startPoint, VectorXd endPoint)
 {
-	//path.resize(numOfPoints, startPoint.size());
 	VectorXd step = (endPoint - startPoint) / (NumOfPoints - 1);
 	path = VectorXd(NumOfJoints*NumOfPoints);
 	for (size_t i = 0; i < NumOfPoints; i++)
@@ -114,12 +113,10 @@ void BasicSimulation::CalculatePath(VectorXd startPoint, VectorXd endPoint)
 		VectorXd roww(NumOfJoints);
 		for (size_t j = 0; j < NumOfJoints; j++)
 		{
-			//roww(j) = startPoint(j) + step(j)*(i);
 			path(i*NumOfJoints+j) = startPoint(j) + step(j)*(i);
 		}
-//		path.row(i) = roww;
 	}
-	printVector(path);
+	//printVector(path);
 }
 
 AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints)
@@ -142,5 +139,5 @@ void AdvancedSimulation::CalculatePath(VectorXd startPoint, VectorXd endPoint)
 	gm.minimize(eo, pp, res);
 
 	path = pp;
-	printVector(path);
+	//printVector(path);
 }
