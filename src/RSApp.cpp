@@ -189,7 +189,8 @@ RSApp::RSApp(void)
 	CreateMenu();
 	
 	viewer.core.camera_base_zoom = 2.5;
-	viewer.core.camera_eye = Eigen::Vector3f(5, 3, 0);
+	//viewer.core.camera_eye = Eigen::Vector3f(5, 3, 0);
+	//viewer.core.camera_eye += Eigen::Vector3f(0, 5, 0);
 	viewer.launch();
 }
 
@@ -304,6 +305,9 @@ void RSApp::CreateMenu()
 	menu.post_resize(200, 200);
 	menu.callback_draw_viewer_menu = [&]()
 	{
+		ImGuiIO& io = ImGui::GetIO();
+		ImFont* pFont = io.Fonts->AddFontFromFileTTF("sansation.ttf", 50.0f);
+		ImGui::PushFont(pFont);
 		//ImGui::Checkbox("bool", &CartMode);
 		// Draw parent menu content
 		//menu.draw_viewer_menu();
@@ -369,6 +373,32 @@ void RSApp::CreateMenu()
 		{
 			robot->PrintJointsValues();
 		}
+
+		ImGui::SetNextWindowPos(ImVec2(300,0), ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(0.0, 0.0));
+		ImGui::SetWindowFontScale(1.2);
+		// 1. Show a simple window.
+		// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets automatically appears in a window called "Debug".
+		{
+			ImGui::Begin("Joints");
+			ImGui::SetWindowFontScale(1.2);
+			ImGui::Text("%5.2f ", robot->GetJointValueR(0));
+			ImGui::SameLine();
+			ImGui::Text("%5.2f", robot->GetJointValueR(1));
+			ImGui::SameLine();
+			ImGui::Text("%5.2f", robot->GetJointValueR(2));
+			ImGui::SameLine();
+			ImGui::Text("%5.2f", robot->GetJointValueR(3));
+			ImGui::SameLine();
+			ImGui::Text("%5.2f", robot->GetJointValueR(4));
+			ImGui::SameLine();
+			ImGui::Text("%5.2f", robot->GetJointValueR(5));
+			ImGui::SameLine();
+			ImGui::Text("%5.2f", robot->GetJointValueR(6));
+			ImGui::End();
+		}
+
+
 		//}
 	};
 
