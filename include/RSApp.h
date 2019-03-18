@@ -33,7 +33,7 @@ private:
 	IK_Solver* ikSolver = nullptr;
 	ImGuiMenu menu;
 	Viewer viewer;
-	Simulation* simulation = nullptr;
+	AdvancedSimulation* simulation = nullptr;
 	chrono::steady_clock::time_point last_rendered;
 	
 	//shared_ptr<Robot*> robot;

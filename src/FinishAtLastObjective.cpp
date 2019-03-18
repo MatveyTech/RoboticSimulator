@@ -38,6 +38,6 @@ void FinishAtLastObjective::addGradientTo(dVector & grad, const dVector & p)
 	for (size_t i = startIndex; i < stopIndex; i++)
 	{
 		int ind = i - startIndex;
-		grad(i) += 2 * p(i) - 2 * m_endPos(ind); 
+		grad(i) += (2 * p(i) - 2 * m_endPos(ind))*weight;
 	}
 }

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Eigen/Dense>
+#include "..\include\GradientDescentFunctionMinimizer.h"
+#include "..\include\ObjectiveFunction.h"
 
 using namespace Eigen;
 
@@ -23,6 +25,7 @@ public:
 	VectorXd MoveToIndAndGet(int i);
 	VectorXd MoveToPrevAndGet();
 	void Reset();
+	virtual void MakeStep();
 };
 
 class BasicSimulation : public Simulation
@@ -38,8 +41,12 @@ public:
 class AdvancedSimulation : public Simulation
 {
 protected:
+	ObjectiveFunction* m_objective;
+	GradientDescentFunctionMinimizer m_gradientDMinimizer;
 	//void CalculatePath(VectorXd startPoint, VectorXd endPoint);
 public:
+	int IterationNum = 0;
+	void MakeStep();
 	AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints,double weight);
 	
 };

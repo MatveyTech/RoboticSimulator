@@ -1,7 +1,5 @@
 #include "..\include\Simulation.h"
-#include "..\include\ObjectiveFunction.h"
 #include "..\include\EqualDistributionObjective.h"
-#include "..\include\GradientDescentFunctionMinimizer.h"
 #include <iostream>
 
 using namespace std;
@@ -96,6 +94,11 @@ void Simulation::Reset()
 	CurrentIndex = 0;
 }
 
+void Simulation::MakeStep()
+{
+
+}
+
 
 
 BasicSimulation::BasicSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints)
@@ -119,22 +122,29 @@ BasicSimulation::BasicSimulation(VectorXd startPoint, VectorXd endPoint, int num
 //}
 
 AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, double weight)
-	:Simulation(startPoint, endPoint, numOfPoints)
+	:Simulation(startPoint, endPoint, numOfPoints),
+	m_gradientDMinimizer(GradientDescentFunctionMinimizer(1))
 {
+	
+	m_objective = new Basic3(startPoint, endPoint, weight);
 	VectorXd pp(NumOfJoints*NumOfPoints);
 	for (size_t i = 0; i < pp.size(); i++)
 	{
 		pp(i) = 20;
 	}
-
-	ObjectiveFunction* eo = new Basic3(startPoint, endPoint,weight);
-	double res;
-	GradientDescentFunctionMinimizer gm;
-	gm.minimize(eo, pp, res);
-
+	//m_gradientDMinimizer.minimize(m_objective, pp, res);
 	path = pp;
-	printVector(path);
+	//printVector(path);
 }
+
+void AdvancedSimulation::MakeStep()
+{
+	double res;
+	IterationNum++;
+	m_gradientDMinimizer.minimize(m_objective, path, res);
+}
+
+
 
 //void AdvancedSimulation::CalculatePath(VectorXd startPoint, VectorXd endPoint)
 //{

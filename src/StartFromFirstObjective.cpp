@@ -48,7 +48,7 @@ void StartFromFirstObjective::addGradientTo(dVector & grad, const dVector & p)
 	int stopIndex = p.rows() - 1;*/
 	for (size_t i = 0; i < m_numOfJoints; i++)
 	{
-		grad(i) += 2 * p(i) - 2 * m_startPos(i);
+		grad(i) += (2 * p(i) - 2 * m_startPos(i))*weight;
 	}
 
 	//printVector1(grad);

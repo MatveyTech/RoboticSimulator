@@ -394,24 +394,35 @@ void RSApp::CreateMenu()
 		ImGui::SetWindowFontScale(1.2);
 		// 1. Show a simple window.
 		// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets automatically appears in a window called "Debug".
+		ImGui::Begin("Joints");
+		ImGui::SetWindowFontScale(1.2);
+		ImGui::Text("%5.2f ", robot->GetJointValueR(0));
+		ImGui::SameLine();
+		ImGui::Text("%5.2f", robot->GetJointValueR(1));
+		ImGui::SameLine();
+		ImGui::Text("%5.2f", robot->GetJointValueR(2));
+		ImGui::SameLine();
+		ImGui::Text("%5.2f", robot->GetJointValueR(3));
+		ImGui::SameLine();
+		ImGui::Text("%5.2f", robot->GetJointValueR(4));
+		ImGui::SameLine();
+		ImGui::Text("%5.2f", robot->GetJointValueR(5));
+		ImGui::SameLine();
+		ImGui::Text("%5.2f", robot->GetJointValueR(6));
+		ImGui::End();
+
+		
+		ImGui::SetNextWindowPos(ImVec2(0, 250), ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(0.0, 0.0));
+		ImGui::SetWindowFontScale(1.2);
+		ImGui::Begin("Optimization");
+		ImGui::SetWindowFontScale(1.2);
+		if (ImGui::Button("Make step", ImVec2(-1, 0)))
 		{
-			ImGui::Begin("Joints");
-			ImGui::SetWindowFontScale(1.2);
-			ImGui::Text("%5.2f ", robot->GetJointValueR(0));
-			ImGui::SameLine();
-			ImGui::Text("%5.2f", robot->GetJointValueR(1));
-			ImGui::SameLine();
-			ImGui::Text("%5.2f", robot->GetJointValueR(2));
-			ImGui::SameLine();
-			ImGui::Text("%5.2f", robot->GetJointValueR(3));
-			ImGui::SameLine();
-			ImGui::Text("%5.2f", robot->GetJointValueR(4));
-			ImGui::SameLine();
-			ImGui::Text("%5.2f", robot->GetJointValueR(5));
-			ImGui::SameLine();
-			ImGui::Text("%5.2f", robot->GetJointValueR(6));
-			ImGui::End();
+			simulation->MakeStep();
 		}
+		ImGui::Text("Iteration # %d", simulation->IterationNum);
+		ImGui::End();
 
 
 		//}
