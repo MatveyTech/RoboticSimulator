@@ -121,12 +121,12 @@ BasicSimulation::BasicSimulation(VectorXd startPoint, VectorXd endPoint, int num
 //{
 //}
 
-AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, double weight)
+AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, std::vector<double> weights)
 	:Simulation(startPoint, endPoint, numOfPoints),
 	m_gradientDMinimizer(GradientDescentFunctionMinimizer(1))
 {
 	
-	m_objective = new Basic3(startPoint, endPoint, weight);
+	m_objective = new Basic3(startPoint, endPoint, weights);
 	VectorXd pp(NumOfJoints*NumOfPoints);
 	for (size_t i = 0; i < pp.size(); i++)
 	{

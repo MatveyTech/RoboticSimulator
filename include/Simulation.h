@@ -47,7 +47,7 @@ protected:
 public:
 	int IterationNum = 0;
 	void MakeStep();
-	AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints,double weight);
+	AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, std::vector<double> weights);
 	double ComputeValueInCurrentPoint();
 	double ComputeGradientInCurrentPoint();
 	int GetLastNumOfIterations();

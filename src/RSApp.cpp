@@ -163,14 +163,14 @@ void RSApp::CreateIKSolver()
 	ikSolver = new IK_Solver(robot, true);
 }
 
-void RSApp::RecreateSimulation(double weight)
+void RSApp::RecreateSimulation(std::vector<double> weights)
 {
 	VectorXd v1(7); v1 << 0, 0, 0, 0, 0, 0, 0;
 	VectorXd v2(7); v2 << 50, -50, 0, -50, 0, 0, 0;
 	if (simulation != nullptr)
 		delete simulation;
 	//simulation = new BasicSimulation(v1, v2, PathSize);
-	simulation = new AdvancedSimulation(v1, v2, PathSize, weight);
+	simulation = new AdvancedSimulation(v1, v2, PathSize, weights);
 }
 
 RSApp::RSApp(void)
@@ -187,7 +187,8 @@ RSApp::RSApp(void)
 	DefineViewerCallbacks();
 
 	CreateIKSolver();
-	RecreateSimulation();
+	std::vector<double> weights = { 1,1,1};
+	RecreateSimulation(weights);
 	CreateMenu();
 	
 	viewer.core.camera_base_zoom = 2.5;
@@ -374,13 +375,18 @@ void RSApp::CreateMenu()
 			robot->MoveByJointsR(simulation->GetCurrent());
 		}
 		ImGui::SameLine();
-		ImGui::Text("Simulation");
-		static float inp=1.0f;
-		ImGui::InputFloat(" ", &inp); 
-		ImGui::SameLine();
+		ImGui::Text("Step");
+		static float w1 = 1.0f;
+		static float w2 = 1.0f;
+		static float w3 = 1.0f;		
+		ImGui::InputFloat("First", &w1); 
+		ImGui::InputFloat("Last", &w2);
+		ImGui::InputFloat("Equal", &w3);
+		//ImGui::SameLine();
+		std::vector<double> weights = { (double)w1,(double)w2,(double)w3 };
 		if (ImGui::Button("Rebuild simulation", ImVec2(-1, 0)))
 		{
-			RecreateSimulation((double)inp);
+			RecreateSimulation(weights);
 		}
 		
 

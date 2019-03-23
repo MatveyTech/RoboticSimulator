@@ -47,7 +47,7 @@ private:
 public:
 	
 	void CreateIKSolver();
-	void RecreateSimulation(double weight =1);
+	void RecreateSimulation(std::vector<double> weights);
 
 	RSApp(void);
 	virtual void loadFile(const char* fName);
