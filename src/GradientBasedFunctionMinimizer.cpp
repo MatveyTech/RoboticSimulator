@@ -104,6 +104,7 @@ double GradientBasedFunctionMinimizer::doLineSearchStandard(ObjectiveFunction *f
 	double initialValue = function->computeValue(pc);
 
 	for(int j = 0; j < maxLineSearchIterations; j++) {
+		LastNumOfIterations = j + 1;
 		// try a new solution
 		pi = pc - dp * alpha;
 

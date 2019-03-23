@@ -48,7 +48,9 @@ public:
 	int IterationNum = 0;
 	void MakeStep();
 	AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints,double weight);
-	
+	double ComputeValueInCurrentPoint();
+	double ComputeGradientInCurrentPoint();
+	int GetLastNumOfIterations();
 };
 
 

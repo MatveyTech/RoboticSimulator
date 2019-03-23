@@ -45,7 +45,7 @@ void RSApp::MoveActiveLink(P3D point, bool isAbsolute)
 
 void RSApp::DefineViewerCallbacks()
 {
-	//viewer.core.is_animating = true;
+	viewer.core.is_animating = true;
 	viewer.callback_pre_draw = 
 	[&](igl::opengl::glfw::Viewer & v)
 	{
@@ -421,7 +421,17 @@ void RSApp::CreateMenu()
 		{
 			simulation->MakeStep();
 		}
+		static bool autostep = false;
+		if (ImGui::Button("Auto step", ImVec2(-1, 0)))
+		{
+			autostep = !autostep;
+		}
+		if (autostep)
+			simulation->MakeStep();
 		ImGui::Text("Iteration # %d", simulation->IterationNum);
+		ImGui::Text("Value %E", simulation->ComputeValueInCurrentPoint());
+		ImGui::Text("Grad  %E", simulation->ComputeGradientInCurrentPoint());
+		ImGui::Text("Iterations:  %d", simulation->GetLastNumOfIterations());
 		ImGui::End();
 
 

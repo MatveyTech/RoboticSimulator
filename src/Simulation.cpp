@@ -137,6 +137,25 @@ AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, i
 	//printVector(path);
 }
 
+double AdvancedSimulation::ComputeValueInCurrentPoint()
+{
+	return m_objective->computeValue(path);
+}
+
+double AdvancedSimulation::ComputeGradientInCurrentPoint()
+{
+	VectorXd grad(NumOfJoints*NumOfPoints);
+	for (size_t i = 0; i < grad.size(); i++)
+		grad(i) = 0;
+	m_objective->addGradientTo(grad, path);
+	return grad.norm();
+}
+
+int AdvancedSimulation::GetLastNumOfIterations()
+{
+	return m_gradientDMinimizer.LastNumOfIterations;
+}
+
 void AdvancedSimulation::MakeStep()
 {
 	double res;

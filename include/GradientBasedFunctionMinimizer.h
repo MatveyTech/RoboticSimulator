@@ -33,6 +33,7 @@ public:
 	// "standard" line search
 	double lineSearchStartValue = 1.0;
 	int maxLineSearchIterations = 15;
+	int LastNumOfIterations = 0;
 
 	// "tweaked" line search
 	double lineSearchEndValue = 3.0e-5;
