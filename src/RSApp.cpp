@@ -376,18 +376,37 @@ void RSApp::CreateMenu()
 		}
 		ImGui::SameLine();
 		ImGui::Text("Step");
-		static float w1 = 1.0f;
-		static float w2 = 1.0f;
-		static float w3 = 1.0f;		
-		ImGui::InputFloat("First", &w1); 
-		ImGui::InputFloat("Last", &w2);
-		ImGui::InputFloat("Equal", &w3);
-		//ImGui::SameLine();
+		static int w1 = 0;
+		static int w2 = 0;
+		static int w3 = 0;	
+
+		auto int2char = [&](int val) -> char*
+		{
+			if (val == 0)
+				return "1";
+			else if (val == 1)
+				return "10";
+			else if (val == 2)
+				return "100";
+			else if (val == 3)
+				return "1000";
+			else if (val == 4)
+				return "10000";
+			else 
+				return "BAD";
+		};
+		ImGui::Text("Weights:");
+		int max_w = 4;
+		ImGui::SliderInt("First", &w1, 0,max_w,int2char(w1));
+		ImGui::SliderInt("Last", &w2, 0,max_w,int2char(w2));
+		ImGui::SliderInt("Equal", &w3, 0,max_w,int2char(w3));
+		ImGui::NewLine();
+		
 		static MinimizerType minimizerType = simulation->MinimizerType;
 		const char* cc = minimizerType == MinimizerType::GD ? "GradDesc" : "BFGS";
 		ImGui::SliderInt("Minimizer", &((int)minimizerType), 0, 1, cc);
 
-		std::vector<double> weights = { (double)w1,(double)w2,(double)w3 };
+		std::vector<double> weights = { (double)pow(10,w1),(double)pow(10,w2),(double)pow(10,w3) };
 		
 		if (ImGui::Button("Rebuild simulation", ImVec2(-1, 0)))
 		{
@@ -397,6 +416,7 @@ void RSApp::CreateMenu()
 
 		if (ImGui::Button("Print joints", ImVec2(-1, 0)))
 		{
+			//cout << pow(10,ww1) << endl;
 			robot->PrintJointsValues();
 		}
 
