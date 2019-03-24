@@ -121,18 +121,21 @@ BasicSimulation::BasicSimulation(VectorXd startPoint, VectorXd endPoint, int num
 //{
 //}
 
-AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, std::vector<double> weights)
-	:Simulation(startPoint, endPoint, numOfPoints),
-	m_gradientDMinimizer(GradientDescentFunctionMinimizer(1))
+AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, std::vector<double> weights, int mt)
+	:Simulation(startPoint, endPoint, numOfPoints)
 {
 	
 	m_objective = new Basic3(startPoint, endPoint, weights);
+	MinimizerType = mt == 0 ? MinimizerType::GD : MinimizerType::BFGS;
 	VectorXd pp(NumOfJoints*NumOfPoints);
 	for (size_t i = 0; i < pp.size(); i++)
 	{
 		pp(i) = 20;
 	}
-	//m_gradientDMinimizer.minimize(m_objective, pp, res);
+	if (MinimizerType == MinimizerType::GD)
+		m_gradientBasedMinimizer = new GradientDescentFunctionMinimizer(1);
+	else if (MinimizerType == MinimizerType::BFGS)
+		m_gradientBasedMinimizer = new BFGSFunctionMinimizer(1);
 	path = pp;
 	//printVector(path);
 }
@@ -153,14 +156,14 @@ double AdvancedSimulation::ComputeGradientInCurrentPoint()
 
 int AdvancedSimulation::GetLastNumOfIterations()
 {
-	return m_gradientDMinimizer.LastNumOfIterations;
+	return m_gradientBasedMinimizer->LastNumOfIterations;
 }
 
 void AdvancedSimulation::MakeStep()
 {
 	double res;
 	IterationNum++;
-	m_gradientDMinimizer.minimize(m_objective, path, res);
+	m_gradientBasedMinimizer->minimize(m_objective, path, res);
 }
 
 

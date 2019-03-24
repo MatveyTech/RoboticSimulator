@@ -2,9 +2,12 @@
 
 #include <Eigen/Dense>
 #include "..\include\GradientDescentFunctionMinimizer.h"
+#include "..\include\BFGSFunctionMinimizer.h"
 #include "..\include\ObjectiveFunction.h"
 
 using namespace Eigen;
+
+enum MinimizerType { GD, BFGS };
 
 class Simulation
 {
@@ -38,16 +41,20 @@ public:
 };
 
 
+
+
 class AdvancedSimulation : public Simulation
 {
 protected:
 	ObjectiveFunction* m_objective;
-	GradientDescentFunctionMinimizer m_gradientDMinimizer;
+	GradientBasedFunctionMinimizer* m_gradientBasedMinimizer;
+	
 	//void CalculatePath(VectorXd startPoint, VectorXd endPoint);
 public:
 	int IterationNum = 0;
+	MinimizerType MinimizerType;// = MinimizerType::GD;
 	void MakeStep();
-	AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, std::vector<double> weights);
+	AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, std::vector<double> weights, int mt);
 	double ComputeValueInCurrentPoint();
 	double ComputeGradientInCurrentPoint();
 	int GetLastNumOfIterations();

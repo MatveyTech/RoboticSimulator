@@ -163,14 +163,14 @@ void RSApp::CreateIKSolver()
 	ikSolver = new IK_Solver(robot, true);
 }
 
-void RSApp::RecreateSimulation(std::vector<double> weights)
+void RSApp::RecreateSimulation(std::vector<double> weights, MinimizerType mt)
 {
 	VectorXd v1(7); v1 << 0, 0, 0, 0, 0, 0, 0;
 	VectorXd v2(7); v2 << 50, -50, 0, -50, 0, 0, 0;
 	if (simulation != nullptr)
 		delete simulation;
 	//simulation = new BasicSimulation(v1, v2, PathSize);
-	simulation = new AdvancedSimulation(v1, v2, PathSize, weights);
+	simulation = new AdvancedSimulation(v1, v2, PathSize, weights,(int)mt);
 }
 
 RSApp::RSApp(void)
@@ -188,7 +188,7 @@ RSApp::RSApp(void)
 
 	CreateIKSolver();
 	std::vector<double> weights = { 1,1,1};
-	RecreateSimulation(weights);
+	RecreateSimulation(weights,MinimizerType::GD);
 	CreateMenu();
 	
 	viewer.core.camera_base_zoom = 2.5;
@@ -383,10 +383,15 @@ void RSApp::CreateMenu()
 		ImGui::InputFloat("Last", &w2);
 		ImGui::InputFloat("Equal", &w3);
 		//ImGui::SameLine();
+		static MinimizerType minimizerType = simulation->MinimizerType;
+		const char* cc = minimizerType == MinimizerType::GD ? "GradDesc" : "BFGS";
+		ImGui::SliderInt("Minimizer", &((int)minimizerType), 0, 1, cc);
+
 		std::vector<double> weights = { (double)w1,(double)w2,(double)w3 };
+		
 		if (ImGui::Button("Rebuild simulation", ImVec2(-1, 0)))
 		{
-			RecreateSimulation(weights);
+			RecreateSimulation(weights, minimizerType);
 		}
 		
 
@@ -418,7 +423,7 @@ void RSApp::CreateMenu()
 		ImGui::End();
 
 		
-		ImGui::SetNextWindowPos(ImVec2(0, 250), ImGuiCond_Once);
+		ImGui::SetNextWindowPos(ImVec2(0, 350), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(0.0, 0.0));
 		ImGui::SetWindowFontScale(1.2);
 		ImGui::Begin("Optimization");
