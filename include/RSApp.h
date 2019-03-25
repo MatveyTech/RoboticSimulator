@@ -52,7 +52,8 @@ public:
 	RSApp(void);
 	virtual void loadFile(const char* fName);
 	void loadRobot(const char* fName);
-	void LoadMeshModelsIntoViewer(bool useSerializedModels); 
+	void LoadMeshModelsIntoViewer(bool useSerializedModels);
+	void AddSphere(int ii);
 	void DrawAll();
 };
 

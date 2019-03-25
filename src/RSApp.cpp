@@ -5,6 +5,7 @@
 #include "..\include\EqualDistributionObjective.h"
 #include <fstream>
 #include <chrono>
+#include <igl/readOFF.h>
 
 #define COLOR(r,g,b) RowVector3d(r / 255., g / 255., b / 225.)
 
@@ -279,6 +280,20 @@ void RSApp::LoadMeshModelsIntoViewer(bool useSerializedModels)
 		ii++;
 	}
 	DrawAll();
+	//AddSphere(ii);
+}
+
+void RSApp::AddSphere(int ii)
+{
+	Eigen::MatrixXd V;
+	Eigen::MatrixXi F;
+	string sphereFile = "../RoboticSimulator/data/models/sphere.off";
+
+	igl::readOFF(sphereFile, V, F);
+	for (int i = 0; i < V.size(); ++i)
+		V(i) = V(i) + 1;
+
+	viewer.data_list[ii].set_mesh(V, F);
 }
 
 void RSApp::DrawAll()
