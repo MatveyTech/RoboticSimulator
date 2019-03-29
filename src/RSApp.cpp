@@ -44,6 +44,12 @@ void RSApp::MoveActiveLink(P3D point, bool isAbsolute)
 	ikSolver->ikPlan->endEffectors.back().targetEEPos = newPoint;
 }
 
+void RSApp::UpdateRobotRepresentation()
+{
+	VectorXd Q = robot->GetQ();
+	m_gcRobotRepresentation->setQ(Q);
+}
+
 void RSApp::DefineViewerCallbacks()
 {
 	viewer.core.is_animating = true;
@@ -53,7 +59,9 @@ void RSApp::DefineViewerCallbacks()
 		if (CartMode)
 			ikSolver->solve(10, false, false);
 		//PrintRenderingTime();
-		DrawAll();
+		UpdateRobotRepresentation();
+		DrawPoint();
+		DrawRobot();
 		return false;
 	};
 	if (CartMode)
@@ -158,10 +166,19 @@ void RSApp::DefineViewerCallbacks()
 
 }
 
+void RSApp::DrawPoint()
+{
+	P3D p = m_gcRobotRepresentation->getWorldCoordinatesFor(P3D(0.05, 0.05, 0.05), robot->getRigidBody(13));
+	//P3D p = P3D(m_gcRobotRepresentation->getWorldCoordinatesForPointT(P3D(0.02,0.02,0.02), robot->getRigidBody(13), Q));
+	pointToDraw << p(0), p(1), p(2);
+	viewer.data().set_points(pointToDraw, Eigen::RowVector3d(0, 1, 0));
+}
+
 void RSApp::CreateIKSolver()
 {
 	delete ikSolver;
 	ikSolver = new IK_Solver(robot, true);
+	m_gcRobotRepresentation = ikSolver->GetgcRobotRepresentation();
 }
 
 void RSApp::RecreateSimulation(std::vector<double> weights, MinimizerType mt)
@@ -279,7 +296,7 @@ void RSApp::LoadMeshModelsIntoViewer(bool useSerializedModels)
 		viewer.append_mesh();
 		ii++;
 	}
-	DrawAll();
+	DrawRobot();
 	//AddSphere(ii);
 }
 
@@ -296,7 +313,7 @@ void RSApp::AddSphere(int ii)
 	viewer.data_list[ii].set_mesh(V, F);
 }
 
-void RSApp::DrawAll()
+void RSApp::DrawRobot()
 {
 	int ii = 0;
 	for (auto&& i : rbEngine->rbs) 
@@ -349,34 +366,11 @@ void RSApp::CreateMenu()
 		//	std::cout << "boolVariable: " << std::boolalpha << boolVariable << std::endl;
 		//}
 
-		// Expose an enumeration type
-		enum Orientation { Up = 0, Down, Left, Right };
-		static Orientation dir = Up;
-		//ImGui::Combo("Direction", (int *)(&dir), "Up\0Down\0Left\0Right\0\0");
-
-		//// We can also use a std::vector<std::string> defined dynamically
-		//static int num_choices = 3;
-		//static std::vector<std::string> choices;
-		//static int idx_choice = 0;
-		//if (ImGui::InputInt("Num letters", &num_choices))
-		//{
-		//	num_choices = std::max(1, std::min(26, num_choices));
-		//}
-		//if (num_choices != (int)choices.size())
-		//{
-		//	choices.resize(num_choices);
-		//	for (int i = 0; i < num_choices; ++i)
-		//		choices[i] = std::string(1, 'A' + i);
-		//	if (idx_choice >= num_choices)
-		//		idx_choice = num_choices - 1;
-		//}
-		//ImGui::Combo("Letter", &idx_choice, choices);
-
-		// Add a button
 		static int simulationPos = 1;
 
 		ImGui::SliderInt("", &simulationPos, 1, PathSize);
-		robot->MoveByJointsR(simulation->MoveToIndAndGet(simulationPos -1));
+		if (!CartMode)
+			robot->MoveByJointsR(simulation->MoveToIndAndGet(simulationPos - 1));
 		ImGui::SameLine();
 		if (ImGui::Button("-"))
 		{

@@ -40,12 +40,14 @@ private:
 	//shared_ptr<Robot*> robot;
 	void PrintRenderingTime(); 
 	void MoveActiveLink(P3D point, bool isAbsolute=false);
+	void UpdateRobotRepresentation();
 	void DefineViewerCallbacks();
+	void DrawPoint();
 	void CreateMenu();
 	bool CartMode = false;
 	int PathSize = 15;
 	GeneralizedCoordinatesRobotRepresentation* m_gcRobotRepresentation;
-	//int joints[7] = { 0,0,0,0,0,0,0 };
+	Eigen::MatrixXd pointToDraw = Eigen::MatrixXd(1, 3);
 public:
 	
 	void CreateIKSolver();
@@ -56,6 +58,6 @@ public:
 	void loadRobot(const char* fName);
 	void LoadMeshModelsIntoViewer(bool useSerializedModels);
 	void AddSphere(int ii);
-	void DrawAll();
+	void DrawRobot();
 };
 
