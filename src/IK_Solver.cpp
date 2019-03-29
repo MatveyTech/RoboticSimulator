@@ -24,6 +24,11 @@ IK_Solver::~IK_Solver(void){
 	delete ikOptimizer;
 }
 
+GeneralizedCoordinatesRobotRepresentation * IK_Solver::GetgcRobotRepresentation()
+{
+	return ikPlan->gcRobotRepresentation;
+}
+
 void IK_Solver::solve(int nSteps, bool resetTargetState, bool resetInitialState) {
 	if (resetInitialState)
 		ikPlan->setCurrentIKStateFromRobot();

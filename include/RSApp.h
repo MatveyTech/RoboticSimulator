@@ -9,6 +9,7 @@
 #include <igl/opengl/glfw/Viewer.h>
 #include <igl/opengl/glfw/imgui/ImGuiMenu.h>
 #include <igl/opengl/glfw/imgui/ImGuiHelpers.h>
+#include "GeneralizedCoordinatesRobotRepresentation.h"
 #include <igl/serialize.h>
 #include <igl/readOBJ.h>
 #include <GLFW/glfw3.h>
@@ -43,6 +44,7 @@ private:
 	void CreateMenu();
 	bool CartMode = false;
 	int PathSize = 15;
+	GeneralizedCoordinatesRobotRepresentation* m_gcRobotRepresentation;
 	//int joints[7] = { 0,0,0,0,0,0,0 };
 public:
 	

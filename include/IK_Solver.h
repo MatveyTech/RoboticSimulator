@@ -23,6 +23,7 @@ public:
 	IK_Solver(Robot* robot, bool freezeRootConfiguration);
 
 	virtual ~IK_Solver(void);
+	GeneralizedCoordinatesRobotRepresentation* GetgcRobotRepresentation();
 
 public:
 	//stores all objectives

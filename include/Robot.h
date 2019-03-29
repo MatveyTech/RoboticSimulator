@@ -9,6 +9,7 @@
 class RobotState;
 
 
+
 /**
 	Robots are articulated figures (i.e. tree structures starting at a root).
 */
@@ -225,6 +226,7 @@ public:
 	bool MoveByJointsR(Eigen::VectorXd vec);
 	bool MoveByJoints(DynamicArray<double> newJoints); //value in degrees , the order is r1 l1 r2 l2 r3 l3... 
 	void PrintJointsValues();
+	Eigen::VectorXd GetQ();
 	double GetJointValueR(int i);
 };
 
