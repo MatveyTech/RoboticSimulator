@@ -251,24 +251,35 @@ bool Robot::MoveByJoints(DynamicArray<double> newJoints)
 
 void Robot::PrintJointsValues()
 {
-	V3D rotAxis; double rotAngle;
 	std::cout << "Joints:{ ";
 
 	for (uint i = 0; i < jointList.size(); i++) {
 		if (i % 2 != 0) continue;
 		HingeJoint* joint = dynamic_cast<HingeJoint*>(jointList[i]);
-		joint->computeRelativeOrientation().getAxisAngle(rotAxis, rotAngle);
+		double rotAngle = joint->computeRelativeOrientation().getRotationAngle(joint->rotationAxis);
 		std::cout << DEG(rotAngle) << ", ";
 	}
 	std::cout << "}" << std::endl;
+}
+
+Eigen::VectorXd Robot::GetQ()
+{
+	Eigen::VectorXd res = Eigen::VectorXd::Zero(20);
+	for (uint i = 0; i < jointList.size(); ++i)
+	{
+		HingeJoint* joint = dynamic_cast<HingeJoint*>(jointList[i]);
+		//joint->computeRelativeOrientation().getAxisAngle(rotAxis, rotAngle);
+		double rotAngle = joint->computeRelativeOrientation().getRotationAngle(joint->rotationAxis);
+		res(i+6) = /*DEG*/(rotAngle);
+	}
+	return res;
 }
 
 double Robot::GetJointValueR(int i)
 {
 	if (i < 0 || i > 13)
 		return -999.999;
-	V3D rotAxis; double rotAngle;
 	HingeJoint* joint = dynamic_cast<HingeJoint*>(jointList[2*i]);
-	joint->computeRelativeOrientation().getAxisAngle(rotAxis, rotAngle);
+	double rotAngle = joint->computeRelativeOrientation().getRotationAngle(joint->rotationAxis);
 	return DEG(rotAngle);
 }
