@@ -38,36 +38,28 @@ void CollisionObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntr
 void CollisionObjective::addGradientTo(dVector & grad, const dVector & p)
 {
 	int numOfPoints = p.rows() / m_numOfJoints;
-	//for (int i = 0; i < numOfPoints; ++i)
-	//{
-	//	MatrixNxM J;
-	//	GeneralizedCoordinatesRobotRepresentation gc(m_robot);
-	//	VectorXd q(7);
-	//	
-	//	//RAD!!!!!!!!!!!!!!!!!!
-	//	VectorXd q = p.segment(m_numOfJoints*i, m_numOfJoints);
-	//	
-	//	gc.setQ(q);
-	//	gc.compute_dpdq(m_robot->GetGripLocalCoordinates(), m_rightEE, J);
+	for (int i = 0; i < numOfPoints; ++i)
+	{
+		MatrixNxM J;
+		VectorXd q = p.segment(m_numOfJoints*i, m_numOfJoints);
+		kSolver.compute_dpdq(q, J);
 
-	//	MatrixNxM Ja(3, 7);
-	//	Ja.col(0) = J.col(6);
-	//	Ja.col(1) = J.col(8);
-	//	Ja.col(2) = J.col(10);
-	//	Ja.col(3) = J.col(12);
-	//	Ja.col(4) = J.col(14);
-	//	Ja.col(5) = J.col(16);
-	//	Ja.col(6) = J.col(18);
+		MatrixNxM Ja(3, 7);
+		Ja.col(0) = J.col(6);
+		Ja.col(1) = J.col(8);
+		Ja.col(2) = J.col(10);
+		Ja.col(3) = J.col(12);
+		Ja.col(4) = J.col(14);
+		Ja.col(5) = J.col(16);
+		Ja.col(6) = J.col(18);
 
-	//	P3D cart_pos = gc.getWorldCoordinatesFor(m_robot->GetGripLocalCoordinates(), m_rightEE);
+		P3D cart_pos = kSolver.CalcForwardKinematics(q);
 
-	//	MatrixNxM res(1, 7);
-	//	res = (cart_pos - m_point).transpose()*Ja;
-	//	grad(i * 7 + 0) += res(0);
-	//	grad(i * 7 + 1) += res(1);
-	//	grad(i * 7 + 2) += res(2);
-	//	grad(i * 7 + 3) += res(3);
-	//	grad(i * 7 + 4) += res(4);
-	//	grad(i * 7 + 5) += res(5);
-	//}
+		MatrixNxM res(1, 7);
+		res = (cart_pos - m_point).transpose()*Ja;
+		for (size_t j = 0; j < m_numOfJoints; j++)
+		{
+			grad(i * m_numOfJoints + j) += res(j);
+		}
+	}
 }

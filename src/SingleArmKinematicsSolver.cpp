@@ -42,6 +42,7 @@ P3D SingleArmKinematicsSolver::CalcForwardKinematics(const dVector & q)
 
 void SingleArmKinematicsSolver::compute_dpdq(const dVector & q, MatrixNxM & dpdq)
 {
+	const dVector& qq = IsOnlyOneArmQ(q) ? ConvertSingleArmtoAllQ(q) : q;
 	m_gcrp.setQ(ConvertSingleArmtoAllQ(q));
 	m_gcrp.compute_dpdq(GetGripLocalCoordinates(), m_rb, dpdq);
 }
