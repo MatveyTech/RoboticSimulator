@@ -3,11 +3,12 @@
 #include "..\include\Robot.h"
 using namespace Eigen;
 
-class EqualDistributionObjective : public ObjectiveFunction
-{
+class ObjectiveSum : public ObjectiveFunction
+{	
+	std::vector<ObjectiveFunction*> objectives;
 public:
-	EqualDistributionObjective(int NumOfJoints);
-	~EqualDistributionObjective();
+	ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos,std::vector<double> weights, Robot* robot);
+	~ObjectiveSum();
 
 	virtual double computeValue(const dVector& p);
 	virtual void addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector& p);
@@ -16,3 +17,4 @@ public:
 private:
 	int m_numOfJoints;
 };
+

@@ -1,5 +1,5 @@
 #include "..\include\Simulation.h"
-#include "..\include\EqualDistributionObjective.h"
+#include "..\include\ObjectiveSum.h"
 #include <iostream>
 
 using namespace std;
@@ -125,7 +125,7 @@ AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, i
 	:Simulation(startPoint, endPoint, numOfPoints)
 {
 	
-	m_objective = new Basic3(startPoint, endPoint, weights, robot);
+	m_objective = new ObjectiveSum(startPoint, endPoint, weights, robot);
 	MinimizerType = mt == 0 ? MinimizerType::GD : MinimizerType::BFGS;
 	VectorXd pp(NumOfJoints*NumOfPoints);
 	for (size_t i = 0; i < pp.size(); i++)

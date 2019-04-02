@@ -54,35 +54,3 @@ void EqualDistributionObjective::addGradientTo(dVector & grad, const dVector & p
 		}
 	}
 }
-
-
-Basic3::Basic3(const VectorXd& startPos, const VectorXd& finalPos, std::vector<double> weights, Robot* robot)
-{
-	objectives.push_back(new StartFromFirstObjective(startPos, weights.at(0)));
-	objectives.push_back(new FinishAtLastObjective(finalPos, weights.at(1)));
-	objectives.push_back(new EqualDistributionObjective(startPos.rows()));//weights.at(2)
-	//objectives.push_back(new CollisionObjective(startPos.rows(), 1.0, P3D(0, 0, 0), robot));
-}
-
-
-Basic3::~Basic3()
-{
-}
-
-double Basic3::computeValue(const dVector & p)
-{
-	double res=0;
-	for (ObjectiveFunction* objective : objectives)
-		res += objective->computeValue(p);
-	return res;
-}
-
-void Basic3::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & p)
-{
-}
-
-void Basic3::addGradientTo(dVector & grad, const dVector & p)
-{
-	for (ObjectiveFunction* objective : objectives)
-		objective->addGradientTo(grad,p);
-}
