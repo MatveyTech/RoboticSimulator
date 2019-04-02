@@ -121,11 +121,12 @@ BasicSimulation::BasicSimulation(VectorXd startPoint, VectorXd endPoint, int num
 //{
 //}
 
-AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, std::vector<double> weights, int mt, Robot* robot)
+AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, std::vector<double> weights,
+	int mt, Robot* robot, P3D finalCart, bool onlyFinalCart)
 	:Simulation(startPoint, endPoint, numOfPoints)
 {
 	
-	m_objective = new ObjectiveSum(startPoint, endPoint, weights, robot);
+	m_objective = new ObjectiveSum(startPoint, endPoint, weights, robot,finalCart,onlyFinalCart);
 	MinimizerType = mt == 0 ? MinimizerType::GD : MinimizerType::BFGS;
 	VectorXd pp(NumOfJoints*NumOfPoints);
 	for (size_t i = 0; i < pp.size(); i++)

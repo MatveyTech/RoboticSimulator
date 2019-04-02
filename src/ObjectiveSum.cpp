@@ -5,12 +5,19 @@
 #include "..\include\ObjectiveSum.h"
 
 
-ObjectiveSum::ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos, std::vector<double> weights, Robot* robot)
+ObjectiveSum::ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos, std::vector<double> weights, Robot* robot, P3D finalCart, bool onlyFinalCart)
 {
-	objectives.push_back(new StartFromFirstObjective(startPos, weights.at(0)));
-	objectives.push_back(new FinishAtLastObjective(finalPos, weights.at(1)));
-	objectives.push_back(new EqualDistributionObjective(startPos.rows()));//weights.at(2)
-	//objectives.push_back(new CollisionObjective(startPos.rows(), 1.0, P3D(0, 0, 0), robot));
+	if (onlyFinalCart)
+	{
+		objectives.push_back(new CollisionObjective(startPos.rows(), 1.0, finalCart, robot));
+	}
+	else
+	{
+		objectives.push_back(new StartFromFirstObjective(startPos, weights.at(0)));
+		objectives.push_back(new FinishAtLastObjective(finalPos, weights.at(1)));
+		objectives.push_back(new EqualDistributionObjective(startPos.rows()));//weights.at(2)
+		//objectives.push_back(new CollisionObjective(startPos.rows(), 1.0, finalCart, robot));
+	}
 }
 
 

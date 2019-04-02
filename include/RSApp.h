@@ -48,6 +48,8 @@ private:
 	int PathSize = 15;
 	Eigen::MatrixXd pointToDraw = Eigen::MatrixXd(1, 3);
 	P3D m_eeLocalCoord;
+	bool m_onlyFinalCart=false;
+	P3D m_finalCart;
 public:
 	
 	void CreateIKSolver();

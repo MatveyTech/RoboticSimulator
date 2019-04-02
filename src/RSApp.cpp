@@ -180,7 +180,7 @@ void RSApp::RecreateSimulation(std::vector<double> weights, MinimizerType mt)
 	if (simulation != nullptr)
 		delete simulation;
 	//simulation = new BasicSimulation(v1, v2, PathSize);
-	simulation = new AdvancedSimulation(v1, v2, PathSize, weights,(int)mt,robot);
+	simulation = new AdvancedSimulation(v1, v2, PathSize, weights,(int)mt,robot,m_finalCart,m_onlyFinalCart);
 }
 
 RSApp::RSApp(void)
@@ -411,6 +411,14 @@ void RSApp::CreateMenu()
 
 		std::vector<double> weights = { (double)pow(10,w1),(double)pow(10,w2),(double)pow(10,w3) };
 		
+		ImGui::Checkbox("Only final position", &m_onlyFinalCart);
+		if (m_onlyFinalCart)
+		{
+			static float fl[3];
+			ImGui::InputFloat3("", fl, 2);
+			m_finalCart = P3D(fl[0], fl[1], fl[2]);
+		}
+
 		if (ImGui::Button("Rebuild simulation", ImVec2(-1, 0)))
 		{
 			RecreateSimulation(weights, minimizerType);

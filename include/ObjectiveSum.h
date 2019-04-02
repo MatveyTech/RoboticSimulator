@@ -7,7 +7,7 @@ class ObjectiveSum : public ObjectiveFunction
 {	
 	std::vector<ObjectiveFunction*> objectives;
 public:
-	ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos,std::vector<double> weights, Robot* robot);
+	ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos,std::vector<double> weights, Robot* robot, P3D finalCart, bool onlyFinalCart);
 	~ObjectiveSum();
 
 	virtual double computeValue(const dVector& p);
