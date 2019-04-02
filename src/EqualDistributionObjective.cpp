@@ -1,6 +1,7 @@
 #include "..\include\EqualDistributionObjective.h"
 #include "..\include\StartFromFirstObjective.h"
 #include "..\include\FinishAtLastObjective.h"
+#include "..\include\CollisionObjective.h"
 
 EqualDistributionObjective::EqualDistributionObjective(int NumOfJoints)
 {
@@ -55,11 +56,12 @@ void EqualDistributionObjective::addGradientTo(dVector & grad, const dVector & p
 }
 
 
-Basic3::Basic3(const VectorXd& startPos, const VectorXd& finalPos, std::vector<double> weights)
+Basic3::Basic3(const VectorXd& startPos, const VectorXd& finalPos, std::vector<double> weights, Robot* robot)
 {
 	objectives.push_back(new StartFromFirstObjective(startPos, weights.at(0)));
 	objectives.push_back(new FinishAtLastObjective(finalPos, weights.at(1)));
 	objectives.push_back(new EqualDistributionObjective(startPos.rows()));//weights.at(2)
+	//objectives.push_back(new CollisionObjective(startPos.rows(), 1.0, P3D(0, 0, 0), robot));
 }
 
 

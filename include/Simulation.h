@@ -4,6 +4,7 @@
 #include "..\include\GradientDescentFunctionMinimizer.h"
 #include "..\include\BFGSFunctionMinimizer.h"
 #include "..\include\ObjectiveFunction.h"
+#include "..\include\Robot.h"
 
 using namespace Eigen;
 
@@ -54,7 +55,7 @@ public:
 	int IterationNum = 0;
 	MinimizerType MinimizerType;// = MinimizerType::GD;
 	void MakeStep();
-	AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, std::vector<double> weights, int mt);
+	AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, std::vector<double> weights, int mt,Robot* robot);
 	double ComputeValueInCurrentPoint();
 	double ComputeGradientInCurrentPoint();
 	int GetLastNumOfIterations();

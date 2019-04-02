@@ -1,5 +1,6 @@
 #pragma once
 #include "ObjectiveFunction.h"
+#include "..\include\Robot.h"
 using namespace Eigen;
 
 class EqualDistributionObjective : public ObjectiveFunction
@@ -21,7 +22,7 @@ class Basic3 : public ObjectiveFunction
 {	
 	std::vector<ObjectiveFunction*> objectives;
 public:
-	Basic3(const VectorXd& startPos, const VectorXd& finalPos,std::vector<double> weights);
+	Basic3(const VectorXd& startPos, const VectorXd& finalPos,std::vector<double> weights, Robot* robot);
 	~Basic3();
 
 	virtual double computeValue(const dVector& p);
