@@ -9,12 +9,12 @@
 #include <igl/opengl/glfw/Viewer.h>
 #include <igl/opengl/glfw/imgui/ImGuiMenu.h>
 #include <igl/opengl/glfw/imgui/ImGuiHelpers.h>
-#include "GeneralizedCoordinatesRobotRepresentation.h"
 #include <igl/serialize.h>
 #include <igl/readOBJ.h>
 #include <GLFW/glfw3.h>
 #include <chrono>
 #include "Simulation.h"
+#include "SingleArmKinematicsSolver.h"
 //#include <Eigen/Sparse>
 
 
@@ -36,18 +36,18 @@ private:
 	Viewer viewer;
 	AdvancedSimulation* simulation = nullptr;
 	chrono::steady_clock::time_point last_rendered;
+	SingleArmKinematicsSolver* kSolver;
 	
 	//shared_ptr<Robot*> robot;
 	void PrintRenderingTime(); 
 	void MoveActiveLink(P3D point, bool isAbsolute=false);
-	void UpdateRobotRepresentation();
 	void DefineViewerCallbacks();
 	void DrawPoint();
 	void CreateMenu();
 	bool CartMode = false;
 	int PathSize = 15;
-	GeneralizedCoordinatesRobotRepresentation* m_gcRobotRepresentation;
 	Eigen::MatrixXd pointToDraw = Eigen::MatrixXd(1, 3);
+	P3D m_eeLocalCoord;
 public:
 	
 	void CreateIKSolver();

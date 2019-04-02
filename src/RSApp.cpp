@@ -35,7 +35,7 @@ void RSApp::MoveActiveLink(P3D point, bool isAbsolute)
 	ikSolver->ikPlan->endEffectors.back().endEffectorLocalCoords = P3D(0, 0, 0);
 	ikSolver->ikPlan->endEffectors.back().endEffectorRB = rb;
 
-	P3D cart = rb->getWorldCoordinates(P3D(0, 0, 0));
+	P3D cart = rb->getWorldCoordinates(kSolver->GetGripLocalCoordinates());
 	cout << "new point:(" << cart.x() << ";" << cart.y() << ";" << cart.z() << ")." << endl;
 
 	ikSolver->ikEnergyFunction->regularizer = 100;
@@ -44,11 +44,6 @@ void RSApp::MoveActiveLink(P3D point, bool isAbsolute)
 	ikSolver->ikPlan->endEffectors.back().targetEEPos = newPoint;
 }
 
-void RSApp::UpdateRobotRepresentation()
-{
-	VectorXd Q = robot->GetQ();
-	m_gcRobotRepresentation->setQ(Q);
-}
 
 void RSApp::DefineViewerCallbacks()
 {
@@ -59,7 +54,6 @@ void RSApp::DefineViewerCallbacks()
 		if (CartMode)
 			ikSolver->solve(10, false, false);
 		//PrintRenderingTime();
-		UpdateRobotRepresentation();
 		DrawPoint();
 		DrawRobot();
 		return false;
@@ -168,17 +162,15 @@ void RSApp::DefineViewerCallbacks()
 
 void RSApp::DrawPoint()
 {
-	P3D p = m_gcRobotRepresentation->getWorldCoordinatesFor(P3D(0.05, 0.05, 0.05), robot->getRigidBody(13));
-	//P3D p = P3D(m_gcRobotRepresentation->getWorldCoordinatesForPointT(P3D(0.02,0.02,0.02), robot->getRigidBody(13), Q));
-	pointToDraw << p(0), p(1), p(2);
-	viewer.data().set_points(pointToDraw, Eigen::RowVector3d(0, 1, 0));
+	P3D p = kSolver->CalcForwardKinematics(robot->GetQ());
+	pointToDraw.row(0) = p;	
+	viewer.data().set_points(pointToDraw, Eigen::RowVector3d(220/255.0, 220 / 255.0, 220 / 255.0));
 }
 
 void RSApp::CreateIKSolver()
 {
 	delete ikSolver;
 	ikSolver = new IK_Solver(robot, true);
-	m_gcRobotRepresentation = ikSolver->GetgcRobotRepresentation();
 }
 
 void RSApp::RecreateSimulation(std::vector<double> weights, MinimizerType mt)
@@ -188,7 +180,7 @@ void RSApp::RecreateSimulation(std::vector<double> weights, MinimizerType mt)
 	if (simulation != nullptr)
 		delete simulation;
 	//simulation = new BasicSimulation(v1, v2, PathSize);
-	simulation = new AdvancedSimulation(v1, v2, PathSize, weights,(int)mt);
+	simulation = new AdvancedSimulation(v1, v2, PathSize, weights,(int)mt,robot);
 }
 
 RSApp::RSApp(void)
@@ -197,10 +189,12 @@ RSApp::RSApp(void)
 	bool useSerializedModels = false;
 	char* fName;
 	if (useSimpleRobot)
-		fName = "../RoboticSimulator/data/rbs/yumi/yumi_simplified.rbs";//TODOMATVEY:Change this
+		fName = "../RoboticSimulator/data/rbs/yumi/yumi_simplified.rbs";
 	else
-		fName = "../RoboticSimulator/data/rbs/yumi/yumi.rbs";//TODOMATVEY:Change this
+		fName = "../RoboticSimulator/data/rbs/yumi/yumi.rbs";
+	m_eeLocalCoord = kSolver->GetGripLocalCoordinates();
 	loadFile(fName);
+	kSolver = new SingleArmKinematicsSolver(robot);
 	LoadMeshModelsIntoViewer(useSerializedModels);
 	DefineViewerCallbacks();
 
@@ -423,18 +417,68 @@ void RSApp::CreateMenu()
 		}
 		
 
-		if (ImGui::Button("Print joints", ImVec2(-1, 0)))
+		if (ImGui::Button("Debug button", ImVec2(-1, 0)))
 		{
-			//cout << pow(10,ww1) << endl;
-			robot->PrintJointsValues();
+			//
 		}
-
-		ImGui::SetNextWindowPos(ImVec2(470,0), ImGuiCond_Once);
+#pragma region		ee_adjustments
+		/*double step = 0.003;
+		if (ImGui::Button("1+", ImVec2(-1, 0)))
+		{
+			m_eeLocalCoord.x() += step;
+			cout << endl << m_eeLocalCoord << endl;
+			P3D p = m_gcRobotRepresentation->getWorldCoordinatesFor(m_eeLocalCoord, robot->getRigidBody(13));
+			pointToDraw << p(0), p(1), p(2);
+			DrawPoint();			
+		}
+		if (ImGui::Button("1-", ImVec2(-1, 0)))
+		{
+			m_eeLocalCoord.x() += -step;
+			cout << endl << m_eeLocalCoord << endl;
+			P3D p = m_gcRobotRepresentation->getWorldCoordinatesFor(m_eeLocalCoord, robot->getRigidBody(13));
+			pointToDraw << p(0), p(1), p(2);
+			DrawPoint();
+		}		
+		if (ImGui::Button("2+", ImVec2(-1, 0)))
+		{
+			m_eeLocalCoord.y() += step;
+			cout << endl << m_eeLocalCoord << endl;
+			P3D p = m_gcRobotRepresentation->getWorldCoordinatesFor(m_eeLocalCoord, robot->getRigidBody(13));
+			pointToDraw << p(0), p(1), p(2);
+			DrawPoint();
+		}
+		if (ImGui::Button("2-", ImVec2(-1, 0)))
+		{
+			m_eeLocalCoord.y() += -step;
+			cout << endl << m_eeLocalCoord << endl;
+			P3D p = m_gcRobotRepresentation->getWorldCoordinatesFor(m_eeLocalCoord, robot->getRigidBody(13));
+			pointToDraw << p(0), p(1), p(2);
+			DrawPoint();
+		}
+		if (ImGui::Button("3+", ImVec2(-1, 0)))
+		{
+			m_eeLocalCoord.z() += step;
+			cout << endl << m_eeLocalCoord << endl;
+			P3D p = m_gcRobotRepresentation->getWorldCoordinatesFor(m_eeLocalCoord, robot->getRigidBody(13));
+			pointToDraw << p(0), p(1), p(2);
+			DrawPoint();
+		}
+		if (ImGui::Button("3-", ImVec2(-1, 0)))
+		{
+			m_eeLocalCoord.z() += -step;
+			cout << endl << m_eeLocalCoord << endl;
+			P3D p = m_gcRobotRepresentation->getWorldCoordinatesFor(m_eeLocalCoord, robot->getRigidBody(13));
+			pointToDraw << p(0), p(1), p(2);
+			DrawPoint();
+		}*/
+#pragma endregion 
+		
+		ImGui::SetNextWindowPos(ImVec2(340,0), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(0.0, 0.0));
 		ImGui::SetWindowFontScale(1.2);
 		// 1. Show a simple window.
 		// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets automatically appears in a window called "Debug".
-		ImGui::Begin("Joints");
+		ImGui::Begin("Right Arm Joints");
 		ImGui::SetWindowFontScale(1.2);
 		ImGui::Text("%5.2f ", robot->GetJointValueR(0));
 		ImGui::SameLine();
@@ -449,6 +493,18 @@ void RSApp::CreateMenu()
 		ImGui::Text("%5.2f", robot->GetJointValueR(5));
 		ImGui::SameLine();
 		ImGui::Text("%5.2f", robot->GetJointValueR(6));
+		
+		ImGui::End();
+
+		ImGui::SetNextWindowPos(ImVec2(800, 0), ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(0.0, 0.0));
+		
+		// 1. Show a simple window.
+		// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets automatically appears in a window called "Debug".
+		ImGui::Begin("Right Arm Cart");
+		ImGui::SetWindowFontScale(1.2);
+		P3D p2 = kSolver->CalcForwardKinematics(robot->GetQ());
+		ImGui::Text("x:%5.2f y:%5.2f z:%5.2f", p2.x(), p2.y(), p2.z());
 		ImGui::End();
 
 		
