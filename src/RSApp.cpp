@@ -417,6 +417,12 @@ void RSApp::CreateMenu()
 			static float fl[3];
 			ImGui::InputFloat3("", fl, 2);
 			m_finalCart = P3D(fl[0], fl[1], fl[2]);
+			ImGui::SameLine();
+			if (ImGui::Button("Reset", ImVec2(-1, 0)))
+			{
+				for (size_t i = 0; i < 3; i++)
+					fl[i] = 0;
+			}
 		}
 
 		if (ImGui::Button("Rebuild simulation", ImVec2(-1, 0)))
