@@ -202,8 +202,8 @@ RSApp::RSApp(void)
 	std::vector<double> weights = { 1,1,1};
 	RecreateSimulation(weights,MinimizerType::GD);
 	CreateMenu();
-	
-	viewer.core.camera_base_zoom = 2.5;
+	viewer.selected_data_index = 0;
+	viewer.core.camera_zoom = 0.5;
 	//viewer.core.camera_eye = Eigen::Vector3f(5, 3, 0);
 	//viewer.core.camera_eye += Eigen::Vector3f(0, 5, 0);
 	viewer.launch();
@@ -286,12 +286,11 @@ void RSApp::LoadMeshModelsIntoViewer(bool useSerializedModels)
 			viewer.data_list[ii].set_colors(COLOR(230, 230, 227));
 		else
 			viewer.data_list[ii].set_colors(COLOR(227, 100, 33));//orange
-		
 		viewer.append_mesh();
 		ii++;
 	}
 	DrawRobot();
-	//AddSphere(ii);
+	AddSphere(ii);
 }
 
 void RSApp::AddSphere(int ii)
@@ -301,10 +300,16 @@ void RSApp::AddSphere(int ii)
 	string sphereFile = "../RoboticSimulator/data/models/sphere.off";
 
 	igl::readOFF(sphereFile, V, F);
-	for (int i = 0; i < V.size(); ++i)
-		V(i) = V(i) + 1;
-
-	viewer.data_list[ii].set_mesh(V, F);
+	Eigen::Matrix4d translation_matrix;
+	translation_matrix << 
+		0.07, 0, 0, 0.68,
+		0, 0.07, 0, 0.78,
+		0, 0, 0.07, 0.33,
+		0, 0, 0, 1;
+	viewer.data_list[ii].set_mesh(TransformP(V,translation_matrix), F);
+	viewer.data_list[ii].show_lines = false;
+	viewer.data_list[ii].set_colors(COLOR(0, 255, 0));
+	
 }
 
 void RSApp::DrawRobot()
