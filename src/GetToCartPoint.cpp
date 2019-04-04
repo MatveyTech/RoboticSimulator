@@ -1,9 +1,9 @@
-#include "..\include\CollisionObjective.h"
+#include "..\include\GetToCartPoint.h"
 #include <iostream>
 
 
 
-CollisionObjective::CollisionObjective(int numOfJoints, double weight, P3D point, Robot* robot):
+GetToCartPoint::GetToCartPoint(int numOfJoints, double weight, P3D point, Robot* robot):
 	kSolver(robot),
 	m_numOfJoints(numOfJoints),
 	m_point(point),
@@ -12,11 +12,11 @@ CollisionObjective::CollisionObjective(int numOfJoints, double weight, P3D point
 	this->weight = weight;
 }
 
-CollisionObjective::~CollisionObjective()
+GetToCartPoint::~GetToCartPoint()
 {
 }
 
-double CollisionObjective::computeValue(const dVector & p)
+double GetToCartPoint::computeValue(const dVector & p)
 {
 	double result = 0;
 	int numOfPoints = p.rows() / m_numOfJoints;
@@ -30,12 +30,12 @@ double CollisionObjective::computeValue(const dVector & p)
 }
 
 
-void CollisionObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & p)
+void GetToCartPoint::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & p)
 {
 
 }
 
-void CollisionObjective::addGradientTo(dVector & grad, const dVector & p)
+void GetToCartPoint::addGradientTo(dVector & grad, const dVector & p)
 {
 	int numOfPoints = p.rows() / m_numOfJoints;
 	for (int i = 0; i < numOfPoints; ++i)

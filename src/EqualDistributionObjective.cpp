@@ -1,7 +1,7 @@
 #include "..\include\EqualDistributionObjective.h"
 #include "..\include\StartFromFirstObjective.h"
 #include "..\include\FinishAtLastObjective.h"
-#include "..\include\CollisionObjective.h"
+#include "..\include\GetToCartPoint.h"
 
 EqualDistributionObjective::EqualDistributionObjective(int NumOfJoints)
 {

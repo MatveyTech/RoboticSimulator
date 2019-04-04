@@ -6,15 +6,15 @@
 
 using namespace Eigen;
 
-class CollisionObjective : public ObjectiveFunction
+class GetToCartPoint : public ObjectiveFunction
 {
 	int m_numOfJoints;
 	P3D m_point;
 	Robot* m_robot;
 	SingleArmKinematicsSolver kSolver;
 public:
-	CollisionObjective(int numOfJoints, double weight, P3D point, Robot* robot);
-	~CollisionObjective();
+	GetToCartPoint(int numOfJoints, double weight, P3D point, Robot* robot);
+	~GetToCartPoint();
 
 	virtual double computeValue(const dVector& p);
 	virtual void addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector& p);
