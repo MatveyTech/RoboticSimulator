@@ -24,6 +24,16 @@ using namespace Eigen;
 using namespace std;
 using namespace igl::opengl::glfw::imgui;
 
+class CollisionSphere
+{
+public:
+	P3D Location;
+	double Radius;
+	int IndexInViewer;
+
+	CollisionSphere(P3D loc, double rad, int ind);
+	bool CollidesRobot(P3D eePosition);
+};
 
 class RSApp
 {
@@ -37,6 +47,7 @@ private:
 	AdvancedSimulation* simulation = nullptr;
 	chrono::steady_clock::time_point last_rendered;
 	SingleArmKinematicsSolver* kSolver;
+	P3D m_cartLocation;
 	
 	//shared_ptr<Robot*> robot;
 	void PrintRenderingTime(); 
@@ -50,6 +61,7 @@ private:
 	P3D m_eeLocalCoord;
 	bool m_onlyFinalCart=false;
 	P3D m_finalCart;
+	vector<CollisionSphere> m_obstacles;
 public:
 	
 	void CreateIKSolver();
@@ -59,7 +71,7 @@ public:
 	virtual void loadFile(const char* fName);
 	void loadRobot(const char* fName);
 	void LoadMeshModelsIntoViewer(bool useSerializedModels);
-	void AddSphere(int ii);
+	void AddCollisionSpheres();
 	void DrawRobot();
 };
 

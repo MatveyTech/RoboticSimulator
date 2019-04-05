@@ -56,6 +56,14 @@ void RSApp::DefineViewerCallbacks()
 		//PrintRenderingTime();
 		DrawPoint();
 		DrawRobot();
+		m_cartLocation = kSolver->CalcForwardKinematics(robot->GetQ());
+		for (auto&& obstacle : m_obstacles)
+		{
+			if (obstacle.CollidesRobot(m_cartLocation))
+				viewer.data_list[obstacle.IndexInViewer].set_colors(COLOR(255, 0, 0));
+			else
+				viewer.data_list[obstacle.IndexInViewer].set_colors(COLOR(0, 255, 0));
+		}
 		return false;
 	};
 	if (CartMode)
@@ -289,11 +297,11 @@ void RSApp::LoadMeshModelsIntoViewer(bool useSerializedModels)
 		viewer.append_mesh();
 		ii++;
 	}
-	DrawRobot();
-	AddSphere(ii);
+	//DrawRobot();
+	AddCollisionSpheres();
 }
 
-void RSApp::AddSphere(int ii)
+void RSApp::AddCollisionSpheres()
 {
 	Eigen::MatrixXd V;
 	Eigen::MatrixXi F;
@@ -301,14 +309,20 @@ void RSApp::AddSphere(int ii)
 
 	igl::readOFF(sphereFile, V, F);
 	Eigen::Matrix4d translation_matrix;
+	
+	int sphereIndexInViewer = viewer.data_list.size() - 1;
+	
+	CollisionSphere cs(P3D(0.68,0.78,0.33), 0.07, sphereIndexInViewer);
+	
+	m_obstacles.push_back(cs);
 	translation_matrix << 
-		0.07, 0, 0, 0.68,
-		0, 0.07, 0, 0.78,
-		0, 0, 0.07, 0.33,
+		cs.Radius, 0, 0, cs.Location.x(),
+		0, cs.Radius, 0, cs.Location.y(),
+		0, 0, cs.Radius, cs.Location.z(),
 		0, 0, 0, 1;
-	viewer.data_list[ii].set_mesh(TransformP(V,translation_matrix), F);
-	viewer.data_list[ii].show_lines = false;
-	viewer.data_list[ii].set_colors(COLOR(0, 255, 0));
+	viewer.data_list[sphereIndexInViewer].set_mesh(TransformP(V,translation_matrix), F);
+	viewer.data_list[sphereIndexInViewer].show_lines = false;
+	viewer.data_list[sphereIndexInViewer].set_colors(COLOR(0, 255, 0));
 	
 }
 
@@ -522,8 +536,7 @@ void RSApp::CreateMenu()
 		// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets automatically appears in a window called "Debug".
 		ImGui::Begin("Right Arm Cart");
 		ImGui::SetWindowFontScale(1.2);
-		P3D p2 = kSolver->CalcForwardKinematics(robot->GetQ());
-		ImGui::Text("x:%5.2f y:%5.2f z:%5.2f", p2.x(), p2.y(), p2.z());
+		ImGui::Text("x:%5.2f y:%5.2f z:%5.2f", m_cartLocation.x(), m_cartLocation.y(), m_cartLocation.z());
 		ImGui::End();
 
 		
@@ -553,4 +566,16 @@ void RSApp::CreateMenu()
 		//}
 	};
 
+}
+
+CollisionSphere::CollisionSphere(P3D loc, double rad, int ind) :
+	Location(loc),
+	Radius(rad),
+	IndexInViewer(ind)
+{
+}
+
+bool CollisionSphere::CollidesRobot(P3D eePosition)
+{
+	return (eePosition - Location).norm() < Radius;
 }
