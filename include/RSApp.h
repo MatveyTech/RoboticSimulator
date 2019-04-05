@@ -71,6 +71,7 @@ public:
 	virtual void loadFile(const char* fName);
 	void loadRobot(const char* fName);
 	void LoadMeshModelsIntoViewer(bool useSerializedModels);
+	void AddRobotModels(bool useSerializedModels);
 	void AddCollisionSpheres();
 	void DrawRobot();
 };
