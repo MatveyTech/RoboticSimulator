@@ -264,6 +264,12 @@ MatrixXd TransformP(Eigen::MatrixXd &V, Eigen::Matrix4d &tr)
 
 void RSApp::LoadMeshModelsIntoViewer(bool useSerializedModels)
 {
+	AddRobotModels(useSerializedModels);
+	AddCollisionSpheres();
+}
+
+void RSApp::AddRobotModels(bool useSerializedModels)
+{
 	int ii = 0;
 	for (auto&& i : rbEngine->rbs)
 	{
@@ -275,7 +281,7 @@ void RSApp::LoadMeshModelsIntoViewer(bool useSerializedModels)
 		if (useSerializedModels)
 		{
 			igl::deserialize(i->vertices, "V", VFile);
-			igl::deserialize(i->faces, "F", FFile);			
+			igl::deserialize(i->faces, "F", FFile);
 		}
 		else
 		{
@@ -297,8 +303,6 @@ void RSApp::LoadMeshModelsIntoViewer(bool useSerializedModels)
 		viewer.append_mesh();
 		ii++;
 	}
-	//DrawRobot();
-	AddCollisionSpheres();
 }
 
 void RSApp::AddCollisionSpheres()
