@@ -1,7 +1,7 @@
 #include "..\include\EqualDistributionObjective.h"
 #include "..\include\StartFromFirstObjective.h"
 #include "..\include\FinishAtLastObjective.h"
-#include "..\include\GetToCartPoint.h"
+#include "..\include\CloseToPointObjective.h"
 
 EqualDistributionObjective::EqualDistributionObjective(int NumOfJoints, double weight):
 	m_numOfJoints(NumOfJoints)

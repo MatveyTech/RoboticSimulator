@@ -1,7 +1,8 @@
 #include "..\include\EqualDistributionObjective.h"
 #include "..\include\StartFromFirstObjective.h"
 #include "..\include\FinishAtLastObjective.h"
-#include "..\include\GetToCartPoint.h"
+#include "..\include\CloseToPointObjective.h"
+#include "..\include\CollisionObjective.h"
 #include "..\include\ObjectiveSum.h"
 
 
@@ -10,7 +11,7 @@ ObjectiveSum::ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos, s
 	int numOfJoints = startPos.rows();
 	if (onlyFinalCart)
 	{
-		objectives.push_back(new GetToCartPoint(numOfJoints, 1.0, finalCart, robot));
+		objectives.push_back(new CloseToPointObjective(numOfJoints, 1.0, finalCart, robot));
 	}
 	else
 	{

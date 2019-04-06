@@ -1,9 +1,6 @@
 
 #include "..\include\RSApp.h"
-#include "..\include\StartFromFirstObjective.h"
-#include "..\include\FinishAtLastObjective.h"
-#include "..\include\EqualDistributionObjective.h"
-#include "..\include\GetToCartPoint.h"
+#include "..\include\CollisionObjective.h"
 #include <fstream>
 #include <chrono>
 #include <igl/readOFF.h>
