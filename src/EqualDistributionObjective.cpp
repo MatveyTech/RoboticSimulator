@@ -3,9 +3,10 @@
 #include "..\include\FinishAtLastObjective.h"
 #include "..\include\GetToCartPoint.h"
 
-EqualDistributionObjective::EqualDistributionObjective(int NumOfJoints)
+EqualDistributionObjective::EqualDistributionObjective(int NumOfJoints, double weight):
+	m_numOfJoints(NumOfJoints)
 {
-	m_numOfJoints = NumOfJoints;
+	this->weight = weight;
 }
 
 
@@ -29,7 +30,7 @@ double EqualDistributionObjective::computeValue(const dVector & p)
 			res += diff*diff;
 		}
 	}
-	return res;
+	return res*weight;
 }
 
 void EqualDistributionObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & p)
@@ -52,5 +53,6 @@ void EqualDistributionObjective::addGradientTo(dVector & grad, const dVector & p
 		{
 			grad(i) += 4 * p(i) - 2 * p(i - m_numOfJoints) - 2 * p(i + m_numOfJoints);
 		}
+		grad(i) *= weight;
 	}
 }

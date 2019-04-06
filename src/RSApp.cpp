@@ -208,7 +208,7 @@ RSApp::RSApp(void)
 	DefineViewerCallbacks();
 
 	CreateIKSolver();
-	std::vector<double> weights = { 1,1,1};
+	std::vector<double> weights = { 1,1,1,1};
 	RecreateSimulation(weights,MinimizerType::BFGS);
 	CreateMenu();
 	viewer.selected_data_index = 0;
@@ -405,7 +405,8 @@ void RSApp::CreateMenu()
 		ImGui::Text("Step");
 		static int w1 = 0;
 		static int w2 = 0;
-		static int w3 = 0;	
+		static int w3 = 0;
+		static int w4 = 0;	
 
 		auto int2char = [&](int val) -> char*
 		{
@@ -427,13 +428,14 @@ void RSApp::CreateMenu()
 		ImGui::SliderInt("First", &w1, 0,max_w,int2char(w1));
 		ImGui::SliderInt("Last", &w2, 0,max_w,int2char(w2));
 		ImGui::SliderInt("Equal", &w3, 0,max_w,int2char(w3));
+		ImGui::SliderInt("Collision", &w4, 0,max_w,int2char(w4));
 		ImGui::NewLine();
 		
 		static MinimizerType minimizerType = simulation->MinimizerType;
 		const char* cc = minimizerType == MinimizerType::GD ? "GradDesc" : "BFGS";
 		ImGui::SliderInt("Minimizer", &((int)minimizerType), 0, 1, cc);
 
-		std::vector<double> weights = { (double)pow(10,w1),(double)pow(10,w2),(double)pow(10,w3) };
+		std::vector<double> weights = { (double)pow(10,w1),(double)pow(10,w2),(double)pow(10,w3),(double)pow(10,w4) };
 		
 		ImGui::Checkbox("Only final position", &m_onlyFinalCart);
 		if (m_onlyFinalCart)
@@ -448,10 +450,11 @@ void RSApp::CreateMenu()
 					fl[i] = 0;
 			}
 		}
-
+		static bool autostep = true;
 		if (ImGui::Button("Rebuild simulation", ImVec2(-1, 0)))
 		{
 			RecreateSimulation(weights, minimizerType);
+			autostep = true;
 		}
 		
 
@@ -554,7 +557,7 @@ void RSApp::CreateMenu()
 		{
 			simulation->MakeStep();
 		}
-		static bool autostep = true;
+		
 		if (ImGui::Button("Auto step", ImVec2(-1, 0)))
 		{
 			autostep = !autostep;
