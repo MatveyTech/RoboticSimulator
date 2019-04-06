@@ -10,7 +10,7 @@ class CollisionObjective : public ObjectiveFunction
 {
 	int m_numOfJoints;
 	P3D m_point;
-	double m_radius;
+	double m_radiusSq;
 	SingleArmKinematicsSolver kSolver;
 public:
 	CollisionObjective(int numOfJoints, double weight, P3D point, double radius, Robot* robot);
