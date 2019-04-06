@@ -209,7 +209,7 @@ RSApp::RSApp(void)
 
 	CreateIKSolver();
 	std::vector<double> weights = { 1,1,1};
-	RecreateSimulation(weights,MinimizerType::GD);
+	RecreateSimulation(weights,MinimizerType::BFGS);
 	CreateMenu();
 	viewer.selected_data_index = 0;
 	viewer.core.camera_zoom = 0.5;
@@ -554,11 +554,13 @@ void RSApp::CreateMenu()
 		{
 			simulation->MakeStep();
 		}
-		static bool autostep = false;
+		static bool autostep = true;
 		if (ImGui::Button("Auto step", ImVec2(-1, 0)))
 		{
 			autostep = !autostep;
 		}
+		if (simulation->IterationNum == 40)
+			autostep = false;
 		if (autostep)
 			simulation->MakeStep();
 		ImGui::Text("Iteration # %d", simulation->IterationNum);
