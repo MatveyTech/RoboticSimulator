@@ -10,7 +10,6 @@ class GetToCartPoint : public ObjectiveFunction
 {
 	int m_numOfJoints;
 	P3D m_point;
-	Robot* m_robot;
 	SingleArmKinematicsSolver kSolver;
 public:
 	GetToCartPoint(int numOfJoints, double weight, P3D point, Robot* robot);
@@ -26,7 +25,6 @@ class CollisionObjective : public ObjectiveFunction
 	int m_numOfJoints;
 	P3D m_point;
 	double m_radius;
-	Robot* m_robot;
 	SingleArmKinematicsSolver kSolver;
 public:
 	CollisionObjective(int numOfJoints, double weight, P3D point, double radius, Robot* robot);

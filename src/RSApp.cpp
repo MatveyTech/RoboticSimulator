@@ -3,6 +3,7 @@
 #include "..\include\StartFromFirstObjective.h"
 #include "..\include\FinishAtLastObjective.h"
 #include "..\include\EqualDistributionObjective.h"
+#include "..\include\GetToCartPoint.h"
 #include <fstream>
 #include <chrono>
 #include <igl/readOFF.h>
@@ -563,6 +564,27 @@ void RSApp::CreateMenu()
 		ImGui::Text("Iteration # %d", simulation->IterationNum);
 		ImGui::Text("Value %E", simulation->ComputeValueInCurrentPoint());
 		ImGui::Text("Grad  %E", simulation->ComputeGradientInCurrentPoint());
+		VectorXd jj(7);
+		jj << robot->GetJointValueR(0),
+			robot->GetJointValueR(1),
+			robot->GetJointValueR(2),
+			robot->GetJointValueR(3),
+			robot->GetJointValueR(4),
+			robot->GetJointValueR(5),
+			robot->GetJointValueR(6);
+
+		CollisionObjective co(7, 1.0, P3D(0.68, 0.78, 0.33), 0.07, robot);
+
+		ImGui::Text("Value %E", co.computeValue(jj));
+
+		VectorXd grad(7);
+		for (size_t i = 0; i < grad.size(); i++)
+			grad(i) = 0;
+		co.addGradientTo(grad, jj);
+		double dd = grad.norm();
+
+
+		ImGui::Text("Grad  %E", dd);
 		ImGui::Text("Iterations:  %d", simulation->GetLastNumOfIterations());
 		ImGui::End();
 

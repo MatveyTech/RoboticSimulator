@@ -6,8 +6,7 @@
 GetToCartPoint::GetToCartPoint(int numOfJoints, double weight, P3D point, Robot* robot):
 	kSolver(robot),
 	m_numOfJoints(numOfJoints),
-	m_point(point),
-	m_robot(robot)
+	m_point(point)
 {
 	this->weight = weight;
 }
@@ -69,8 +68,7 @@ CollisionObjective::CollisionObjective(int numOfJoints, double weight, P3D point
 	kSolver(robot),
 	m_numOfJoints(numOfJoints),
 	m_point(point),
-	m_radius(radius),
-	m_robot(robot)
+	m_radius(radius)
 {
 	this->weight = weight;
 }
@@ -90,7 +88,7 @@ double CollisionObjective::computeValue(const dVector & p)
 		double d = (cart_pos - m_point).norm();
 		result += d > m_radius ? 0 : (d - m_radius)*(d - m_radius);
 	}
-	return result;
+	return result*weight;
 }
 
 
@@ -120,10 +118,12 @@ void CollisionObjective::addGradientTo(dVector & grad, const dVector & p)
 		P3D cart_pos = kSolver.CalcForwardKinematics(q);
 
 		MatrixNxM res(1, 7);
-		res = (cart_pos - m_point).transpose()*Ja;
+		double d = (cart_pos - m_point).norm();
+		double f_val = d > m_radius ? 0 : (d - m_radius)*(d - m_radius);
+		res = (cart_pos - m_point).transpose()*Ja*f_val;
 		for (size_t j = 0; j < m_numOfJoints; j++)
 		{
-			grad(i * m_numOfJoints + j) += res(j);
+			grad(i * m_numOfJoints + j) += res(j)*weight;
 		}
 	}
 }
