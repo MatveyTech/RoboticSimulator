@@ -1,6 +1,7 @@
 
 #include "..\include\RSApp.h"
 #include "..\include\CollisionObjective.h"
+#include "..\include\CloseToPointObjective.h"
 #include <fstream>
 #include <chrono>
 #include <igl/readOFF.h>
@@ -186,7 +187,7 @@ void RSApp::RecreateSimulation(std::vector<double> weights, MinimizerType mt)
 	if (simulation != nullptr)
 		delete simulation;
 	//simulation = new BasicSimulation(v1, v2, PathSize);
-	simulation = new AdvancedSimulation(v1, v2, PathSize, weights,(int)mt,robot,m_finalCart,m_onlyFinalCart);
+	simulation = new AdvancedSimulation(v1, v2, PathSize, weights,(int)mt,robot,m_finalCart,m_onlyFinalCart, m_obstacles);
 }
 
 RSApp::RSApp(void)
@@ -314,7 +315,9 @@ void RSApp::AddCollisionSpheres()
 	
 	int sphereIndexInViewer = viewer.data_list.size() - 1;
 	
-	CollisionSphere cs(P3D(0.68,0.78,0.33), 0.07, sphereIndexInViewer);
+	P3D p(0.68, 0.78, 0.33);
+	//P3D p(0.3,0.47,-0.34);
+	CollisionSphere cs(p, 0.07, sphereIndexInViewer);
 	
 	m_obstacles.push_back(cs);
 	translation_matrix << 
@@ -405,27 +408,20 @@ void RSApp::CreateMenu()
 		static int w3 = 0;
 		static int w4 = 0;	
 
-		auto int2char = [&](int val) -> char*
+
+		auto int2char = [&](int val) -> std::string
 		{
-			if (val == 0)
-				return "1";
-			else if (val == 1)
-				return "10";
-			else if (val == 2)
-				return "100";
-			else if (val == 3)
-				return "1000";
-			else if (val == 4)
-				return "10000";
-			else 
-				return "BAD";
+			std::string out_string;
+			std::stringstream ss;
+			ss << pow(10, val);
+			return ss.str();
 		};
 		ImGui::Text("Weights:");
-		int max_w = 4;
-		ImGui::SliderInt("First", &w1, 0,max_w,int2char(w1));
-		ImGui::SliderInt("Last", &w2, 0,max_w,int2char(w2));
-		ImGui::SliderInt("Equal", &w3, 0,max_w,int2char(w3));
-		ImGui::SliderInt("Collision", &w4, 0,max_w,int2char(w4));
+		int max_w = 9;
+		ImGui::SliderInt("First", &w1, 0,max_w,int2char(w1).data());
+		ImGui::SliderInt("Last", &w2, 0,max_w,int2char(w2).data());
+		ImGui::SliderInt("Equal", &w3, 0,max_w,int2char(w3).data());
+		ImGui::SliderInt("Collision", &w4, 0,max_w,int2char(w4).data());
 		ImGui::NewLine();
 		
 		static MinimizerType minimizerType = simulation->MinimizerType;
@@ -435,6 +431,8 @@ void RSApp::CreateMenu()
 		std::vector<double> weights = { (double)pow(10,w1),(double)pow(10,w2),(double)pow(10,w3),(double)pow(10,w4) };
 		
 		ImGui::Checkbox("Only final position", &m_onlyFinalCart);
+		static bool showPathOutput = false;
+		ImGui::Checkbox("Show path", &showPathOutput);
 		if (m_onlyFinalCart)
 		{
 			static float fl[3];
@@ -447,11 +445,11 @@ void RSApp::CreateMenu()
 					fl[i] = 0;
 			}
 		}
-		static bool autostep = true;
+		static bool autostep = false;
 		if (ImGui::Button("Rebuild simulation", ImVec2(-1, 0)))
 		{
 			RecreateSimulation(weights, minimizerType);
-			autostep = true;
+			//autostep = true;
 		}
 		
 
@@ -544,8 +542,22 @@ void RSApp::CreateMenu()
 		ImGui::Text("x:%5.2f y:%5.2f z:%5.2f", m_cartLocation.x(), m_cartLocation.y(), m_cartLocation.z());
 		ImGui::End();
 
+		if (showPathOutput)
+		{
+			ImGui::SetWindowFontScale(1.2);
+			ImGui::Begin("Path");
+			ImGui::SetWindowPos(ImVec2(830, 350), ImGuiCond_Once);
+			ImGui::SetWindowFontScale(1.2);
+			int n = 7;
+			for (size_t i = 0; i < simulation->path.size() / n; i++)
+			{
+				ImGui::Text("%5.2f  %5.2f  %5.2f  %5.2f  %5.2f  %5.2f  %5.2f  ", simulation->path(i*n+0), simulation->path(i * n + 1), simulation->path(i * n + 2), simulation->path(i * n + 3), simulation->path(i * n + 4), simulation->path(i * n + 5), simulation->path(i * n + 6));
+			}
+			ImGui::End();
+		}
 		
-		ImGui::SetNextWindowPos(ImVec2(0, 350), ImGuiCond_Once);
+		
+		ImGui::SetNextWindowPos(ImVec2(0, 430), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(0.0, 0.0));
 		ImGui::SetWindowFontScale(1.2);
 		ImGui::Begin("Optimization");
@@ -559,7 +571,7 @@ void RSApp::CreateMenu()
 		{
 			autostep = !autostep;
 		}
-		if (simulation->IterationNum == 40)
+		if (simulation->IterationNum == 4000)
 			autostep = false;
 		if (autostep)
 			simulation->MakeStep();
@@ -575,10 +587,18 @@ void RSApp::CreateMenu()
 			robot->GetJointValueR(5),
 			robot->GetJointValueR(6);
 
-		CollisionObjective co(7, 1.0, P3D(0.68, 0.78, 0.33), 0.07, robot);
+		CollisionSphere cs = m_obstacles.front();
+		CollisionObjective co(7, (double)pow(10, w4), cs.Location, cs.Radius, robot);
+
+		CloseToPointObjective ctp(7, 1.0, P3D(0.1, 0.1, 0.1), robot);
+		VectorXd j3(105);
+		j3.setConstant(20);
+		//co.testGradientWithFD(j3);
+		//ctp.testGradientWithFD(j3);
 
 		ImGui::Text("Value %E", co.computeValue(jj));
-
+		
+		
 		VectorXd grad(7);
 		for (size_t i = 0; i < grad.size(); i++)
 			grad(i) = 0;

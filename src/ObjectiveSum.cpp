@@ -4,9 +4,11 @@
 #include "..\include\CloseToPointObjective.h"
 #include "..\include\CollisionObjective.h"
 #include "..\include\ObjectiveSum.h"
+#include <vector>
 
 
-ObjectiveSum::ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos, std::vector<double> weights, Robot* robot, P3D finalCart, bool onlyFinalCart)
+ObjectiveSum::ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos, std::vector<double> weights, Robot* robot, 
+	P3D finalCart, bool onlyFinalCart,std::vector<CollisionSphere> obstacles)
 {
 	int numOfJoints = startPos.rows();
 	if (onlyFinalCart)
@@ -14,12 +16,13 @@ ObjectiveSum::ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos, s
 		objectives.push_back(new CloseToPointObjective(numOfJoints, 1.0, finalCart, robot));
 	}
 	else
-	{
+	{		
 		
 		objectives.push_back(new StartFromFirstObjective(startPos, weights.at(0)));
 		objectives.push_back(new FinishAtLastObjective(finalPos, weights.at(1)));
 		objectives.push_back(new EqualDistributionObjective(numOfJoints, weights.at(2)));//weights.at(2)
-		objectives.push_back(new CollisionObjective(numOfJoints, weights.at(3), P3D(0.68, 0.78, 0.33),0.07, robot));
+		CollisionSphere cs = obstacles.front();
+		objectives.push_back(new CollisionObjective(numOfJoints, weights.at(3), cs.Location,cs.Radius, robot));
 	}
 }
 

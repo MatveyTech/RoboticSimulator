@@ -122,17 +122,14 @@ BasicSimulation::BasicSimulation(VectorXd startPoint, VectorXd endPoint, int num
 //}
 
 AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, std::vector<double> weights,
-	int mt, Robot* robot, P3D finalCart, bool onlyFinalCart)
+	int mt, Robot* robot, P3D finalCart, bool onlyFinalCart, vector<CollisionSphere> obstacles)
 	:Simulation(startPoint, endPoint, numOfPoints)
 {
 	
-	m_objective = new ObjectiveSum(startPoint, endPoint, weights, robot,finalCart,onlyFinalCart);
+	m_objective = new ObjectiveSum(startPoint, endPoint, weights, robot,finalCart,onlyFinalCart, obstacles);
 	MinimizerType = mt == 0 ? MinimizerType::GD : MinimizerType::BFGS;
 	VectorXd pp(NumOfJoints*NumOfPoints);
-	for (size_t i = 0; i < pp.size(); i++)
-	{
-		pp(i) = 20;
-	}
+	pp.setConstant(20);
 	if (MinimizerType == MinimizerType::GD)
 		m_gradientBasedMinimizer = new GradientDescentFunctionMinimizer(1);
 	else if (MinimizerType == MinimizerType::BFGS)

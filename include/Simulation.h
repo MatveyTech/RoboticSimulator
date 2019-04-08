@@ -4,6 +4,7 @@
 #include "..\include\GradientDescentFunctionMinimizer.h"
 #include "..\include\BFGSFunctionMinimizer.h"
 #include "..\include\ObjectiveFunction.h"
+#include "..\include\CollisionObjective.h"
 #include "..\include\Robot.h"
 
 using namespace Eigen;
@@ -16,7 +17,7 @@ protected:
 	
 	int NumOfJoints;
 	int NumOfPoints;
-	VectorXd path;
+	
 	//virtual void CalculatePath(VectorXd startPoint, VectorXd endPoint) = 0;
 
 public:
@@ -30,6 +31,8 @@ public:
 	VectorXd MoveToPrevAndGet();
 	void Reset();
 	virtual void MakeStep();
+
+	VectorXd path;
 };
 
 class BasicSimulation : public Simulation
@@ -55,7 +58,8 @@ public:
 	int IterationNum = 0;
 	MinimizerType MinimizerType;// = MinimizerType::GD;
 	void MakeStep();
-	AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, std::vector<double> weights, int mt,Robot* robot, P3D finalCart, bool onlyFinalCart);
+	AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, std::vector<double> weights, 
+		int mt,Robot* robot, P3D finalCart, bool onlyFinalCart,std::vector<CollisionSphere> obstacles);
 	double ComputeValueInCurrentPoint();
 	double ComputeGradientInCurrentPoint();
 	int GetLastNumOfIterations();
