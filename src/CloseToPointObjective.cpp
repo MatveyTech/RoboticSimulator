@@ -25,7 +25,7 @@ double CloseToPointObjective::computeValue(const dVector & p)
 		P3D cart_pos = kSolver.CalcForwardKinematics(q);
 		result += (cart_pos - m_point).squaredNorm();
 	}
-	return result;
+	return result*0.5;
 }
 
 
