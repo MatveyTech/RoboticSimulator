@@ -63,6 +63,7 @@ public:
 	double ComputeValueInCurrentPoint();
 	double ComputeGradientInCurrentPoint();
 	int GetLastNumOfIterations();
+	void testGradient();
 };
 
 

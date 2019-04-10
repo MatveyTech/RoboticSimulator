@@ -82,8 +82,8 @@ void ObjectiveFunction::testGradientWithFD(const dVector& p){
 //	print("..\\out\\gradient_FD.m", FDGradient);
 //	print("..\\out\\gradient.m", analyticGradient);
 
-	//Logger::logPrint("Objective Function: testing gradients...norms: analytic: %lf, FD: %lf\n", analyticGradient.norm(), FDGradient.norm());
-	//Logger::print("Objective Function: testing gradients...norms: analytic: %lf, FD: %lf\n", analyticGradient.norm(), FDGradient.norm());
+	Logger::logPrint("Objective Function: testing gradients...norms: analytic: %lf, FD: %lf\n", analyticGradient.norm(), FDGradient.norm());
+	Logger::print("Objective Function: testing gradients...norms: analytic: %lf, FD: %lf\n", analyticGradient.norm(), FDGradient.norm());
 	for (int i=0;i<p.size();i++){
 		double absErr = std::abs(FDGradient[i] - analyticGradient[i]);
 		double relError = 2 * absErr / (eps + std::abs(analyticGradient[i]) + std::abs(FDGradient[i]));

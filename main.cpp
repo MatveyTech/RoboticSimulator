@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[])
 {
-	cout << std::setprecision(2);
+	//cout << std::setprecision(2);
 	RSApp app;
 	return 0;	
 }

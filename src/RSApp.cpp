@@ -592,20 +592,22 @@ void RSApp::CreateMenu()
 
 		CloseToPointObjective ctp(7, 1.0, P3D(0.1, 0.1, 0.1), robot);
 		VectorXd j3(105);
-		j3.setConstant(20);
-		//co.testGradientWithFD(j3);
+		j3.setConstant(RAD(20));
+		//co.testGradientWithFD(j3);		
 		//ctp.testGradientWithFD(j3);
 
 		ImGui::Text("Value %E", co.computeValue(jj));
 		
+		static bool testGradient = false;
+		ImGui::Checkbox("Test gradient", &testGradient);
+		if (testGradient)
+			simulation->testGradient();
 		
 		VectorXd grad(7);
 		for (size_t i = 0; i < grad.size(); i++)
 			grad(i) = 0;
 		co.addGradientTo(grad, jj);
 		double dd = grad.norm();
-
-
 		ImGui::Text("Grad  %E", dd);
 		ImGui::Text("Iterations:  %d", simulation->GetLastNumOfIterations());
 		ImGui::End();
