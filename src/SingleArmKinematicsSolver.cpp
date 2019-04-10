@@ -20,13 +20,13 @@ dVector SingleArmKinematicsSolver::ConvertSingleArmtoAllQ(const dVector & q)
 {
 	dVector current_q = m_robot->GetQ();
 	//quick and dirty
-	current_q(6) = RAD(q(0));
-	current_q(8) = RAD(q(1));
-	current_q(10) = RAD(q(2));
-	current_q(12) = RAD(q(3));
-	current_q(14) = RAD(q(4));
-	current_q(16) = RAD(q(5));
-	current_q(18) = RAD(q(6));
+	current_q(6) = q(0);
+	current_q(8) = q(1);
+	current_q(10) = q(2);
+	current_q(12) = q(3);
+	current_q(14) = q(4);
+	current_q(16) = q(5);
+	current_q(18) = q(6);
 	return current_q;
 }
 
