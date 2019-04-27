@@ -18,6 +18,11 @@ RigidBody * GetCurrentActiveLink(Robot* robot)
 	return nullptr;
 }
 
+double Rad(double x) // the functor we want to apply
+{
+	return RAD(x);
+}
+
 void RSApp::PrintRenderingTime()
 {
 	auto now = std::chrono::high_resolution_clock::now();
@@ -106,14 +111,14 @@ void RSApp::DefineViewerCallbacks()
 				//newJoints[1] = 58; newJoints[3] = 15; newJoints[5] = 68; newJoints[7] = 300;
 				//newJoints[9] = 258; newJoints[11] = 72; newJoints[13] = 72;
 				newJoints[0] = 90; newJoints[2] = 50;
-				robot->MoveByJoints(newJoints);
+				robot->MoveByJoints(newJoints,true);
 				return true;
 			}
 			case GLFW_KEY_R:
 			{
 				DynamicArray<double> newJoints;
 				newJoints.resize(14, 0);
-				robot->MoveByJoints(newJoints);
+				robot->MoveByJoints(newJoints,true);
 				return true;
 			}
 			default:
@@ -132,10 +137,10 @@ void RSApp::DefineViewerCallbacks()
 			switch (key)
 			{
 			case GLFW_KEY_LEFT:
-				robot->MoveByJointsR(simulation->MoveToPrevAndGet());
+				robot->MoveByJointsR(simulation->MoveToPrevAndGet(),false);
 				return true;
 			case GLFW_KEY_RIGHT:
-				robot->MoveByJointsR(simulation->MoveToNextAndGet());
+				robot->MoveByJointsR(simulation->MoveToNextAndGet(), false);
 				return true;
 			case GLFW_KEY_S:
 				ikSolver->solve(100, false, false);
@@ -147,7 +152,7 @@ void RSApp::DefineViewerCallbacks()
 			{
 				VectorXd v(7);
 				v << 50 ,-50,0,-50,0,0,0;
-				robot->MoveByJointsR(v);
+				robot->MoveByJointsR(v,true);
 				robot->PrintJointsValues();
 				return true;
 			}
@@ -155,7 +160,7 @@ void RSApp::DefineViewerCallbacks()
 			{
 				DynamicArray<double> newJoints;
 				newJoints.resize(14, 0);
-				robot->MoveByJoints(newJoints);
+				robot->MoveByJoints(newJoints,true);
 				return true;
 			}
 			default:
@@ -183,7 +188,9 @@ void RSApp::CreateIKSolver()
 void RSApp::RecreateSimulation(std::vector<double> weights, MinimizerType mt)
 {
 	VectorXd v1(7); v1 << 0, 0, 0, 0, 0, 0, 0;
+	v1 = v1.unaryExpr(&Rad);
 	VectorXd v2(7); v2 << 50, -50, 0, -50, 0, 0, 0;
+	v2 = v2.unaryExpr(&Rad);
 	if (simulation != nullptr)
 		delete simulation;
 	//simulation = new BasicSimulation(v1, v2, PathSize);
@@ -388,18 +395,18 @@ void RSApp::CreateMenu()
 
 		ImGui::SliderInt("", &simulationPos, 1, PathSize);
 		if (!CartMode)
-			robot->MoveByJointsR(simulation->MoveToIndAndGet(simulationPos - 1));
+			robot->MoveByJointsR(simulation->MoveToIndAndGet(simulationPos - 1), false);
 		ImGui::SameLine();
 		if (ImGui::Button("-"))
 		{
 			simulationPos = simulation->DecreaseCurrentIndex()+1;
-			robot->MoveByJointsR(simulation->GetCurrent());
+			robot->MoveByJointsR(simulation->GetCurrent(), false);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("+"))
 		{
 			simulationPos = simulation->IncreaseCurrentIndex()+1;
-			robot->MoveByJointsR(simulation->GetCurrent());
+			robot->MoveByJointsR(simulation->GetCurrent(), false);
 		}
 		ImGui::SameLine();
 		ImGui::Text("Step");
@@ -551,7 +558,7 @@ void RSApp::CreateMenu()
 			int n = 7;
 			for (size_t i = 0; i < simulation->path.size() / n; i++)
 			{
-				ImGui::Text("%5.2f  %5.2f  %5.2f  %5.2f  %5.2f  %5.2f  %5.2f  ", simulation->path(i*n+0), simulation->path(i * n + 1), simulation->path(i * n + 2), simulation->path(i * n + 3), simulation->path(i * n + 4), simulation->path(i * n + 5), simulation->path(i * n + 6));
+				ImGui::Text("%5.2f  %5.2f  %5.2f  %5.2f  %5.2f  %5.2f  %5.2f  ", DEG(simulation->path(i*n+0)), DEG(simulation->path(i * n + 1)), DEG(simulation->path(i * n + 2)), DEG(simulation->path(i * n + 3)), DEG(simulation->path(i * n + 4)), DEG(simulation->path(i * n + 5)), DEG(simulation->path(i * n + 6)));
 			}
 			ImGui::End();
 		}
@@ -576,39 +583,23 @@ void RSApp::CreateMenu()
 		if (autostep)
 			simulation->MakeStep();
 		ImGui::Text("Iteration # %d", simulation->IterationNum);
-		ImGui::Text("Value %E", simulation->ComputeValueInCurrentPoint());
-		ImGui::Text("Grad  %E", simulation->ComputeGradientInCurrentPoint());
-		VectorXd jj(7);
-		jj << robot->GetJointValueR(0),
-			robot->GetJointValueR(1),
-			robot->GetJointValueR(2),
-			robot->GetJointValueR(3),
-			robot->GetJointValueR(4),
-			robot->GetJointValueR(5),
-			robot->GetJointValueR(6);
-
-		CollisionSphere cs = m_obstacles.front();
+		ImGui::Text("Value %E", simulation->ComputeValueAll());
+		ImGui::Text("Grad  %E", simulation->ComputeGradientAll());
+		
+		/*CollisionSphere cs = m_obstacles.front();
 		CollisionObjective co(7, (double)pow(10, w4), cs.Location, cs.Radius, robot);
-
-		CloseToPointObjective ctp(7, 1.0, P3D(0.1, 0.1, 0.1), robot);
-		VectorXd j3(105);
-		j3.setConstant(RAD(20));
-		//co.testGradientWithFD(j3);		
+		CloseToPointObjective ctp(7, 1.0, cs.Location, robot);		
+		co.testGradientWithFD(simulation->GetCurrent().unaryExpr(&Rad));*/
 		//ctp.testGradientWithFD(j3);
 
-		ImGui::Text("Value %E", co.computeValue(jj));
-		
+		ImGui::Text("Curr. Value %E", simulation->ComputeValueCurrent());		
+		ImGui::Text("Curr. Grad  %E", simulation->ComputeGradientCurrent());
+
 		static bool testGradient = false;
 		ImGui::Checkbox("Test gradient", &testGradient);
 		if (testGradient)
 			simulation->testGradient();
-		
-		VectorXd grad(7);
-		for (size_t i = 0; i < grad.size(); i++)
-			grad(i) = 0;
-		co.addGradientTo(grad, jj);
-		double dd = grad.norm();
-		ImGui::Text("Grad  %E", dd);
+
 		ImGui::Text("Iterations:  %d", simulation->GetLastNumOfIterations());
 		ImGui::End();
 

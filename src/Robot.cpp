@@ -222,7 +222,7 @@ RigidBody* Robot::getRBByName(const char* jName) {
 	return NULL;
 }
 
-bool Robot::MoveByJointsR(Eigen::VectorXd vec)
+bool Robot::MoveByJointsR(Eigen::VectorXd vec, bool isDeg/* = false*/)
 {
 	//quick and dirty
 	DynamicArray<double> newJoints;
@@ -231,10 +231,10 @@ bool Robot::MoveByJointsR(Eigen::VectorXd vec)
 	{
 		newJoints[2 * i] = vec(i);
 	}
-	return MoveByJoints(newJoints);
+	return MoveByJoints(newJoints,isDeg);
 }
 
-bool Robot::MoveByJoints(DynamicArray<double> newJoints)
+bool Robot::MoveByJoints(DynamicArray<double> newJoints, bool isDeg/* = false*/)
 {
 	if (jointList.size() != newJoints.size())
 		return false;
@@ -242,7 +242,8 @@ bool Robot::MoveByJoints(DynamicArray<double> newJoints)
 	RobotState rs(this);
 	for (uint i = 0; i < jointList.size(); i++) {
 		HingeJoint* joint = dynamic_cast<HingeJoint*>(jointList[i]);
-		QuaternionR jointOrientation = getRotationQuaternion(RAD(newJoints[i]), joint->rotationAxis);
+		double ang = isDeg ? RAD(newJoints[i]) : newJoints[i];
+		QuaternionR jointOrientation = getRotationQuaternion(ang, joint->rotationAxis);
 		rs.setJointRelativeOrientation(jointOrientation, i);
 	}
 	setState(&rs);

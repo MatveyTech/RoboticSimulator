@@ -129,7 +129,7 @@ AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, i
 	m_objective = new ObjectiveSum(startPoint, endPoint, weights, robot,finalCart,onlyFinalCart, obstacles);
 	MinimizerType = mt == 0 ? MinimizerType::GD : MinimizerType::BFGS;
 	VectorXd pp(NumOfJoints*NumOfPoints);
-	pp.setConstant(20);
+	pp.setConstant(RAD(20));
 	if (MinimizerType == MinimizerType::GD)
 		m_gradientBasedMinimizer = new GradientDescentFunctionMinimizer(1);
 	else if (MinimizerType == MinimizerType::BFGS)
@@ -138,17 +138,32 @@ AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, i
 	//printVector(path);
 }
 
-double AdvancedSimulation::ComputeValueInCurrentPoint()
+double AdvancedSimulation::ComputeValueAll()
 {
 	return m_objective->computeValue(path);
 }
 
-double AdvancedSimulation::ComputeGradientInCurrentPoint()
+double AdvancedSimulation::ComputeGradientAll()
 {
 	VectorXd grad(NumOfJoints*NumOfPoints);
 	for (size_t i = 0; i < grad.size(); i++)
 		grad(i) = 0;
 	m_objective->addGradientTo(grad, path);
+	return grad.norm();
+}
+
+double AdvancedSimulation::ComputeValueCurrent()
+{
+	//return m_objective->computeValue(GetCurrent());
+	return m_objective->GetCollisionObjective()->computeValue(GetCurrent());
+}
+
+double AdvancedSimulation::ComputeGradientCurrent()
+{
+	VectorXd grad(7);
+	grad.setZero();	
+	//m_objective->addGradientTo(grad, GetCurrent());
+	m_objective->GetCollisionObjective()->computeValue(GetCurrent());
 	return grad.norm();
 }
 

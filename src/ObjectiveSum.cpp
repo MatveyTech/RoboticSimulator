@@ -2,7 +2,6 @@
 #include "..\include\StartFromFirstObjective.h"
 #include "..\include\FinishAtLastObjective.h"
 #include "..\include\CloseToPointObjective.h"
-#include "..\include\CollisionObjective.h"
 #include "..\include\ObjectiveSum.h"
 #include <vector>
 
@@ -16,13 +15,13 @@ ObjectiveSum::ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos, s
 		objectives.push_back(new CloseToPointObjective(numOfJoints, 1.0, finalCart, robot));
 	}
 	else
-	{		
-		
+	{				
 		objectives.push_back(new StartFromFirstObjective(startPos, weights.at(0)));
 		objectives.push_back(new FinishAtLastObjective(finalPos, weights.at(1)));
 		objectives.push_back(new EqualDistributionObjective(numOfJoints, weights.at(2)));//weights.at(2)
 		CollisionSphere cs = obstacles.front();
-		objectives.push_back(new CollisionObjective(numOfJoints, weights.at(3), cs.Location,cs.Radius, robot));
+		m_collisionObjective = new CollisionObjective(numOfJoints, weights.at(3), cs.Location, cs.Radius, robot);
+		objectives.push_back(m_collisionObjective);
 	}
 }
 

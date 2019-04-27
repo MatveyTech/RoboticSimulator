@@ -4,6 +4,7 @@
 #include "..\include\GradientDescentFunctionMinimizer.h"
 #include "..\include\BFGSFunctionMinimizer.h"
 #include "..\include\ObjectiveFunction.h"
+#include "..\include\ObjectiveSum.h"
 #include "..\include\CollisionObjective.h"
 #include "..\include\Robot.h"
 
@@ -50,7 +51,7 @@ public:
 class AdvancedSimulation : public Simulation
 {
 protected:
-	ObjectiveFunction* m_objective;
+	ObjectiveSum* m_objective;
 	GradientBasedFunctionMinimizer* m_gradientBasedMinimizer;
 	
 	//void CalculatePath(VectorXd startPoint, VectorXd endPoint);
@@ -60,8 +61,10 @@ public:
 	void MakeStep();
 	AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, std::vector<double> weights, 
 		int mt,Robot* robot, P3D finalCart, bool onlyFinalCart,std::vector<CollisionSphere> obstacles);
-	double ComputeValueInCurrentPoint();
-	double ComputeGradientInCurrentPoint();
+	double ComputeValueAll();
+	double ComputeGradientAll();
+	double ComputeValueCurrent();
+	double ComputeGradientCurrent();
 	int GetLastNumOfIterations();
 	void testGradient();
 };

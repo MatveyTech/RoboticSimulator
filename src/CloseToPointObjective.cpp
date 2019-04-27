@@ -25,7 +25,7 @@ double CloseToPointObjective::computeValue(const dVector & p)
 		P3D cart_pos = kSolver.CalcForwardKinematics(q);
 		result += (cart_pos - m_point).squaredNorm();
 	}
-	return result*0.5;
+	return result*weight*.5;
 }
 
 
@@ -58,7 +58,7 @@ void CloseToPointObjective::addGradientTo(dVector & grad, const dVector & p)
 		res = (cart_pos - m_point).transpose()*Ja;
 		for (size_t j = 0; j < m_numOfJoints; j++)
 		{
-			grad(i * m_numOfJoints + j) += res(j);
+			grad(i * m_numOfJoints + j) += res(j)*weight;
 		}
 	}
 }
