@@ -6,7 +6,7 @@ using namespace Eigen;
 class StartFromFirstObjective : public ObjectiveFunction
 {
 public:
-	StartFromFirstObjective(const VectorXd& startPos, double weight);
+	StartFromFirstObjective(const VectorXd& startPos, int weight);
 	virtual ~StartFromFirstObjective(void);
 
 	virtual double computeValue(const dVector& p);

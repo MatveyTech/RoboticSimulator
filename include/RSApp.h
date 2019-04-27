@@ -53,10 +53,17 @@ private:
 	bool m_onlyFinalCart=false;
 	P3D m_finalCart;
 	vector<CollisionSphere> m_obstacles;
+
+	//weights
+	int w_first = 0;
+	int w_last = 0;
+	int w_equal = 0;
+	int w_close2point = -1;
+	int w_collision = 0;
 public:
 	
 	void CreateIKSolver();
-	void RecreateSimulation(std::vector<double> weights, MinimizerType mt);
+	void RecreateSimulation(std::vector<int> weights, MinimizerType mt);
 
 	RSApp(void);
 	virtual void loadFile(const char* fName);

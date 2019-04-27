@@ -3,7 +3,7 @@
 #include "..\include\FinishAtLastObjective.h"
 #include "..\include\CloseToPointObjective.h"
 
-EqualDistributionObjective::EqualDistributionObjective(int NumOfJoints, double weight):
+EqualDistributionObjective::EqualDistributionObjective(int NumOfJoints, int weight):
 	m_numOfJoints(NumOfJoints)
 {
 	this->weight = weight;

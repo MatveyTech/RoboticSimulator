@@ -1,7 +1,7 @@
 #include "..\include\CollisionObjective.h"
 
 
-CollisionObjective::CollisionObjective(int numOfJoints, double weight, P3D point, double radius, Robot* robot) :
+CollisionObjective::CollisionObjective(int numOfJoints, int weight, P3D point, double radius, Robot* robot) :
 	kSolver(robot),
 	m_numOfJoints(numOfJoints),
 	m_point(point),
@@ -29,7 +29,7 @@ double CollisionObjective::computeValue(const dVector & p)
 		double diff = dSq - m_radiusSq;
 		result += dSq > m_radiusSq ? 0 : diff*diff;
 	}
-	return result*norm_const * weight;
+	return result*norm_const * weight*.5;
 }
 
 
@@ -40,6 +40,8 @@ void CollisionObjective::addHessianEntriesTo(DynamicArray<MTriplet>&	 hessianEnt
 
 void CollisionObjective::addGradientTo(dVector & grad, const dVector & p)
 {
+	/*ObjectiveFunction::addGradientTo(grad, p);
+	return;*/
 	int numOfPoints = p.rows() / m_numOfJoints;
 	for (int i = 0; i < numOfPoints; ++i)
 	{
@@ -62,7 +64,7 @@ void CollisionObjective::addGradientTo(dVector & grad, const dVector & p)
 		double dSq = (cart_pos - m_point).squaredNorm();
 		double diff = dSq - m_radiusSq;
 		double f_val = dSq > m_radiusSq ? 0 : 2*diff;
-		res = 2*Ja.transpose()*(cart_pos - m_point)*f_val;
+		res = /*2**/Ja.transpose()*(cart_pos - m_point)*f_val;
 		grad.segment(m_numOfJoints*i, m_numOfJoints) += res * norm_const * weight;
 	}
 }

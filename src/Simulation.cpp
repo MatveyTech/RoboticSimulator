@@ -121,7 +121,7 @@ BasicSimulation::BasicSimulation(VectorXd startPoint, VectorXd endPoint, int num
 //{
 //}
 
-AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, std::vector<double> weights,
+AdvancedSimulation::AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, std::vector<int> weights,
 	int mt, Robot* robot, P3D finalCart, bool onlyFinalCart, vector<CollisionSphere> obstacles)
 	:Simulation(startPoint, endPoint, numOfPoints)
 {

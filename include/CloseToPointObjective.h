@@ -12,7 +12,7 @@ class CloseToPointObjective : public ObjectiveFunction
 	P3D m_point;
 	SingleArmKinematicsSolver kSolver;
 public:
-	CloseToPointObjective(int numOfJoints, double weight, P3D point, Robot* robot);
+	CloseToPointObjective(int numOfJoints, int weight, P3D point, Robot* robot);
 	~CloseToPointObjective();
 
 	virtual double computeValue(const dVector& p);

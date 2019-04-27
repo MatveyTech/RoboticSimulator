@@ -6,7 +6,7 @@ using namespace Eigen;
 class EqualDistributionObjective : public ObjectiveFunction
 {
 public:
-	EqualDistributionObjective(int NumOfJoints, double weight);
+	EqualDistributionObjective(int NumOfJoints, int weight);
 	~EqualDistributionObjective();
 
 	virtual double computeValue(const dVector& p);

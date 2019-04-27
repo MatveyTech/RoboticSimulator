@@ -185,7 +185,7 @@ void RSApp::CreateIKSolver()
 	ikSolver = new IK_Solver(robot, true);
 }
 
-void RSApp::RecreateSimulation(std::vector<double> weights, MinimizerType mt)
+void RSApp::RecreateSimulation(std::vector<int> weights, MinimizerType mt)
 {
 	VectorXd v1(7); v1 << 0, 0, 0, 0, 0, 0, 0;
 	v1 = v1.unaryExpr(&Rad);
@@ -213,7 +213,7 @@ RSApp::RSApp(void)
 	DefineViewerCallbacks();
 
 	CreateIKSolver();
-	std::vector<double> weights = { 1,1,1,1};
+	std::vector<int> weights = { w_first,w_last,w_equal,w_close2point,w_collision};
 	RecreateSimulation(weights,MinimizerType::BFGS);
 	CreateMenu();
 	viewer.selected_data_index = 0;
@@ -410,36 +410,56 @@ void RSApp::CreateMenu()
 		}
 		ImGui::SameLine();
 		ImGui::Text("Step");
-		static int w1 = 0;
-		static int w2 = 0;
-		static int w3 = 0;
-		static int w4 = 0;	
-
+		
 
 		auto int2char = [&](int val) -> std::string
 		{
+			//quick and dirty
+			if (val == -1)
+				return "0";
 			std::string out_string;
 			std::stringstream ss;
 			ss << pow(10, val);
 			return ss.str();
 		};
+		auto calcWeight = [&](int val) -> int
+		{
+			//quick and dirty
+			if (val == -1)
+				return 0;
+			else
+				return pow(10, val);
+		};
 		ImGui::Text("Weights:");
 		int max_w = 9;
-		ImGui::SliderInt("First", &w1, 0,max_w,int2char(w1).data());
-		ImGui::SliderInt("Last", &w2, 0,max_w,int2char(w2).data());
-		ImGui::SliderInt("Equal", &w3, 0,max_w,int2char(w3).data());
-		ImGui::SliderInt("Collision", &w4, 0,max_w,int2char(w4).data());
+		int min_w = -1;
+		ImGui::SliderInt("First", &w_first, min_w,max_w,int2char(w_first).data());
+		ImGui::SliderInt("Last", &w_last, min_w,max_w,int2char(w_last).data());
+		ImGui::SliderInt("Equal", &w_equal, min_w,max_w,int2char(w_equal).data());
+		ImGui::SliderInt("Close2Point", &w_close2point, min_w,max_w,int2char(w_close2point).data());
+		ImGui::SliderInt("Collision", &w_collision, min_w,max_w,int2char(w_collision).data());
 		ImGui::NewLine();
 		
 		static MinimizerType minimizerType = simulation->MinimizerType;
 		const char* cc = minimizerType == MinimizerType::GD ? "GradDesc" : "BFGS";
 		ImGui::SliderInt("Minimizer", &((int)minimizerType), 0, 1, cc);
 
-		std::vector<double> weights = { (double)pow(10,w1),(double)pow(10,w2),(double)pow(10,w3),(double)pow(10,w4) };
+		std::vector<int> weights = { calcWeight(w_first),calcWeight(w_last),calcWeight(w_equal),calcWeight(w_close2point),calcWeight(w_collision) };
 		
-		ImGui::Checkbox("Only final position", &m_onlyFinalCart);
-		static bool showPathOutput = false;
-		ImGui::Checkbox("Show path", &showPathOutput);
+		if (ImGui::Checkbox("Only final position", &m_onlyFinalCart))
+		{
+			if (!m_onlyFinalCart)
+			{
+				w_first = 0; w_last = 0; w_equal = 0; w_collision = 0;
+				w_close2point = -1;
+			}
+			else
+			{
+				w_first = -1; w_last = -1; w_equal = -1; w_collision = -1;
+				w_close2point = 0;
+			}
+		}
+
 		if (m_onlyFinalCart)
 		{
 			static float fl[3];
@@ -452,6 +472,10 @@ void RSApp::CreateMenu()
 					fl[i] = 0;
 			}
 		}
+
+		static bool showPathOutput = false;
+		ImGui::Checkbox("Show path", &showPathOutput);
+
 		static bool autostep = false;
 		if (ImGui::Button("Rebuild simulation", ImVec2(-1, 0)))
 		{
@@ -564,7 +588,7 @@ void RSApp::CreateMenu()
 		}
 		
 		
-		ImGui::SetNextWindowPos(ImVec2(0, 430), ImGuiCond_Once);
+		ImGui::SetNextWindowPos(ImVec2(0, 600), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(0.0, 0.0));
 		ImGui::SetWindowFontScale(1.2);
 		ImGui::Begin("Optimization");

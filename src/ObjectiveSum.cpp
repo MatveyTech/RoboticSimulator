@@ -6,23 +6,18 @@
 #include <vector>
 
 
-ObjectiveSum::ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos, std::vector<double> weights, Robot* robot, 
+ObjectiveSum::ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos, std::vector<int> weights, Robot* robot, 
 	P3D finalCart, bool onlyFinalCart,std::vector<CollisionSphere> obstacles)
 {
 	int numOfJoints = startPos.rows();
-	if (onlyFinalCart)
-	{
-		objectives.push_back(new CloseToPointObjective(numOfJoints, 1.0, finalCart, robot));
-	}
-	else
-	{				
-		objectives.push_back(new StartFromFirstObjective(startPos, weights.at(0)));
-		objectives.push_back(new FinishAtLastObjective(finalPos, weights.at(1)));
-		objectives.push_back(new EqualDistributionObjective(numOfJoints, weights.at(2)));//weights.at(2)
-		CollisionSphere cs = obstacles.front();
-		m_collisionObjective = new CollisionObjective(numOfJoints, weights.at(3), cs.Location, cs.Radius, robot);
-		objectives.push_back(m_collisionObjective);
-	}
+	
+	objectives.push_back(new StartFromFirstObjective(startPos, weights.at(0)));
+	objectives.push_back(new FinishAtLastObjective(finalPos, weights.at(1)));
+	objectives.push_back(new EqualDistributionObjective(numOfJoints, weights.at(2)));
+	objectives.push_back(new CloseToPointObjective(numOfJoints, weights.at(3), finalCart, robot));
+	CollisionSphere cs = obstacles.front();
+	m_collisionObjective = new CollisionObjective(numOfJoints, weights.at(4), cs.Location, cs.Radius, robot);
+	objectives.push_back(m_collisionObjective);
 }
 
 

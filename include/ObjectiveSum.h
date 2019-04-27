@@ -8,10 +8,10 @@ using namespace Eigen;
 class ObjectiveSum : public ObjectiveFunction
 {	
 	std::vector<ObjectiveFunction*> objectives;
-	CollisionObjective* m_collisionObjective;
+	CollisionObjective* m_collisionObjective = nullptr;
 
 public:
-	ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos,std::vector<double> weights, Robot* robot, 
+	ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos,std::vector<int> weights, Robot* robot, 
 		P3D finalCart, bool onlyFinalCart, std::vector<CollisionSphere> obstacles);
 	~ObjectiveSum();
 
