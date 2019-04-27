@@ -438,6 +438,8 @@ void RSApp::CreateMenu()
 		ImGui::SliderInt("Equal", &w_equal, min_w,max_w,int2char(w_equal).data());
 		ImGui::SliderInt("Close2Point", &w_close2point, min_w,max_w,int2char(w_close2point).data());
 		ImGui::SliderInt("Collision", &w_collision, min_w,max_w,int2char(w_collision).data());
+		ImGui::SameLine();
+		ImGui::Checkbox("B", &CollisionObjective::UseBaseAddGradient);
 		ImGui::NewLine();
 		
 		static MinimizerType minimizerType = simulation->MinimizerType;
@@ -588,7 +590,7 @@ void RSApp::CreateMenu()
 		}
 		
 		
-		ImGui::SetNextWindowPos(ImVec2(0, 600), ImGuiCond_Once);
+		ImGui::SetNextWindowPos(ImVec2(0, 480), ImGuiCond_Once);
 		ImGui::SetNextWindowSize(ImVec2(0.0, 0.0));
 		ImGui::SetWindowFontScale(1.2);
 		ImGui::Begin("Optimization");

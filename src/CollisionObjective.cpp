@@ -38,10 +38,16 @@ void CollisionObjective::addHessianEntriesTo(DynamicArray<MTriplet>&	 hessianEnt
 
 }
 
+bool CollisionObjective::UseBaseAddGradient = false;
+
 void CollisionObjective::addGradientTo(dVector & grad, const dVector & p)
 {
-	/*ObjectiveFunction::addGradientTo(grad, p);
-	return;*/
+	if (UseBaseAddGradient)
+	{
+		ObjectiveFunction::addGradientTo(grad, p);
+		return;
+	}
+	
 	int numOfPoints = p.rows() / m_numOfJoints;
 	for (int i = 0; i < numOfPoints; ++i)
 	{
