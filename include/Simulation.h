@@ -7,6 +7,7 @@
 #include "..\include\ObjectiveSum.h"
 #include "..\include\CollisionObjective.h"
 #include "..\include\Robot.h"
+#include "..\include\DraggableSphere.h"
 
 using namespace Eigen;
 

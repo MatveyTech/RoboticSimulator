@@ -56,6 +56,7 @@ void CloseToPointObjective::addGradientTo(dVector & grad, const dVector & p)
 
 		MatrixNxM res(1, 7);
 		res = (cart_pos - m_point).transpose()*Ja;
+		//grad.segment(m_numOfJoints*i, m_numOfJoints) += res*weight;
 		for (size_t j = 0; j < m_numOfJoints; j++)
 		{
 			grad(i * m_numOfJoints + j) += res(j)*weight;

@@ -2,6 +2,7 @@
 #include "ObjectiveFunction.h"
 #include "..\include\Robot.h"
 #include "..\include\CollisionObjective.h"
+#include "..\include\DraggableSphere.h"
 #include <vector>
 using namespace Eigen;
 

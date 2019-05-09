@@ -2,11 +2,12 @@
 #include "..\include\RSApp.h"
 #include "..\include\CollisionObjective.h"
 #include "..\include\CloseToPointObjective.h"
+#include "..\include\Utilities.h"
 #include <fstream>
 #include <chrono>
 #include <igl/readOFF.h>
-
-#define COLOR(r,g,b) RowVector3d(r / 255., g / 255., b / 225.)
+#include <igl/unproject_onto_mesh.h>
+#include "igl/unproject.h"
 
 
 //always returns 7nth right link
@@ -21,6 +22,11 @@ RigidBody * GetCurrentActiveLink(Robot* robot)
 double Rad(double x) // the functor we want to apply
 {
 	return RAD(x);
+}
+
+Vector2f RSApp::GetCurrentMousePosition()
+{
+	return Vector2f(viewer.current_mouse_x, viewer.core.viewport(3) - viewer.current_mouse_y);
 }
 
 void RSApp::PrintRenderingTime()
@@ -67,6 +73,10 @@ void RSApp::DefineViewerCallbacks()
 				viewer.data_list[obstacle.IndexInViewer].set_colors(COLOR(255, 0, 0));
 			else
 				viewer.data_list[obstacle.IndexInViewer].set_colors(COLOR(0, 255, 0));
+		}
+		if (m_selectedSphere)
+		{
+			m_ds->MoveAlongAxis(m_draggingDirection);
 		}
 		return false;
 	};
@@ -169,7 +179,99 @@ void RSApp::DefineViewerCallbacks()
 			return false;
 		};
 	}
+	
+	viewer.callback_mouse_move =
+		[&](igl::opengl::glfw::Viewer& viewer, int mouse_x, int mouse_y)->bool
+	{
+		if (m_selectedSphere==nullptr)
+			VerifyHighlight(m_ds);
+		else
+		{
+			
+			Vector2f currenPos = GetCurrentMousePosition();
+			m_draggingDirection = currenPos.x() - m_dragStartPosition.x();
+			
+			//m_dragStartPosition = currenPos;
+			/*if (igl::unproject_onto_mesh(Eigen::Vector2f(x, y), viewer.core.view,
+				viewer.core.proj, viewer.core.viewport, viewer.data_list[i].V, viewer.data_list[i].F, fid, bc))*/
+			//Vector3f s;
+			//igl::unproject(Vector3f(mouse_x, mouse_y, 0), viewer.core.view, viewer.core.proj, viewer.core.viewport,s);
+			//P3D xx(s.x(), s.y(), s.z());
+			//cout << xx.x() << " " << xx.y() << " " << xx.z() << endl ;
+			////P3D xx(1,1,1);
+			//pointToDraw.row(0) = xx;
+			//viewer.data().set_points(pointToDraw, Eigen::RowVector3d(220 / 255.0, 220 / 255.0, 220 / 255.0));
+			//Vec3 win_s(pos(0), pos(1), 0);
+			//Vec3 win_d(pos(0), pos(1), 1);
+			//// Source, destination and direction in world
+			//Vec3 d;
+			//igl::unproject(win_s, model, proj, viewport, s);
+			//igl::unproject(win_d, model, proj, viewport, d);
+			//dir = d - s;
+		}
 
+		return (m_selectedSphere != nullptr);
+		
+		/*if (igl::unproject_onto_mesh(Eigen::Vector2f(x, y), viewer.core.view,
+			viewer.core.proj, viewer.core.viewport, viewer.data_list[sphereIndexInViewer].V, viewer.data_list[sphereIndexInViewer].F, fid, bc))
+		{
+			cout << "boom!\n";
+			return true;
+		}*/
+	};
+
+	viewer.callback_mouse_down =
+		[&](igl::opengl::glfw::Viewer& viewer, int button, int modifier)->bool
+	{
+		if (button == GLFW_MOUSE_BUTTON_1)
+		{
+			m_selectedSphere = m_highlightedSphere;
+			if (m_selectedSphere)
+			{
+				m_selectedSphere->SetSelected();
+				m_dragStartPosition = GetCurrentMousePosition();
+			}
+			
+		}
+		return false;
+	};
+
+	viewer.callback_mouse_up =
+		[&](igl::opengl::glfw::Viewer& viewer, int button, int modifier)->bool
+	{
+		if (button == GLFW_MOUSE_BUTTON_1)
+		{
+			if (m_selectedSphere)
+				m_selectedSphere->ClearSelection();
+			m_selectedSphere = nullptr;
+			m_draggingDirection = 0;
+		}
+		VerifyHighlight(m_ds);
+		return false;
+	};
+}
+
+bool RSApp::VerifyHighlight(DraggableSphere* ds)
+{
+	int fid;
+	Eigen::Vector3f bc;
+
+	double x = viewer.current_mouse_x;
+	double y = viewer.core.viewport(3) - viewer.current_mouse_y;
+
+	ds->ClearHighlight();
+	m_highlightedSphere = nullptr;
+	for (int i = ds->IndexInViewer+1; i <= ds->LastIndexInViewer; ++i)
+	{
+		if (igl::unproject_onto_mesh(Eigen::Vector2f(x, y), viewer.core.view,
+			viewer.core.proj, viewer.core.viewport, viewer.data_list[i].V, viewer.data_list[i].F, fid, bc))
+		{
+			ds->SetHighlighted(i);
+			m_highlightedSphere = ds;
+			return true;
+		}
+	}
+	return false;
 }
 
 void RSApp::DrawPoint()
@@ -262,16 +364,13 @@ void RSApp::loadRobot(const char* fName) {
 	
 }
 
-MatrixXd TransformP(Eigen::MatrixXd &V, Eigen::Matrix4d &tr)
-{
-	MatrixXd th = V.rowwise().homogeneous().transpose();
-	return (tr * th).transpose().leftCols(3);
-}
+
 
 void RSApp::LoadMeshModelsIntoViewer(bool useSerializedModels)
 {
 	AddRobotModels(useSerializedModels);
 	AddCollisionSpheres();
+	m_ds = new DraggableSphere(P3D (0.5, 0.1, 0.33), 0.07, viewer.data_list.size() - 1, &viewer);
 }
 
 void RSApp::AddRobotModels(bool useSerializedModels)
@@ -320,11 +419,11 @@ void RSApp::AddCollisionSpheres()
 	igl::readOFF(sphereFile, V, F);
 	Eigen::Matrix4d translation_matrix;
 	
-	int sphereIndexInViewer = viewer.data_list.size() - 1;
+	sphereIndexInViewer = viewer.data_list.size();
 	
 	P3D p(0.68, 0.78, 0.33);
 	//P3D p(0.3,0.47,-0.34);
-	CollisionSphere cs(p, 0.07, sphereIndexInViewer);
+	CollisionSphere cs(p, 0.07, sphereIndexInViewer,&viewer);
 	
 	m_obstacles.push_back(cs);
 	translation_matrix << 
@@ -336,6 +435,42 @@ void RSApp::AddCollisionSpheres()
 	viewer.data_list[sphereIndexInViewer].show_lines = false;
 	viewer.data_list[sphereIndexInViewer].set_colors(COLOR(0, 255, 0));
 	
+	/*viewer.append_mesh();
+	Eigen::Matrix4d translation_matrix2;
+	double small_r = cs.Radius / 3;
+	double step = 0.15;
+	translation_matrix2 <<
+		small_r, 0, 0, cs.Location.x()+ step,
+		0, small_r, 0, cs.Location.y(),
+		0, 0, small_r, cs.Location.z(),
+		0, 0, 0, 1;
+	viewer.data_list[sphereIndexInViewer+1].set_mesh(TransformP(V, translation_matrix2), F);
+	viewer.data_list[sphereIndexInViewer+1].show_lines = false;
+	viewer.data_list[sphereIndexInViewer+1].set_colors(COLOR(255, 255, 0));
+
+
+	viewer.append_mesh();
+	Eigen::Matrix4d translation_matrix3;
+	translation_matrix3 <<
+		small_r, 0, 0, cs.Location.x(),
+		0, small_r, 0, cs.Location.y()+ step,
+		0, 0, small_r, cs.Location.z(),
+		0, 0, 0, 1;
+	viewer.data_list[sphereIndexInViewer + 2].set_mesh(TransformP(V, translation_matrix3), F);
+	viewer.data_list[sphereIndexInViewer + 2].show_lines = false;
+	viewer.data_list[sphereIndexInViewer + 2].set_colors(COLOR(255, 255, 0));
+
+	viewer.append_mesh();
+	Eigen::Matrix4d translation_matrix4;
+	translation_matrix4 <<
+		small_r, 0, 0, cs.Location.x(),
+		0, small_r, 0, cs.Location.y(),
+		0, 0, small_r, cs.Location.z() + step,
+		0, 0, 0, 1;
+	viewer.data_list[sphereIndexInViewer + 3].set_mesh(TransformP(V, translation_matrix4), F);
+	viewer.data_list[sphereIndexInViewer + 3].show_lines = false;
+	viewer.data_list[sphereIndexInViewer + 3].set_colors(COLOR(255, 255, 0));*/
+
 }
 
 void RSApp::DrawRobot()
@@ -488,7 +623,9 @@ void RSApp::CreateMenu()
 
 		if (ImGui::Button("Debug button", ImVec2(-1, 0)))
 		{
-			//
+			static bool b = true;
+			b = !b;
+			m_ds->ShowDraggers(b);
 		}
 #pragma region		ee_adjustments
 		/*double step = 0.003;
@@ -604,7 +741,9 @@ void RSApp::CreateMenu()
 		{
 			autostep = !autostep;
 		}
-		if (simulation->IterationNum == 4000)
+		static int stopAfter = 1000;
+		ImGui::InputInt("Stop after", &stopAfter);
+		if (simulation->IterationNum == stopAfter)
 			autostep = false;
 		if (autostep)
 			simulation->MakeStep();
@@ -633,16 +772,4 @@ void RSApp::CreateMenu()
 		//}
 	};
 
-}
-
-CollisionSphere::CollisionSphere(P3D loc, double rad, int ind) :
-	Location(loc),
-	Radius(rad),
-	IndexInViewer(ind)
-{
-}
-
-bool CollisionSphere::CollidesRobot(P3D eePosition)
-{
-	return (eePosition - Location).norm() < Radius;
 }

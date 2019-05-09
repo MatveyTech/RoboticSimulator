@@ -1,4 +1,8 @@
 #include "..\include\CollisionObjective.h"
+#include <igl/readOFF.h>
+#include <stdio.h>
+
+using namespace std;
 
 
 CollisionObjective::CollisionObjective(int numOfJoints, int weight, P3D point, double radius, Robot* robot) :

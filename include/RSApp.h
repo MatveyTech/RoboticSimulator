@@ -39,11 +39,20 @@ private:
 	chrono::steady_clock::time_point last_rendered;
 	SingleArmKinematicsSolver* kSolver;
 	P3D m_cartLocation;
+
+	DraggableSphere* m_ds = nullptr;
+	DraggableSphere* m_highlightedSphere = nullptr;
+	DraggableSphere* m_selectedSphere = nullptr;
+	Vector2f m_dragStartPosition;
+	int m_draggingDirection = 0;
+
 	
 	//shared_ptr<Robot*> robot;
-	void PrintRenderingTime(); 
+	void PrintRenderingTime();
+	Vector2f GetCurrentMousePosition();
 	void MoveActiveLink(P3D point, bool isAbsolute=false);
 	void DefineViewerCallbacks();
+	bool VerifyHighlight(DraggableSphere* ds);
 	void DrawPoint();
 	void CreateMenu();
 	bool CartMode = false;
@@ -53,6 +62,7 @@ private:
 	bool m_onlyFinalCart=false;
 	P3D m_finalCart;
 	vector<CollisionSphere> m_obstacles;
+	int sphereIndexInViewer = 0;
 
 	//weights
 	int w_first = 0;

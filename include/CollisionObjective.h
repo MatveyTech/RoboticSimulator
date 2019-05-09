@@ -4,17 +4,6 @@
 #include "Robot.h"
 #include "SingleArmKinematicsSolver.h"
 
-class CollisionSphere
-{
-public:
-	P3D Location;
-	double Radius;
-	int IndexInViewer;
-
-	CollisionSphere(P3D loc, double rad, int ind);
-	bool CollidesRobot(P3D eePosition);
-};
-
 using namespace Eigen;
 
 class CollisionObjective : public ObjectiveFunction
@@ -34,4 +23,5 @@ public:
 
 	static bool UseBaseAddGradient;
 };
+
 
