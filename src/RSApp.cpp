@@ -65,7 +65,7 @@ void RSApp::DefineViewerCallbacks()
 		if (CartMode)
 			ikSolver->solve(10, false, false);
 		//PrintRenderingTime();
-		//DrawPoint();
+		DrawPoint();
 		DrawRobot();
 		m_cartLocation = kSolver->CalcForwardKinematics(robot->GetQ());
 		for (auto&& obstacle : m_obstacles)
@@ -491,7 +491,7 @@ void RSApp::AddRobotModels(bool useSerializedModels)
 
 void RSApp::AddCollisionSpheres()
 {
-	m_obstacles.push_back(new CollisionSphere(P3D(0.68, 0.78, 0.33), 0.07, &viewer));
+	m_obstacles.push_back(new CollisionSphere(P3D(0.72, 0.60, 0.34), 0.07, &viewer));
 	//m_obstacles.push_back(new CollisionSphere(P3D(0.3, 0.78, 0.33), 0.07, &viewer));
 	
 }
@@ -616,7 +616,7 @@ void RSApp::CreateMenu()
 		{
 			if (!m_onlyFinalCart)
 			{
-				w_first = 0; w_last = 0; w_equal = 0; w_collision = 0;
+				w_first = 2; w_last = 2; w_equal = 0; w_collision = 0;
 				w_close2point = -1;
 			}
 			else

@@ -71,8 +71,8 @@ private:
 	int sphereIndexInViewer = 0;
 
 	//weights
-	int w_first = 0;
-	int w_last = 0;
+	int w_first = 2;
+	int w_last = 2;
 	int w_equal = 0;
 	int w_close2point = -1;
 	int w_collision = 0;
