@@ -24,7 +24,11 @@ using namespace Eigen;
 using namespace std;
 using namespace igl::opengl::glfw::imgui;
 
-
+enum SState {
+	Simulation = 0,
+	AdjustStart,
+	AdjustEnd
+};
 
 class RSApp
 {
@@ -40,7 +44,8 @@ private:
 	SingleArmKinematicsSolver* kSolver;
 	P3D m_cartLocation;
 
-	DraggableSphere* m_ds = nullptr;
+	DraggableSphere* m_startDragger = nullptr;
+	DraggableSphere* m_endDragger = nullptr;
 	DraggableSphere* m_highlightedSphere = nullptr;
 	DraggableSphere* m_selectedSphere = nullptr;
 	Vector2f m_dragStartPosition;
@@ -53,6 +58,7 @@ private:
 	void MoveActiveLink(P3D point, bool isAbsolute=false);
 	void DefineViewerCallbacks();
 	bool VerifyHighlight(DraggableSphere* ds);
+	void VerifyHighlightAll();
 	void DrawPoint();
 	void CreateMenu();
 	bool CartMode = false;
@@ -61,7 +67,7 @@ private:
 	P3D m_eeLocalCoord;
 	bool m_onlyFinalCart=false;
 	P3D m_finalCart;
-	vector<CollisionSphere> m_obstacles;
+	vector<CollisionSphere*> m_obstacles;
 	int sphereIndexInViewer = 0;
 
 	//weights
@@ -70,6 +76,15 @@ private:
 	int w_equal = 0;
 	int w_close2point = -1;
 	int w_collision = 0;
+
+	GradientBasedFunctionMinimizer* m_ikMinimizer;
+	ObjectiveFunction* m_ikStartPositionObjective;
+	ObjectiveFunction* m_ikEndPositionObjective;
+	SState m_state = SState::Simulation;
+
+	VectorXd m_startPosition;
+	VectorXd m_endPosition;
+
 public:
 	
 	void CreateIKSolver();
@@ -81,6 +96,7 @@ public:
 	void LoadMeshModelsIntoViewer(bool useSerializedModels);
 	void AddRobotModels(bool useSerializedModels);
 	void AddCollisionSpheres();
+	void SetCollisionSpheresVisibility(bool val);
 	void DrawRobot();
 };
 

@@ -7,7 +7,7 @@
 
 
 ObjectiveSum::ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos, std::vector<int> weights, Robot* robot, 
-	P3D finalCart, bool onlyFinalCart,std::vector<CollisionSphere> obstacles)
+	P3D finalCart, bool onlyFinalCart,std::vector<CollisionSphere*> obstacles)
 {
 	int numOfJoints = startPos.rows();
 	
@@ -15,8 +15,8 @@ ObjectiveSum::ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos, s
 	objectives.push_back(new FinishAtLastObjective(finalPos, weights.at(1)));
 	objectives.push_back(new EqualDistributionObjective(numOfJoints, weights.at(2)));
 	objectives.push_back(new CloseToPointObjective(numOfJoints, weights.at(3), finalCart, robot));
-	CollisionSphere cs = obstacles.front();
-	m_collisionObjective = new CollisionObjective(numOfJoints, weights.at(4), cs.Location, cs.Radius, robot);
+	CollisionSphere* cs = obstacles.front();
+	m_collisionObjective = new CollisionObjective(numOfJoints, weights.at(4), cs->Location, cs->Radius, robot);
 	objectives.push_back(m_collisionObjective);
 }
 

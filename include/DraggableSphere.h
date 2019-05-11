@@ -6,6 +6,7 @@
 //
 #include "..\include\Utilities.h"
 #include "..\include\P3D.h"
+#include <vector>
 
 #include <igl/opengl/glfw/Viewer.h>
 
@@ -17,10 +18,7 @@ private:
 	MatrixXd m_transformedV;
 	MatrixXd m_transformedDragX;
 
-	RowVector3d m_SphereColor = COLOR(0, 255, 0);
-	RowVector3d m_DraggerColor = COLOR(255, 255, 0);
-	RowVector3d m_DraggerHighlightedColor = COLOR(255,255, 255);
-	RowVector3d m_DraggerSelectedColor = COLOR(0,0,255);
+	
 
 	double m_draggableStep = 0.15;
 
@@ -42,7 +40,12 @@ private:
 	void RecalculatePositions();
 
 	double m_moveAlomgAxisStep = 0.0065;
-	
+
+protected:
+	RowVector3d m_SphereColor;// = COLOR(0, 255, 0);
+	RowVector3d m_DraggerColor = COLOR(255, 255, 0);
+	RowVector3d m_DraggerHighlightedColor = COLOR(255, 255, 255);
+	RowVector3d m_DraggerSelectedColor = COLOR(0, 0, 255);	
 
 public:
 	P3D Location;
@@ -50,7 +53,8 @@ public:
 	int IndexInViewer;
 	int LastIndexInViewer;
 
-	DraggableSphere(P3D loc, double radius, int ind, Viewer* viewer);
+	DraggableSphere(P3D loc, double radius, Viewer* viewer);
+	virtual ~DraggableSphere();
 
 	void SetHighlighted(int index);
 	void SetSelected();
@@ -63,6 +67,9 @@ public:
 
 	void MoveAlongAxis(int direction);
 	void ShowDraggers(bool val);
+	void SetVisibility(bool val);
+
+	static std::vector<DraggableSphere*> AllDS;
 
 };
 
@@ -70,7 +77,7 @@ public:
 class CollisionSphere : public DraggableSphere
 {
 public:
-	CollisionSphere(P3D loc, double rad, int ind, Viewer* viewer);
+	CollisionSphere(P3D loc, double rad, Viewer* viewer);
 	bool CollidesRobot(P3D eePosition);
 };
 

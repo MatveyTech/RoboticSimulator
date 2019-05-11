@@ -2,10 +2,10 @@
 
 
 
-FinishAtLastObjective::FinishAtLastObjective(const VectorXd & endPos, int weight)
-{
-	m_endPos = endPos;
-	m_numOfJoints = m_endPos.rows();
+FinishAtLastObjective::FinishAtLastObjective(const VectorXd & endPos, int weight):
+	m_endPos(endPos),
+	m_numOfJoints(m_endPos.rows())
+{	
 	this->weight = weight;
 }
 

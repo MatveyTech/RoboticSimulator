@@ -13,7 +13,7 @@ class ObjectiveSum : public ObjectiveFunction
 
 public:
 	ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos,std::vector<int> weights, Robot* robot, 
-		P3D finalCart, bool onlyFinalCart, std::vector<CollisionSphere> obstacles);
+		P3D finalCart, bool onlyFinalCart, std::vector<CollisionSphere*> obstacles);
 	~ObjectiveSum();
 
 	CollisionObjective* GetCollisionObjective() { return m_collisionObjective; }

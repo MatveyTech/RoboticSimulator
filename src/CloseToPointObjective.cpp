@@ -3,7 +3,7 @@
 
 
 
-CloseToPointObjective::CloseToPointObjective(int numOfJoints, int weight, P3D point, Robot* robot):
+CloseToPointObjective::CloseToPointObjective(int numOfJoints, int weight, P3D& point, Robot* robot):
 	kSolver(robot),
 	m_numOfJoints(numOfJoints),
 	m_point(point)

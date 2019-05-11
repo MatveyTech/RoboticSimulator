@@ -14,7 +14,7 @@ public:
 	virtual void addGradientTo(dVector& grad, const dVector& p);
 
 private:
-	VectorXd m_startPos;
+	const VectorXd& m_startPos;
 	int m_numOfJoints;
 };
 

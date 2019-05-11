@@ -60,8 +60,8 @@ public:
 	int IterationNum = 0;
 	MinimizerType MinimizerType;// = MinimizerType::GD;
 	void MakeStep();
-	AdvancedSimulation(VectorXd startPoint, VectorXd endPoint, int numOfPoints, std::vector<int> weights, 
-		int mt,Robot* robot, P3D finalCart, bool onlyFinalCart,std::vector<CollisionSphere> obstacles);
+	AdvancedSimulation(VectorXd& startPoint, VectorXd& endPoint, int numOfPoints, std::vector<int> weights, 
+		int mt,Robot* robot, P3D finalCart, bool onlyFinalCart,std::vector<CollisionSphere*> obstacles);
 	double ComputeValueAll();
 	double ComputeGradientAll();
 	double ComputeValueCurrent();

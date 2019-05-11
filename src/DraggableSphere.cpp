@@ -5,6 +5,7 @@
 
 using namespace std;
 
+vector<DraggableSphere*> DraggableSphere::AllDS;
 
 Eigen::Matrix4d DraggableSphere::GetTranslationMatrix()
 {
@@ -15,7 +16,7 @@ Eigen::Matrix4d DraggableSphere::GetTranslationMatrix()
 		0, 1, 0, Location.y(),
 		0, 0, 1, Location.z(),
 		0, 0, 0, 1;
-	
+
 	return tm;
 }
 
@@ -62,7 +63,7 @@ Eigen::Matrix4d DraggableSphere::GetDraggerTranslationMatrix(int axis)
 	}
 	else
 		throw ("Not supported");
-	
+
 
 	return tm;
 }
@@ -124,31 +125,49 @@ void DraggableSphere::ShowDraggers(bool val)
 	m_viewer->data_list[DraggerZIndex()].show_faces = val;
 }
 
-DraggableSphere::DraggableSphere(P3D loc, double radius, int ind, Viewer* viewer) :
+void DraggableSphere::SetVisibility(bool val)
+{
+	m_viewer->data_list[IndexInViewer].show_faces = val;
+	ShowDraggers(val);
+}
+
+DraggableSphere::DraggableSphere(P3D loc, double radius, Viewer* viewer) :
 	Location(loc),
 	Radius(radius),
-	IndexInViewer(ind),
-	m_viewer(viewer)
+	IndexInViewer(viewer->data_list.size()),
+	m_viewer(viewer),
+	m_draggableStep(radius*2),
+	m_SphereColor (COLOR(0, 0, 255))
 {
 	std::string sphereFile = "../RoboticSimulator/data/models/sphere.off";
 	igl::readOFF(sphereFile, V, F);
 
-	for(int i=0; i<=3; ++i)
+	for (int i = 0; i <= 3; ++i)
 		m_viewer->append_mesh();
 
 	RecalculatePositions();
 
 	for (int i = 0; i <= 3; ++i)
 	{
-		m_viewer->data_list[ind+i].show_lines = false;
-		if (i==0)
-			m_viewer->data_list[ind+i].set_colors(m_SphereColor);
+		m_viewer->data_list[IndexInViewer + i].show_lines = false;
+		if (i == 0)
+			m_viewer->data_list[IndexInViewer + i].set_colors(m_SphereColor);
 		else
-			m_viewer->data_list[ind + i].set_colors(m_DraggerColor);
+			m_viewer->data_list[IndexInViewer + i].set_colors(m_DraggerColor);
 	}
 
 	LastIndexInViewer = DraggerZIndex();
+	AllDS.push_back(this);
+	
+}
 
+DraggableSphere::~DraggableSphere()
+{
+	auto it = std::find(AllDS.begin(), AllDS.end(), this);
+	if (it != AllDS.end())
+	{
+		AllDS.erase(it);
+	}
 }
 
 void DraggableSphere::SetHighlighted(int index)
@@ -180,12 +199,14 @@ void DraggableSphere::ClearSelection()
 	m_selectedIndex = 0;
 }
 
-CollisionSphere::CollisionSphere(P3D loc, double rad, int ind, Viewer* viewer) :
-	DraggableSphere(loc,rad,ind, viewer)
+CollisionSphere::CollisionSphere(P3D loc, double rad, Viewer* viewer) :
+	DraggableSphere(loc, rad, viewer)	
 {
+	m_SphereColor = COLOR(0, 255, 0);
 }
 
 bool CollisionSphere::CollidesRobot(P3D eePosition)
 {
-	return (eePosition - Location).norm() < Radius;
+	double d = (eePosition - Location).norm();
+	return d < Radius;
 }

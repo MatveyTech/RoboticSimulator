@@ -13,10 +13,10 @@ void printVector1(VectorXd pp)
 }
 
 
-StartFromFirstObjective::StartFromFirstObjective(const VectorXd & startPos, int weight)
+StartFromFirstObjective::StartFromFirstObjective(const VectorXd & startPos, int weight):
+	m_startPos(startPos),
+	m_numOfJoints(m_startPos.rows())
 {
-	m_startPos = startPos;
-	m_numOfJoints = m_startPos.rows();
 	this->weight = weight;
 }
 

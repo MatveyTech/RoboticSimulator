@@ -5,11 +5,11 @@
 using namespace std;
 
 
-CollisionObjective::CollisionObjective(int numOfJoints, int weight, P3D point, double radius, Robot* robot) :
+CollisionObjective::CollisionObjective(int numOfJoints, int weight, P3D& point, double& radius, Robot* robot) :
 	kSolver(robot),
 	m_numOfJoints(numOfJoints),
 	m_point(point),
-	m_radiusSq(radius*radius*1.1*1.1) // add 10% safety margin
+	m_radius(radius)	
 {
 	this->weight = weight;
 }
@@ -23,6 +23,7 @@ CollisionObjective::~CollisionObjective()
 
 double CollisionObjective::computeValue(const dVector & p)
 {
+	double radiusSq = m_radius*m_radius*m_safetyMarginSq;
 	double result = 0;
 	int numOfPoints = p.rows() / m_numOfJoints;
 	for (size_t i = 0; i < numOfPoints; i++)
@@ -30,8 +31,8 @@ double CollisionObjective::computeValue(const dVector & p)
 		VectorXd q = p.segment(m_numOfJoints*i, m_numOfJoints);		
 		P3D cart_pos = kSolver.CalcForwardKinematics(q);
 		double dSq = (cart_pos - m_point).squaredNorm();
-		double diff = dSq - m_radiusSq;
-		result += dSq > m_radiusSq ? 0 : diff*diff;
+		double diff = dSq - radiusSq;
+		result += dSq > radiusSq ? 0 : diff*diff;
 	}
 	return result*norm_const * weight*.5;
 }
@@ -51,7 +52,8 @@ void CollisionObjective::addGradientTo(dVector & grad, const dVector & p)
 		ObjectiveFunction::addGradientTo(grad, p);
 		return;
 	}
-	
+	double radiusSq = m_radius*m_radius*m_safetyMarginSq;
+
 	int numOfPoints = p.rows() / m_numOfJoints;
 	for (int i = 0; i < numOfPoints; ++i)
 	{
@@ -72,8 +74,8 @@ void CollisionObjective::addGradientTo(dVector & grad, const dVector & p)
 
 		MatrixNxM res(1, 7);
 		double dSq = (cart_pos - m_point).squaredNorm();
-		double diff = dSq - m_radiusSq;
-		double f_val = dSq > m_radiusSq ? 0 : 2*diff;
+		double diff = dSq - radiusSq;
+		double f_val = dSq > radiusSq ? 0 : 2*diff;
 		res = /*2**/Ja.transpose()*(cart_pos - m_point)*f_val;
 		grad.segment(m_numOfJoints*i, m_numOfJoints) += res * norm_const * weight;
 	}

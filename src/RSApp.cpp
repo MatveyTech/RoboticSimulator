@@ -10,6 +10,7 @@
 #include "igl/unproject.h"
 
 
+
 //always returns 7nth right link
 RigidBody * GetCurrentActiveLink(Robot* robot)
 {
@@ -46,7 +47,7 @@ void RSApp::MoveActiveLink(P3D point, bool isAbsolute)
 	ikSolver->ikPlan->endEffectors.back().endEffectorRB = rb;
 
 	P3D cart = rb->getWorldCoordinates(kSolver->GetGripLocalCoordinates());
-	cout << "new point:(" << cart.x() << ";" << cart.y() << ";" << cart.z() << ")." << endl;
+	//cout << "new point:(" << cart.x() << ";" << cart.y() << ";" << cart.z() << ")." << endl;
 
 	ikSolver->ikEnergyFunction->regularizer = 100;
 	ikSolver->ikOptimizer->checkDerivatives = true;
@@ -64,20 +65,37 @@ void RSApp::DefineViewerCallbacks()
 		if (CartMode)
 			ikSolver->solve(10, false, false);
 		//PrintRenderingTime();
-		DrawPoint();
+		//DrawPoint();
 		DrawRobot();
 		m_cartLocation = kSolver->CalcForwardKinematics(robot->GetQ());
 		for (auto&& obstacle : m_obstacles)
 		{
-			if (obstacle.CollidesRobot(m_cartLocation))
-				viewer.data_list[obstacle.IndexInViewer].set_colors(COLOR(255, 0, 0));
+			if (obstacle->CollidesRobot(m_cartLocation))
+				viewer.data_list[obstacle->IndexInViewer].set_colors(COLOR(255, 0, 0));
 			else
-				viewer.data_list[obstacle.IndexInViewer].set_colors(COLOR(0, 255, 0));
+				viewer.data_list[obstacle->IndexInViewer].set_colors(COLOR(0, 255, 0));
 		}
 		if (m_selectedSphere)
 		{
-			m_ds->MoveAlongAxis(m_draggingDirection);
+			m_selectedSphere->MoveAlongAxis(m_draggingDirection);
 		}
+		
+		if (m_state == SState::AdjustStart)
+		{
+			double res = 0;
+			for (int i = 0; i<5; ++i)
+				m_ikMinimizer->minimize(m_ikStartPositionObjective, m_startPosition, res);
+			robot->MoveByJointsR(m_startPosition, false);
+		}
+
+		if (m_state == SState::AdjustEnd)
+		{
+			double res = 0;
+			for (int i = 0; i<5; ++i)
+				m_ikMinimizer->minimize(m_ikEndPositionObjective, m_endPosition, res);
+			robot->MoveByJointsR(m_endPosition, false);
+		}		
+
 		return false;
 	};
 	if (CartMode)
@@ -143,7 +161,9 @@ void RSApp::DefineViewerCallbacks()
 			[&](igl::opengl::glfw::Viewer &, unsigned int key, int mod)
 		{
 			double step = 0.035;
-
+			m_startDragger->SetVisibility(false);
+			m_endDragger->SetVisibility(false);
+			//m_state == SState::Simulation;
 			switch (key)
 			{
 			case GLFW_KEY_LEFT:
@@ -153,8 +173,16 @@ void RSApp::DefineViewerCallbacks()
 				robot->MoveByJointsR(simulation->MoveToNextAndGet(), false);
 				return true;
 			case GLFW_KEY_S:
-				ikSolver->solve(100, false, false);
+				m_state = SState::AdjustStart;
+				m_startDragger->SetVisibility(true);
 				return true;
+			case GLFW_KEY_E:
+				m_state = SState::AdjustEnd;
+				m_endDragger->SetVisibility(true);
+				return true;
+			/*case GLFW_KEY_S:
+				ikSolver->solve(100, false, false);
+				return true;*/
 			case GLFW_KEY_P:
 				robot->PrintJointsValues();
 				return true;
@@ -178,13 +206,24 @@ void RSApp::DefineViewerCallbacks()
 			}
 			return false;
 		};
+		viewer.callback_key_up =
+			[&](igl::opengl::glfw::Viewer &, unsigned int key, int mod)
+		{
+			m_state = SState::Simulation;
+			m_startDragger->SetVisibility(false);
+			m_endDragger->SetVisibility(false);
+			return true;
+		};
 	}
 	
 	viewer.callback_mouse_move =
 		[&](igl::opengl::glfw::Viewer& viewer, int mouse_x, int mouse_y)->bool
 	{
-		if (m_selectedSphere==nullptr)
-			VerifyHighlight(m_ds);
+		if (m_selectedSphere == nullptr)
+		{
+			VerifyHighlightAll();
+		}
+			
 		else
 		{
 			
@@ -246,9 +285,18 @@ void RSApp::DefineViewerCallbacks()
 			m_selectedSphere = nullptr;
 			m_draggingDirection = 0;
 		}
-		VerifyHighlight(m_ds);
+		VerifyHighlightAll();
 		return false;
 	};
+}
+
+void RSApp::VerifyHighlightAll()
+{
+	m_highlightedSphere = nullptr;
+	for (auto&& ds : DraggableSphere::AllDS)
+	{
+		VerifyHighlight(ds);
+	}
 }
 
 bool RSApp::VerifyHighlight(DraggableSphere* ds)
@@ -260,7 +308,6 @@ bool RSApp::VerifyHighlight(DraggableSphere* ds)
 	double y = viewer.core.viewport(3) - viewer.current_mouse_y;
 
 	ds->ClearHighlight();
-	m_highlightedSphere = nullptr;
 	for (int i = ds->IndexInViewer+1; i <= ds->LastIndexInViewer; ++i)
 	{
 		if (igl::unproject_onto_mesh(Eigen::Vector2f(x, y), viewer.core.view,
@@ -296,7 +343,9 @@ void RSApp::RecreateSimulation(std::vector<int> weights, MinimizerType mt)
 	if (simulation != nullptr)
 		delete simulation;
 	//simulation = new BasicSimulation(v1, v2, PathSize);
-	simulation = new AdvancedSimulation(v1, v2, PathSize, weights,(int)mt,robot,m_finalCart,m_onlyFinalCart, m_obstacles);
+	
+
+	simulation = new AdvancedSimulation(m_startPosition, m_endPosition, PathSize, weights,(int)mt,robot,m_finalCart,m_onlyFinalCart, m_obstacles);
 }
 
 RSApp::RSApp(void)
@@ -309,11 +358,40 @@ RSApp::RSApp(void)
 	else
 		fName = "../RoboticSimulator/data/rbs/yumi/yumi.rbs";
 	m_eeLocalCoord = kSolver->GetGripLocalCoordinates();
+
+	
+	
 	loadFile(fName);
 	kSolver = new SingleArmKinematicsSolver(robot);
 	LoadMeshModelsIntoViewer(useSerializedModels);
 	DefineViewerCallbacks();
 
+	P3D startingPoint = kSolver->CalcForwardKinematics(robot->GetQ());
+	m_startDragger = new DraggableSphere(startingPoint, 0.04, &viewer);
+	m_startDragger->SetVisibility(false);
+	P3D endingPoint(0.59,0.69,0.43);
+	m_endDragger = new DraggableSphere(endingPoint, 0.04, &viewer);
+	m_endDragger->SetVisibility(false);
+	m_ikMinimizer = new BFGSFunctionMinimizer(1);
+	m_ikStartPositionObjective = new CloseToPointObjective(7, 1, m_startDragger->Location, robot);
+	m_ikEndPositionObjective  = new CloseToPointObjective(7, 1, m_endDragger->Location, robot);
+	m_ikMinimizer = new BFGSFunctionMinimizer(1);
+
+	m_startPosition = VectorXd(7);
+	m_startPosition.setConstant(RAD(0));
+
+	double res = 0;
+	for (int i = 0; i<5; ++i)
+		m_ikMinimizer->minimize(m_ikStartPositionObjective, m_startPosition, res);
+
+	m_endPosition = VectorXd(7);
+	m_endPosition.setConstant(RAD(0));
+
+	res = 0;
+	for (int i = 0; i<5; ++i)
+		m_ikMinimizer->minimize(m_ikEndPositionObjective, m_endPosition, res);
+
+	
 	CreateIKSolver();
 	std::vector<int> weights = { w_first,w_last,w_equal,w_close2point,w_collision};
 	RecreateSimulation(weights,MinimizerType::BFGS);
@@ -370,7 +448,8 @@ void RSApp::LoadMeshModelsIntoViewer(bool useSerializedModels)
 {
 	AddRobotModels(useSerializedModels);
 	AddCollisionSpheres();
-	m_ds = new DraggableSphere(P3D (0.5, 0.1, 0.33), 0.07, viewer.data_list.size() - 1, &viewer);
+	
+	
 }
 
 void RSApp::AddRobotModels(bool useSerializedModels)
@@ -412,65 +491,15 @@ void RSApp::AddRobotModels(bool useSerializedModels)
 
 void RSApp::AddCollisionSpheres()
 {
-	Eigen::MatrixXd V;
-	Eigen::MatrixXi F;
-	string sphereFile = "../RoboticSimulator/data/models/sphere.off";
-
-	igl::readOFF(sphereFile, V, F);
-	Eigen::Matrix4d translation_matrix;
+	m_obstacles.push_back(new CollisionSphere(P3D(0.68, 0.78, 0.33), 0.07, &viewer));
+	//m_obstacles.push_back(new CollisionSphere(P3D(0.3, 0.78, 0.33), 0.07, &viewer));
 	
-	sphereIndexInViewer = viewer.data_list.size();
-	
-	P3D p(0.68, 0.78, 0.33);
-	//P3D p(0.3,0.47,-0.34);
-	CollisionSphere cs(p, 0.07, sphereIndexInViewer,&viewer);
-	
-	m_obstacles.push_back(cs);
-	translation_matrix << 
-		cs.Radius, 0, 0, cs.Location.x(),
-		0, cs.Radius, 0, cs.Location.y(),
-		0, 0, cs.Radius, cs.Location.z(),
-		0, 0, 0, 1;
-	viewer.data_list[sphereIndexInViewer].set_mesh(TransformP(V,translation_matrix), F);
-	viewer.data_list[sphereIndexInViewer].show_lines = false;
-	viewer.data_list[sphereIndexInViewer].set_colors(COLOR(0, 255, 0));
-	
-	/*viewer.append_mesh();
-	Eigen::Matrix4d translation_matrix2;
-	double small_r = cs.Radius / 3;
-	double step = 0.15;
-	translation_matrix2 <<
-		small_r, 0, 0, cs.Location.x()+ step,
-		0, small_r, 0, cs.Location.y(),
-		0, 0, small_r, cs.Location.z(),
-		0, 0, 0, 1;
-	viewer.data_list[sphereIndexInViewer+1].set_mesh(TransformP(V, translation_matrix2), F);
-	viewer.data_list[sphereIndexInViewer+1].show_lines = false;
-	viewer.data_list[sphereIndexInViewer+1].set_colors(COLOR(255, 255, 0));
+}
 
-
-	viewer.append_mesh();
-	Eigen::Matrix4d translation_matrix3;
-	translation_matrix3 <<
-		small_r, 0, 0, cs.Location.x(),
-		0, small_r, 0, cs.Location.y()+ step,
-		0, 0, small_r, cs.Location.z(),
-		0, 0, 0, 1;
-	viewer.data_list[sphereIndexInViewer + 2].set_mesh(TransformP(V, translation_matrix3), F);
-	viewer.data_list[sphereIndexInViewer + 2].show_lines = false;
-	viewer.data_list[sphereIndexInViewer + 2].set_colors(COLOR(255, 255, 0));
-
-	viewer.append_mesh();
-	Eigen::Matrix4d translation_matrix4;
-	translation_matrix4 <<
-		small_r, 0, 0, cs.Location.x(),
-		0, small_r, 0, cs.Location.y(),
-		0, 0, small_r, cs.Location.z() + step,
-		0, 0, 0, 1;
-	viewer.data_list[sphereIndexInViewer + 3].set_mesh(TransformP(V, translation_matrix4), F);
-	viewer.data_list[sphereIndexInViewer + 3].show_lines = false;
-	viewer.data_list[sphereIndexInViewer + 3].set_colors(COLOR(255, 255, 0));*/
-
+void RSApp::SetCollisionSpheresVisibility(bool val)
+{
+	for (auto&& cs : m_obstacles)
+		cs->SetVisibility(val);
 }
 
 void RSApp::DrawRobot()
@@ -529,7 +558,7 @@ void RSApp::CreateMenu()
 		static int simulationPos = 1;
 
 		ImGui::SliderInt("", &simulationPos, 1, PathSize);
-		if (!CartMode)
+		if (m_state==SState::Simulation)
 			robot->MoveByJointsR(simulation->MoveToIndAndGet(simulationPos - 1), false);
 		ImGui::SameLine();
 		if (ImGui::Button("-"))
@@ -612,6 +641,12 @@ void RSApp::CreateMenu()
 
 		static bool showPathOutput = false;
 		ImGui::Checkbox("Show path", &showPathOutput);
+		
+		static bool showCollisionSpheres = true;
+		if (ImGui::Checkbox("Show collision spheres", &showCollisionSpheres))
+		{
+			SetCollisionSpheresVisibility(showCollisionSpheres);
+		}
 
 		static bool autostep = false;
 		if (ImGui::Button("Rebuild simulation", ImVec2(-1, 0)))
@@ -625,7 +660,11 @@ void RSApp::CreateMenu()
 		{
 			static bool b = true;
 			b = !b;
-			m_ds->ShowDraggers(b);
+			for (auto&& ds : DraggableSphere::AllDS)
+			{
+				ds->ShowDraggers(b);
+			}
+			
 		}
 #pragma region		ee_adjustments
 		/*double step = 0.003;
@@ -741,10 +780,10 @@ void RSApp::CreateMenu()
 		{
 			autostep = !autostep;
 		}
-		static int stopAfter = 1000;
+		/*static int stopAfter = 1000;
 		ImGui::InputInt("Stop after", &stopAfter);
 		if (simulation->IterationNum == stopAfter)
-			autostep = false;
+			autostep = false;*/
 		if (autostep)
 			simulation->MakeStep();
 		ImGui::Text("Iteration # %d", simulation->IterationNum);
