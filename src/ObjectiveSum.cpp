@@ -4,6 +4,7 @@
 #include "..\include\CloseToPointObjective.h"
 #include "..\include\ObjectiveSum.h"
 #include <vector>
+#include <stdio.h>
 
 
 ObjectiveSum::ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos, std::vector<int> weights, Robot* robot, 
@@ -40,7 +41,10 @@ void ObjectiveSum::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, c
 void ObjectiveSum::addGradientTo(dVector & grad, const dVector & p)
 {
 	for (ObjectiveFunction* objective : objectives)
-		objective->addGradientTo(grad,p);
+	{
+		objective->addGradientTo(grad, p);
+		//std::cout << "iteration " << i++ << " grad.norm() " << grad.norm() << std::endl;
+	}
 }
 
 //template<class T>

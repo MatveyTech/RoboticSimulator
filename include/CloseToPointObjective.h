@@ -15,6 +15,8 @@ public:
 	CloseToPointObjective(int numOfJoints, int weight, P3D& point, Robot* robot);
 	~CloseToPointObjective();
 
+	static bool UseBaseAddGradient;
+
 	virtual double computeValue(const dVector& p);
 	virtual void addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector& p);
 	virtual void addGradientTo(dVector& grad, const dVector& p);

@@ -1,7 +1,7 @@
 #include "..\include\CloseToPointObjective.h"
 #include <iostream>
 
-
+bool CloseToPointObjective::UseBaseAddGradient = false;
 
 CloseToPointObjective::CloseToPointObjective(int numOfJoints, int weight, P3D& point, Robot* robot):
 	kSolver(robot),
@@ -36,6 +36,11 @@ void CloseToPointObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianE
 
 void CloseToPointObjective::addGradientTo(dVector & grad, const dVector & p)
 {
+	if (UseBaseAddGradient)
+	{
+		ObjectiveFunction::addGradientTo(grad, p);
+		return;
+	}
 	int numOfPoints = p.rows() / m_numOfJoints;
 	for (int i = 0; i < numOfPoints; ++i)
 	{

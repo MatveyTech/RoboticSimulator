@@ -245,7 +245,9 @@ bool Robot::MoveByJoints(DynamicArray<double> newJoints, bool isDeg/* = false*/)
 		HingeJoint* joint = dynamic_cast<HingeJoint*>(jointList[i]);
 		double ang = isDeg ? RAD(newJoints[i]) : newJoints[i];
 		if (i==1) //put the left arm aside
-			ang = RAD(110);
+			ang = RAD(-130);
+		if (i == 3) //put the left arm aside
+			ang = RAD(50);
 		QuaternionR jointOrientation = getRotationQuaternion(ang, joint->rotationAxis);
 		rs.setJointRelativeOrientation(jointOrientation, i);
 	}

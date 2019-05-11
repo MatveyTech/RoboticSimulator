@@ -1,6 +1,6 @@
 #include "..\include\FinishAtLastObjective.h"
 
-
+bool FinishAtLastObjective::UseBaseAddGradient = false;
 
 FinishAtLastObjective::FinishAtLastObjective(const VectorXd & endPos, int weight):
 	m_endPos(endPos),
@@ -32,6 +32,11 @@ void FinishAtLastObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianE
 
 void FinishAtLastObjective::addGradientTo(dVector & grad, const dVector & p)
 {
+	if (UseBaseAddGradient)
+	{
+		ObjectiveFunction::addGradientTo(grad, p);
+		return;
+	}
 	//the derivation is 2ql1 - 2qf1
 	int startIndex = p.rows() - m_numOfJoints;
 	int stopIndex = p.rows();

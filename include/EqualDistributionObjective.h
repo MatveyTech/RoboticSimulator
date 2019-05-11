@@ -13,6 +13,8 @@ public:
 	virtual void addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector& p);
 	virtual void addGradientTo(dVector& grad, const dVector& p);
 
+	static bool UseBaseAddGradient;
+
 private:
 	int m_numOfJoints;
 };

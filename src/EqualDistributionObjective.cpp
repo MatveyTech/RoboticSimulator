@@ -3,6 +3,8 @@
 #include "..\include\FinishAtLastObjective.h"
 #include "..\include\CloseToPointObjective.h"
 
+bool EqualDistributionObjective::UseBaseAddGradient = false;
+
 EqualDistributionObjective::EqualDistributionObjective(int NumOfJoints, int weight):
 	m_numOfJoints(NumOfJoints)
 {
@@ -39,20 +41,27 @@ void EqualDistributionObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hes
 
 void EqualDistributionObjective::addGradientTo(dVector & grad, const dVector & p)
 {
+	if (UseBaseAddGradient)
+	{
+		ObjectiveFunction::addGradientTo(grad, p);
+		return;
+	}
+
 	for (size_t i = 0; i < p.rows(); i++)
 	{
+		double currVal = 0;
 		if (i < m_numOfJoints)
 		{
-			grad(i) += 2 * p(i) - 2 * p(i + m_numOfJoints);
+			currVal = 2 * p(i) - 2 * p(i + m_numOfJoints);
 		}
 		else if (i > p.rows() - 1 - m_numOfJoints)
 		{
-			grad(i) += 2 * p(i) - 2 * p(i - m_numOfJoints);
+			currVal = 2 * p(i) - 2 * p(i - m_numOfJoints);
 		}
 		else
 		{
-			grad(i) += 4 * p(i) - 2 * p(i - m_numOfJoints) - 2 * p(i + m_numOfJoints);
+			currVal = 4 * p(i) - 2 * p(i - m_numOfJoints) - 2 * p(i + m_numOfJoints);
 		}
-		grad(i) *= weight;
+		grad(i) += currVal * weight;
 	}
 }

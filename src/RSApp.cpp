@@ -1,5 +1,8 @@
 
 #include "..\include\RSApp.h"
+#include "..\include\StartFromFirstObjective.h"
+#include "..\include\FinishAtLastObjective.h"
+#include "..\include\EqualDistributionObjective.h"
 #include "..\include\CollisionObjective.h"
 #include "..\include\CloseToPointObjective.h"
 #include "..\include\Utilities.h"
@@ -336,10 +339,10 @@ void RSApp::CreateIKSolver()
 
 void RSApp::RecreateSimulation(std::vector<int> weights, MinimizerType mt)
 {
-	VectorXd v1(7); v1 << 0, 0, 0, 0, 0, 0, 0;
+	/*VectorXd v1(7); v1 << 0, 0, 0, 0, 0, 0, 0;
 	v1 = v1.unaryExpr(&Rad);
 	VectorXd v2(7); v2 << 50, -50, 0, -50, 0, 0, 0;
-	v2 = v2.unaryExpr(&Rad);
+	v2 = v2.unaryExpr(&Rad);*/
 	if (simulation != nullptr)
 		delete simulation;
 	//simulation = new BasicSimulation(v1, v2, PathSize);
@@ -381,14 +384,14 @@ RSApp::RSApp(void)
 	m_startPosition.setConstant(RAD(0));
 
 	double res = 0;
-	for (int i = 0; i<5; ++i)
+	for (int i = 0; i<30; ++i)
 		m_ikMinimizer->minimize(m_ikStartPositionObjective, m_startPosition, res);
 
 	m_endPosition = VectorXd(7);
 	m_endPosition.setConstant(RAD(0));
 
 	res = 0;
-	for (int i = 0; i<5; ++i)
+	for (int i = 0; i<30; ++i)
 		m_ikMinimizer->minimize(m_ikEndPositionObjective, m_endPosition, res);
 
 	
@@ -400,6 +403,7 @@ RSApp::RSApp(void)
 	viewer.core.camera_zoom = 0.5;
 	//viewer.core.camera_eye = Eigen::Vector3f(5, 3, 0);
 	//viewer.core.camera_eye += Eigen::Vector3f(0, 5, 0);
+	viewer.resize(1800, 750);
 	viewer.launch();
 }
 
@@ -598,12 +602,24 @@ void RSApp::CreateMenu()
 		int max_w = 9;
 		int min_w = -1;
 		ImGui::SliderInt("First", &w_first, min_w,max_w,int2char(w_first).data());
+		ImGui::SameLine();
+		ImGui::Checkbox("B1", &StartFromFirstObjective::UseBaseAddGradient);
+
 		ImGui::SliderInt("Last", &w_last, min_w,max_w,int2char(w_last).data());
+		ImGui::SameLine();
+		ImGui::Checkbox("B2", &FinishAtLastObjective::UseBaseAddGradient);
+
 		ImGui::SliderInt("Equal", &w_equal, min_w,max_w,int2char(w_equal).data());
+		ImGui::SameLine();
+		ImGui::Checkbox("B3", &EqualDistributionObjective::UseBaseAddGradient);
+
 		ImGui::SliderInt("Close2Point", &w_close2point, min_w,max_w,int2char(w_close2point).data());
+		ImGui::SameLine();
+		ImGui::Checkbox("B4", &CloseToPointObjective::UseBaseAddGradient);
+
 		ImGui::SliderInt("Collision", &w_collision, min_w,max_w,int2char(w_collision).data());
 		ImGui::SameLine();
-		ImGui::Checkbox("B", &CollisionObjective::UseBaseAddGradient);
+		ImGui::Checkbox("B5", &CollisionObjective::UseBaseAddGradient);
 		ImGui::NewLine();
 		
 		static MinimizerType minimizerType = simulation->MinimizerType;
@@ -787,8 +803,8 @@ void RSApp::CreateMenu()
 		if (autostep)
 			simulation->MakeStep();
 		ImGui::Text("Iteration # %d", simulation->IterationNum);
-		ImGui::Text("Value %E", simulation->ComputeValueAll());
-		ImGui::Text("Grad  %E", simulation->ComputeGradientAll());
+		//ImGui::Text("Value %E", simulation->ComputeValueAll());
+		//ImGui::Text("Grad  %E", simulation->ComputeGradientAll());
 		
 		/*CollisionSphere cs = m_obstacles.front();
 		CollisionObjective co(7, (double)pow(10, w4), cs.Location, cs.Radius, robot);

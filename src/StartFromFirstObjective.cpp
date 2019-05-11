@@ -12,6 +12,7 @@ void printVector1(VectorXd pp)
 	}
 }
 
+bool StartFromFirstObjective::UseBaseAddGradient = false;
 
 StartFromFirstObjective::StartFromFirstObjective(const VectorXd & startPos, int weight):
 	m_startPos(startPos),
@@ -43,6 +44,11 @@ void StartFromFirstObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessia
 
 void StartFromFirstObjective::addGradientTo(dVector & grad, const dVector & p)
 {
+	if (UseBaseAddGradient)
+	{
+		ObjectiveFunction::addGradientTo(grad, p);
+		return;
+	}
 	//the derivation is 2ql1 - 2qf1
 	/*int startIndex = p.rows() - m_numOfJoints -1;
 	int stopIndex = p.rows() - 1;*/

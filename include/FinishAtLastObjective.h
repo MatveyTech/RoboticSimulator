@@ -14,6 +14,8 @@ public:
 	virtual void addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector& p);
 	virtual void addGradientTo(dVector& grad, const dVector& p);
 
+	static bool UseBaseAddGradient;
+
 private:
 	const VectorXd& m_endPos;
 	int m_numOfJoints;
