@@ -227,6 +227,7 @@ bool Robot::MoveByJointsR(Eigen::VectorXd vec, bool isDeg/* = false*/)
 	//quick and dirty
 	DynamicArray<double> newJoints;
 	newJoints.resize(14, 0);
+	//newJoints[1] = vec(RAD(50));
 	for (size_t i = 0; i < 7; i++)
 	{
 		newJoints[2 * i] = vec(i);
@@ -243,6 +244,8 @@ bool Robot::MoveByJoints(DynamicArray<double> newJoints, bool isDeg/* = false*/)
 	for (uint i = 0; i < jointList.size(); i++) {
 		HingeJoint* joint = dynamic_cast<HingeJoint*>(jointList[i]);
 		double ang = isDeg ? RAD(newJoints[i]) : newJoints[i];
+		if (i==1) //put the left arm aside
+			ang = RAD(110);
 		QuaternionR jointOrientation = getRotationQuaternion(ang, joint->rotationAxis);
 		rs.setJointRelativeOrientation(jointOrientation, i);
 	}
