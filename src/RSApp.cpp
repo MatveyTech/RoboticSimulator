@@ -802,7 +802,24 @@ void RSApp::CreateMenu()
 		static bool testGradient = false;
 		ImGui::Checkbox("Test gradient", &testGradient);
 		if (testGradient)
-			simulation->testGradient();
+		{
+			static bool contTestAll = false;
+			ImGui::Checkbox("Continuously Test All", &contTestAll);
+			if (contTestAll)
+				simulation->testGradient(0);
+			if (ImGui::Button("Test1", ImVec2(-1, 0)))
+				simulation->testGradient(1);
+			if (ImGui::Button("Test2", ImVec2(-1, 0)))
+				simulation->testGradient(2);
+			if (ImGui::Button("Test3", ImVec2(-1, 0)))
+				simulation->testGradient(3);
+			if (ImGui::Button("Test4", ImVec2(-1, 0)))
+				simulation->testGradient(4);
+			if (ImGui::Button("Test5", ImVec2(-1, 0)))
+				simulation->testGradient(5);
+
+		}
+			
 
 		ImGui::Text("Iterations:  %d", simulation->GetLastNumOfIterations());
 		ImGui::End();

@@ -42,3 +42,14 @@ void ObjectiveSum::addGradientTo(dVector & grad, const dVector & p)
 	for (ObjectiveFunction* objective : objectives)
 		objective->addGradientTo(grad,p);
 }
+
+//template<class T>
+ObjectiveFunction *ObjectiveSum::GetObjective(int i)
+{
+	return objectives.at(i);
+	/*for (auto obj : objectives)
+	{
+		if (typeid(obj) == typeid(T))
+			return obj;
+	}*/
+}

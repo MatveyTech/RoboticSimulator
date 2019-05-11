@@ -172,9 +172,16 @@ int AdvancedSimulation::GetLastNumOfIterations()
 	return m_gradientBasedMinimizer->LastNumOfIterations;
 }
 
-void AdvancedSimulation::testGradient()
+void AdvancedSimulation::testGradient(int i)
 {
-	m_objective->testGradientWithFD(path);
+	if (i==0)
+		m_objective->testGradientWithFD(path);
+	else
+	{
+		ObjectiveFunction* d = m_objective->GetObjective(i-1);
+		d->testGradientWithFD(path);
+	}
+
 }
 
 void AdvancedSimulation::MakeStep()

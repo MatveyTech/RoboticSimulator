@@ -67,7 +67,7 @@ public:
 	double ComputeValueCurrent();
 	double ComputeGradientCurrent();
 	int GetLastNumOfIterations();
-	void testGradient();
+	void testGradient(int i);
 };
 
 

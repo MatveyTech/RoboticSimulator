@@ -16,6 +16,8 @@ public:
 		P3D finalCart, bool onlyFinalCart, std::vector<CollisionSphere*> obstacles);
 	~ObjectiveSum();
 
+	//template <class T>
+	ObjectiveFunction* GetObjective(int i);
 	CollisionObjective* GetCollisionObjective() { return m_collisionObjective; }
 
 	virtual double computeValue(const dVector& p);
