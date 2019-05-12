@@ -184,6 +184,11 @@ void AdvancedSimulation::testGradient(int i)
 
 }
 
+void AdvancedSimulation::UpdateWeights(std::vector<int> weights)
+{
+	m_objective->UpdateWeights(weights);
+}
+
 void AdvancedSimulation::MakeStep()
 {
 	double res;

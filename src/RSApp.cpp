@@ -628,6 +628,7 @@ void RSApp::CreateMenu()
 
 		std::vector<int> weights = { calcWeight(w_first),calcWeight(w_last),calcWeight(w_equal),calcWeight(w_close2point),calcWeight(w_collision) };
 		
+		simulation->UpdateWeights(weights);
 		if (ImGui::Checkbox("Only final position", &m_onlyFinalCart))
 		{
 			if (!m_onlyFinalCart)

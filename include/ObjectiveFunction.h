@@ -25,6 +25,7 @@ public:
 	virtual void setWeight(double w) { }
 
 	virtual void printObjectiveDetails(const dVector& p) {}
+	void SetWeight(double w) { weight = w; }
 
 private:
 public:

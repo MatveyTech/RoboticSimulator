@@ -21,6 +21,13 @@ ObjectiveSum::ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos, s
 	objectives.push_back(m_collisionObjective);
 }
 
+void ObjectiveSum::UpdateWeights(std::vector<int> weights)
+{
+	for (int i=0; i<objectives.size();++i)
+	{
+		objectives.at(i)->SetWeight(weights.at(i));
+	}
+}
 
 ObjectiveSum::~ObjectiveSum()
 {
