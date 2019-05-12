@@ -61,6 +61,7 @@ private:
 	void VerifyHighlightAll();
 	void DrawPoint();
 	void CreateMenu();
+	std::vector<int> CalcWeights();
 	bool CartMode = false;
 	int PathSize = 15;
 	Eigen::MatrixXd pointToDraw = Eigen::MatrixXd(1, 3);

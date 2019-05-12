@@ -394,10 +394,8 @@ RSApp::RSApp(void)
 	for (int i = 0; i<30; ++i)
 		m_ikMinimizer->minimize(m_ikEndPositionObjective, m_endPosition, res);
 
-	
 	CreateIKSolver();
-	std::vector<int> weights = { w_first,w_last,w_equal,w_close2point,w_collision};
-	RecreateSimulation(weights,MinimizerType::BFGS);
+	RecreateSimulation(CalcWeights(),MinimizerType::BFGS);
 	CreateMenu();
 	viewer.selected_data_index = 0;
 	viewer.core.camera_zoom = 0.5;
@@ -526,6 +524,31 @@ void RSApp::DrawRobot()
 	}
 }
 
+std::vector<int> RSApp::CalcWeights()
+{
+	auto int2char = [&](int val) -> std::string
+	{
+		//quick and dirty
+		if (val == -1)
+			return "0";
+		std::string out_string;
+		std::stringstream ss;
+		ss << pow(10, val);
+		return ss.str();
+	};
+	auto calcWeight = [&](int val) -> int
+	{
+		//quick and dirty
+		if (val == -1)
+			return 0;
+		else
+			return pow(10, val);
+	};
+
+	std::vector<int> res = { calcWeight(w_first),calcWeight(w_last),calcWeight(w_equal),calcWeight(w_close2point),calcWeight(w_collision) };
+	return res;
+}
+
 void RSApp::CreateMenu()
 {
 	
@@ -578,6 +601,7 @@ void RSApp::CreateMenu()
 		}
 		ImGui::SameLine();
 		ImGui::Text("Step");
+
 		
 
 		auto int2char = [&](int val) -> std::string
@@ -626,7 +650,7 @@ void RSApp::CreateMenu()
 		const char* cc = minimizerType == MinimizerType::GD ? "GradDesc" : "BFGS";
 		ImGui::SliderInt("Minimizer", &((int)minimizerType), 0, 1, cc);
 
-		std::vector<int> weights = { calcWeight(w_first),calcWeight(w_last),calcWeight(w_equal),calcWeight(w_close2point),calcWeight(w_collision) };
+		std::vector<int> weights = CalcWeights();
 		
 		simulation->UpdateWeights(weights);
 		if (ImGui::Checkbox("Only final position", &m_onlyFinalCart))
@@ -665,7 +689,7 @@ void RSApp::CreateMenu()
 			SetCollisionSpheresVisibility(showCollisionSpheres);
 		}
 
-		static bool autostep = false;
+		static bool autostep = true;
 		if (ImGui::Button("Rebuild simulation", ImVec2(-1, 0)))
 		{
 			RecreateSimulation(weights, minimizerType);
