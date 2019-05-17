@@ -1,5 +1,6 @@
 #include "..\include\Simulation.h"
 #include "..\include\ObjectiveSum.h"
+#include "..\include\CloseToPointObjective.h"
 #include <iostream>
 
 using namespace std;
@@ -182,6 +183,12 @@ void AdvancedSimulation::testGradient(int i)
 		d->testGradientWithFD(path);
 	}
 
+}
+
+void AdvancedSimulation::UpdateCloseToPoint(P3D point)
+{
+	CloseToPointObjective* d = (CloseToPointObjective*)m_objective->GetObjective(3);//bad.To be solved
+	d->UpdatePoint(point);
 }
 
 void AdvancedSimulation::UpdateWeights(std::vector<int> weights)

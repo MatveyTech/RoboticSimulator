@@ -68,6 +68,7 @@ public:
 	double ComputeGradientCurrent();
 	int GetLastNumOfIterations();
 	void testGradient(int i);
+	void UpdateCloseToPoint(P3D point);
 	void UpdateWeights(std::vector<int> weights);
 };
 

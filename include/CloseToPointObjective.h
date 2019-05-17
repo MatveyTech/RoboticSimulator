@@ -9,11 +9,13 @@ using namespace Eigen;
 class CloseToPointObjective : public ObjectiveFunction
 {
 	int m_numOfJoints;
-	P3D& m_point;
+	P3D m_point;
 	SingleArmKinematicsSolver kSolver;
 public:
 	CloseToPointObjective(int numOfJoints, int weight, P3D& point, Robot* robot);
 	~CloseToPointObjective();
+
+	void UpdatePoint(P3D point);
 
 	static bool UseBaseAddGradient;
 

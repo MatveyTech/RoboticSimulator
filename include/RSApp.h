@@ -15,6 +15,7 @@
 #include <chrono>
 #include "Simulation.h"
 #include "SingleArmKinematicsSolver.h"
+#include "CloseToPointObjective.h"
 //#include <Eigen/Sparse>
 
 
@@ -79,8 +80,8 @@ private:
 	int w_collision = 0;
 
 	GradientBasedFunctionMinimizer* m_ikMinimizer;
-	ObjectiveFunction* m_ikStartPositionObjective;
-	ObjectiveFunction* m_ikEndPositionObjective;
+	CloseToPointObjective* m_ikStartPositionObjective;
+	CloseToPointObjective* m_ikEndPositionObjective;
 	SState m_state = SState::Simulation;
 
 	VectorXd m_startPosition;

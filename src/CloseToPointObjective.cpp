@@ -15,6 +15,11 @@ CloseToPointObjective::~CloseToPointObjective()
 {
 }
 
+void CloseToPointObjective::UpdatePoint(P3D point)
+{
+	m_point = point;
+}
+
 double CloseToPointObjective::computeValue(const dVector & p)
 {
 	double result = 0;

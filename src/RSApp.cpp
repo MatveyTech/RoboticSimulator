@@ -98,6 +98,9 @@ void RSApp::DefineViewerCallbacks()
 				m_ikMinimizer->minimize(m_ikEndPositionObjective, m_endPosition, res);
 			robot->MoveByJointsR(m_endPosition, false);
 		}		
+		simulation->UpdateCloseToPoint(m_finalCart);
+		m_ikStartPositionObjective->UpdatePoint(m_startDragger->Location);
+		m_ikEndPositionObjective->UpdatePoint(m_endDragger->Location);
 
 		return false;
 	};
