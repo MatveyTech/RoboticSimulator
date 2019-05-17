@@ -40,7 +40,11 @@ double CollisionObjective::computeValue(const dVector & p)
 
 void CollisionObjective::addHessianEntriesTo(DynamicArray<MTriplet>&	 hessianEntries, const dVector & p)
 {
-
+	if (UseBaseAddGradient)
+	{
+		ObjectiveFunction::addHessianEntriesTo(hessianEntries, p);
+		return;
+	}
 }
 
 bool CollisionObjective::UseBaseAddGradient = false;

@@ -128,13 +128,15 @@ AdvancedSimulation::AdvancedSimulation(VectorXd& startPoint, VectorXd& endPoint,
 {
 	
 	m_objective = new ObjectiveSum(startPoint, endPoint, weights, robot,finalCart,onlyFinalCart, obstacles);
-	MinimizerType = mt == 0 ? MinimizerType::GD : MinimizerType::BFGS;
+	MinimizerType = mt == 0 ? MinimizerType::GD : mt == 1 ? MinimizerType::BFGS : MinimizerType::NW;
 	VectorXd pp(NumOfJoints*NumOfPoints);
 	pp.setConstant(RAD(20));
 	if (MinimizerType == MinimizerType::GD)
 		m_gradientBasedMinimizer = new GradientDescentFunctionMinimizer(1);
 	else if (MinimizerType == MinimizerType::BFGS)
 		m_gradientBasedMinimizer = new BFGSFunctionMinimizer(1);
+	else if (MinimizerType == MinimizerType::NW)
+		m_gradientBasedMinimizer = new NewtonFunctionMinimizer(1);
 	path = pp;
 	//printVector(path);
 }

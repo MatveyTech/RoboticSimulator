@@ -37,6 +37,11 @@ double EqualDistributionObjective::computeValue(const dVector & p)
 
 void EqualDistributionObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & p)
 {
+	if (UseBaseAddGradient)
+	{
+		ObjectiveFunction::addHessianEntriesTo(hessianEntries, p);
+		return;
+	}
 }
 
 void EqualDistributionObjective::addGradientTo(dVector & grad, const dVector & p)

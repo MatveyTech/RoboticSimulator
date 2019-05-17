@@ -398,7 +398,7 @@ RSApp::RSApp(void)
 		m_ikMinimizer->minimize(m_ikEndPositionObjective, m_endPosition, res);
 
 	CreateIKSolver();
-	RecreateSimulation(CalcWeights(),MinimizerType::BFGS);
+	RecreateSimulation(CalcWeights(),MinimizerType::NW);
 	CreateMenu();
 	viewer.selected_data_index = 0;
 	viewer.core.camera_zoom = 0.5;
@@ -689,8 +689,8 @@ void RSApp::CreateMenu()
 		ImGui::NewLine();
 		
 		static MinimizerType minimizerType = simulation->MinimizerType;
-		const char* cc = minimizerType == MinimizerType::GD ? "GradDesc" : "BFGS";
-		ImGui::SliderInt("Minimizer", &((int)minimizerType), 0, 1, cc);
+		const char* cc = minimizerType == MinimizerType::GD ? "GradDesc" : minimizerType == MinimizerType::BFGS ? "BFGS" : "Newton";
+		ImGui::SliderInt("Minimizer", &((int)minimizerType), 0, 2, cc);
 
 		std::vector<int> weights = CalcWeights();
 		

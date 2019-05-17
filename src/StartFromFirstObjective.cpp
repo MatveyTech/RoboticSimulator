@@ -39,6 +39,11 @@ double StartFromFirstObjective::computeValue(const dVector & p)
 
 void StartFromFirstObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & p)
 {
+	if (UseBaseAddGradient)
+	{
+		ObjectiveFunction::addHessianEntriesTo(hessianEntries, p);
+		return;
+	}
 
 }
 

@@ -27,7 +27,11 @@ double FinishAtLastObjective::computeValue(const dVector & p)
 
 void FinishAtLastObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & p)
 {
-
+	if (UseBaseAddGradient)
+	{
+		ObjectiveFunction::addHessianEntriesTo(hessianEntries, p);
+		return;
+	}
 }
 
 void FinishAtLastObjective::addGradientTo(dVector & grad, const dVector & p)

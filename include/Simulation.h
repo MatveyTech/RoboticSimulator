@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 #include "..\include\GradientDescentFunctionMinimizer.h"
 #include "..\include\BFGSFunctionMinimizer.h"
+#include "..\include\NewtonFunctionMinimizer.h"
 #include "..\include\ObjectiveFunction.h"
 #include "..\include\ObjectiveSum.h"
 #include "..\include\CollisionObjective.h"
@@ -11,7 +12,7 @@
 
 using namespace Eigen;
 
-enum MinimizerType { GD, BFGS };
+enum MinimizerType { GD, BFGS, NW };
 
 class Simulation
 {

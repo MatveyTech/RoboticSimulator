@@ -43,6 +43,10 @@ double ObjectiveSum::computeValue(const dVector & p)
 
 void ObjectiveSum::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & p)
 {
+	for (ObjectiveFunction* objective : objectives)
+	{
+		objective->addHessianEntriesTo(hessianEntries, p);
+	}
 }
 
 void ObjectiveSum::addGradientTo(dVector & grad, const dVector & p)
@@ -50,7 +54,6 @@ void ObjectiveSum::addGradientTo(dVector & grad, const dVector & p)
 	for (ObjectiveFunction* objective : objectives)
 	{
 		objective->addGradientTo(grad, p);
-		//std::cout << "iteration " << i++ << " grad.norm() " << grad.norm() << std::endl;
 	}
 }
 
