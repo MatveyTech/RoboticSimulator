@@ -601,6 +601,45 @@ void RSApp::CreateMenu()
 		}
 		ImGui::SameLine();
 		ImGui::Text("Step");
+		
+		ImGui::SameLine();
+
+
+		/*auto AutorunSimulation = [&]() -> void
+		{
+			static int direction = 1;
+			if (direction = 1)
+				simulation->IncreaseCurrentIndex();
+			else if (direction = -1)
+				simulation->DecreaseCurrentIndex();
+			
+			if (simulation->CurrentIndex == 0)
+				direction = 1;
+			else if (simulation->CurrentIndex == PathSize - 1)
+				direction = -1;
+		};
+
+
+		static bool autoSimulation = false;
+		if (autoSimulation)
+		{
+			if (ImGui::Button("Stop"))
+			{
+				autoSimulation = false;
+			}
+		}
+		else
+		{
+			if (ImGui::Button("Start"))
+			{
+				autoSimulation = true;
+			}
+		}
+
+		if (autoSimulation)
+		{
+			AutorunSimulation();
+		}*/
 
 		
 
