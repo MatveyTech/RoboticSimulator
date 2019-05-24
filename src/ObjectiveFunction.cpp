@@ -107,8 +107,8 @@ void ObjectiveFunction::testHessianWithFD(const dVector& p){
 	hessianEntries.clear();
 	addHessianEntriesTo(hessianEntries, p);
 	analyticHessian.setFromTriplets(hessianEntries.begin(), hessianEntries.end());
-	//Logger::logPrint("Objective Function: testing hessians...\n");
-    //Logger::print("Objective Function: testing hessians...\n");
+	Logger::logPrint("Objective Function: testing hessians...\n");
+    Logger::print("Objective Function: testing hessians...\n");
 	for (int i=0;i<p.size();i++){
 		for (int j=0;j<p.size();j++){
 			double absErr = std::abs(FDHessian.coeff(i, j) - analyticHessian.coeff(i, j));
@@ -127,8 +127,8 @@ void ObjectiveFunction::testHessianPSD(const dVector& p) {
 	hessianEntries.clear();
 	addHessianEntriesTo(hessianEntries, p);
 	H.setFromTriplets(hessianEntries.begin(), hessianEntries.end());
-	//Logger::logPrint("Objective Function: testing hessians...\n");
-	//Logger::print("Objective Function: testing hessians...\n");
+	Logger::logPrint("Objective Function: testing hessians...\n");
+	Logger::print("Objective Function: testing hessians...\n");
 
 	MatrixNxM Hd(H);
 	Eigen::SelfAdjointEigenSolver<MatrixNxM> es(Hd);

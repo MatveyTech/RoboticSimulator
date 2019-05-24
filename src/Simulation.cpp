@@ -187,6 +187,17 @@ void AdvancedSimulation::testGradient(int i)
 
 }
 
+void AdvancedSimulation::TestHessian(int i)
+{
+	if (i == 0)
+		m_objective->testHessianWithFD(path);
+	else
+	{
+		ObjectiveFunction* d = m_objective->GetObjective(i - 1);
+		d->testHessianWithFD(path);
+	}
+}
+
 void AdvancedSimulation::UpdateCloseToPoint(P3D point)
 {
 	CloseToPointObjective* d = (CloseToPointObjective*)m_objective->GetObjective(3);//bad.To be solved

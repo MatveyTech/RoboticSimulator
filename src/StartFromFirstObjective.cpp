@@ -32,7 +32,7 @@ double StartFromFirstObjective::computeValue(const dVector & p)
 	for (size_t i = 0; i < m_numOfJoints; i++)
 	{
 		double diff = firstQ(i) - m_startPos(i);
-		res += diff*diff;
+		res += diff*diff; 
 	}
 	return res * weight;
 }
@@ -44,6 +44,11 @@ void StartFromFirstObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessia
 		ObjectiveFunction::addHessianEntriesTo(hessianEntries, p);
 		return;
 	}
+	for (int i = 0; i < m_numOfJoints; ++i)
+	{
+		ADD_HES_ELEMENT(hessianEntries, i, i, 2, weight);
+	}
+	
 
 }
 

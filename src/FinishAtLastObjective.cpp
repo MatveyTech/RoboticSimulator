@@ -32,6 +32,12 @@ void FinishAtLastObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianE
 		ObjectiveFunction::addHessianEntriesTo(hessianEntries, p);
 		return;
 	}
+
+	int matSize = p.size();
+	for (int i = matSize-m_numOfJoints; i < matSize; ++i)
+	{
+		ADD_HES_ELEMENT(hessianEntries, i, i, 2, weight);
+	}
 }
 
 void FinishAtLastObjective::addGradientTo(dVector & grad, const dVector & p)

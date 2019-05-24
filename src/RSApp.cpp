@@ -902,6 +902,27 @@ void RSApp::CreateMenu()
 				simulation->testGradient(5);
 
 		}
+
+		static bool testHessian = false;
+		ImGui::Checkbox("Test Hessian", &testHessian);
+		if (testHessian)
+		{
+			static bool contTestHessAll = false;
+			ImGui::Checkbox("Continuously Test All", &contTestHessAll);
+			if (contTestHessAll)
+				simulation->TestHessian(0);
+			if (ImGui::Button("TestH1", ImVec2(-1, 0)))
+				simulation->TestHessian(1);
+			if (ImGui::Button("TestH2", ImVec2(-1, 0)))
+				simulation->TestHessian(2);
+			if (ImGui::Button("TestH3", ImVec2(-1, 0)))
+				simulation->TestHessian(3);
+			if (ImGui::Button("TestH4", ImVec2(-1, 0)))
+				simulation->TestHessian(4);
+			if (ImGui::Button("TestH5", ImVec2(-1, 0)))
+				simulation->TestHessian(5);
+
+		}
 			
 
 		ImGui::Text("Iterations:  %d", simulation->GetLastNumOfIterations());
