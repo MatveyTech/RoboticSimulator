@@ -51,21 +51,10 @@ void SmoothnessObjective::addGradientTo(dVector & grad, const dVector & p)
 		ObjectiveFunction::addGradientTo(grad, p);
 		return;
 	}
-	for (size_t i = 0; i < p.rows(); i++)
-	{
-		double currVal = 0;
-		if (i < m_numOfJoints)
-		{
-			currVal = 2 * p(i) - 2 * p(i + m_numOfJoints);
-		}
-		else if (i > p.rows() - 1 - m_numOfJoints)
-		{
-			currVal = 2 * p(i) - 2 * p(i - m_numOfJoints);
-		}
-		else
-		{
-			currVal = 4 * p(i) - 2 * p(i - m_numOfJoints) - 2 * p(i + m_numOfJoints);
-		}
-		grad(i) += currVal * weight;
-	}
+	if (weight == 0)
+		return;
+
+	VectorXd tres = 2 * A.transpose() * A * p * weight;
+	grad += tres;
+	return;
 }

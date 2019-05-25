@@ -77,7 +77,7 @@ private:
 	int w_last = 2;
 	int w_equal = 0;
 	int w_close2point = -1;
-	int w_collision = 0;
+	int w_collision = -1;
 
 	GradientBasedFunctionMinimizer* m_ikMinimizer;
 	CloseToPointObjective* m_ikStartPositionObjective;
