@@ -5,10 +5,22 @@
 
 bool EqualDistributionObjective::UseBaseAddGradient = false;
 
-EqualDistributionObjective::EqualDistributionObjective(int NumOfJoints, int weight):
-	m_numOfJoints(NumOfJoints)
+EqualDistributionObjective::EqualDistributionObjective(int numOfJoints, int numOfPoints, int weight):
+	m_numOfJoints(numOfJoints)
 {
 	this->weight = weight;
+
+	int c = numOfJoints * numOfPoints;
+	int r = c - numOfJoints;
+	
+	MatrixXd a(r, c);
+	a.setConstant(0);
+	for (int i = 0; i < r; ++i)
+	{
+		a(i, i) = -1;
+		a(i, i + numOfJoints) = 1;
+	}
+	A = a;
 }
 
 
@@ -20,19 +32,7 @@ double EqualDistributionObjective::computeValue(const dVector & p)
 {
 	if (p.rows() % m_numOfJoints != 0)
 		throw("BAD");
-	double res=0;
-	int numOfPoints = p.rows() / m_numOfJoints;
-	for (size_t i = 1; i < numOfPoints; i++)
-	{
-		for (size_t j = 0; j < m_numOfJoints; j++)
-		{
-			double p1 = p(i*m_numOfJoints + j);
-			double p2 = p((i - 1)*m_numOfJoints + j);
-			double diff =  p1-p2;
-			res += diff*diff;
-		}
-	}
-	return res*weight;
+	return (A*p).squaredNorm() * weight;
 }
 
 void EqualDistributionObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & p)
@@ -51,7 +51,6 @@ void EqualDistributionObjective::addGradientTo(dVector & grad, const dVector & p
 		ObjectiveFunction::addGradientTo(grad, p);
 		return;
 	}
-
 	for (size_t i = 0; i < p.rows(); i++)
 	{
 		double currVal = 0;

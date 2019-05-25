@@ -127,7 +127,7 @@ AdvancedSimulation::AdvancedSimulation(VectorXd& startPoint, VectorXd& endPoint,
 	:Simulation(startPoint, endPoint, numOfPoints)
 {
 	
-	m_objective = new ObjectiveSum(startPoint, endPoint, weights, robot,finalCart,onlyFinalCart, obstacles);
+	m_objective = new ObjectiveSum(startPoint, endPoint, numOfPoints, weights, robot,finalCart,onlyFinalCart, obstacles);
 	MinimizerType = mt == 0 ? MinimizerType::GD : mt == 1 ? MinimizerType::BFGS : MinimizerType::NW;
 	VectorXd pp(NumOfJoints*NumOfPoints);
 	pp.setConstant(RAD(20));
