@@ -1,4 +1,4 @@
-#include "..\include\EqualDistributionObjective.h"
+#include "..\include\SmoothnessObjective.h"
 #include "..\include\StartFromFirstObjective.h"
 #include "..\include\FinishAtLastObjective.h"
 #include "..\include\CloseToPointObjective.h"
@@ -14,7 +14,7 @@ ObjectiveSum::ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos, i
 	
 	objectives.push_back(new StartFromFirstObjective(startPos, weights.at(0)));
 	objectives.push_back(new FinishAtLastObjective(finalPos, weights.at(1)));
-	objectives.push_back(new EqualDistributionObjective(numOfJoints, numOfPoints, weights.at(2)));
+	objectives.push_back(new SmoothnessObjective(numOfJoints, numOfPoints, weights.at(2)));
 	objectives.push_back(new CloseToPointObjective(numOfJoints, weights.at(3), finalCart, robot));
 	CollisionSphere* cs = obstacles.front();
 	m_collisionObjective = new CollisionObjective(numOfJoints, weights.at(4), cs->Location, cs->Radius, robot);

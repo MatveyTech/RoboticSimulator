@@ -1,11 +1,11 @@
-#include "..\include\EqualDistributionObjective.h"
+#include "..\include\SmoothnessObjective.h"
 #include "..\include\StartFromFirstObjective.h"
 #include "..\include\FinishAtLastObjective.h"
 #include "..\include\CloseToPointObjective.h"
 
-bool EqualDistributionObjective::UseBaseAddGradient = false;
+bool SmoothnessObjective::UseBaseAddGradient = false;
 
-EqualDistributionObjective::EqualDistributionObjective(int numOfJoints, int numOfPoints, int weight):
+SmoothnessObjective::SmoothnessObjective(int numOfJoints, int numOfPoints, int weight):
 	m_numOfJoints(numOfJoints)
 {
 	this->weight = weight;
@@ -24,18 +24,18 @@ EqualDistributionObjective::EqualDistributionObjective(int numOfJoints, int numO
 }
 
 
-EqualDistributionObjective::~EqualDistributionObjective()
+SmoothnessObjective::~SmoothnessObjective()
 {
 }
 
-double EqualDistributionObjective::computeValue(const dVector & p)
+double SmoothnessObjective::computeValue(const dVector & p)
 {
 	if (p.rows() % m_numOfJoints != 0)
 		throw("BAD");
 	return (A*p).squaredNorm() * weight;
 }
 
-void EqualDistributionObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & p)
+void SmoothnessObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & p)
 {
 	if (UseBaseAddGradient)
 	{
@@ -44,7 +44,7 @@ void EqualDistributionObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hes
 	}
 }
 
-void EqualDistributionObjective::addGradientTo(dVector & grad, const dVector & p)
+void SmoothnessObjective::addGradientTo(dVector & grad, const dVector & p)
 {
 	if (UseBaseAddGradient)
 	{

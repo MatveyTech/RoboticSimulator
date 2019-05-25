@@ -3,11 +3,11 @@
 #include "..\include\Robot.h"
 using namespace Eigen;
 
-class EqualDistributionObjective : public ObjectiveFunction
+class SmoothnessObjective : public ObjectiveFunction
 {
 public:
-	EqualDistributionObjective(int numOfJoints, int numOfPoints, int weight);
-	~EqualDistributionObjective();
+	SmoothnessObjective(int numOfJoints, int numOfPoints, int weight);
+	~SmoothnessObjective();
 
 	virtual double computeValue(const dVector& p);
 	virtual void addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector& p);

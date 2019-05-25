@@ -675,9 +675,9 @@ void RSApp::CreateMenu()
 		ImGui::SameLine();
 		ImGui::Checkbox("B2", &FinishAtLastObjective::UseBaseAddGradient);
 
-		ImGui::SliderInt("Equal", &w_equal, min_w,max_w,int2char(w_equal).data());
+		ImGui::SliderInt("Smoothness", &w_equal, min_w,max_w,int2char(w_equal).data());
 		ImGui::SameLine();
-		ImGui::Checkbox("B3", &EqualDistributionObjective::UseBaseAddGradient);
+		ImGui::Checkbox("B3", &SmoothnessObjective::UseBaseAddGradient);
 
 		ImGui::SliderInt("Close2Point", &w_close2point, min_w,max_w,int2char(w_close2point).data());
 		ImGui::SameLine();
