@@ -8,18 +8,15 @@ using namespace Eigen;
 
 class ObjectiveSum : public ObjectiveFunction
 {	
-	std::vector<ObjectiveFunction*> objectives;
-	CollisionObjective* m_collisionObjective = nullptr;
+protected:
+	std::vector<ObjectiveFunction*> objectives;	
 
-public:
-	ObjectiveSum(const VectorXd& startPos, const VectorXd& finalPos, int numOfPoints, std::vector<int> weights, Robot* robot,
-		P3D finalCart, bool onlyFinalCart, std::vector<CollisionSphere*> obstacles);
-	~ObjectiveSum();
+public:	
+	
 	void UpdateWeights(std::vector<int> weights);
-
 	//template <class T>
 	ObjectiveFunction* GetObjective(int i);
-	CollisionObjective* GetCollisionObjective() { return m_collisionObjective; }
+	
 
 	virtual double computeValue(const dVector& p);
 	virtual void addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector& p);
@@ -28,4 +25,25 @@ public:
 private:
 	int m_numOfJoints;
 };
+
+class PathObjectivesSum : public ObjectiveSum
+{
+	CollisionObjective* m_collisionObjective = nullptr;
+
+public:
+	PathObjectivesSum(const VectorXd& startPos, const VectorXd& finalPos, int numOfPoints, std::vector<int> weights, Robot* robot,
+		P3D finalCart, bool onlyFinalCart, std::vector<CollisionSphere*> obstacles);
+	~PathObjectivesSum();
+
+	CollisionObjective* GetCollisionObjective() { return m_collisionObjective; }
+};
+
+
+
+
+//class CollisionObjectivesSum : public ObjectiveSum
+//{
+//	std::vector<CollisionObjective*> objectives;
+//	CollisionObjective();
+//};
 

@@ -53,7 +53,7 @@ public:
 class AdvancedSimulation : public Simulation
 {
 protected:
-	ObjectiveSum* m_objective;
+	PathObjectivesSum* m_objective;
 	GradientBasedFunctionMinimizer* m_gradientBasedMinimizer;
 	
 	//void CalculatePath(VectorXd startPoint, VectorXd endPoint);
