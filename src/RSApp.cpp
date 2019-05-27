@@ -2,7 +2,7 @@
 #include "..\include\RSApp.h"
 #include "..\include\StartFromFirstObjective.h"
 #include "..\include\FinishAtLastObjective.h"
-#include "..\include\EqualDistributionObjective.h"
+#include "..\include\SmoothnessObjective.h"
 #include "..\include\CollisionObjective.h"
 #include "..\include\CloseToPointObjective.h"
 #include "..\include\Utilities.h"
@@ -741,13 +741,31 @@ void RSApp::CreateMenu()
 
 		if (ImGui::Button("Debug button", ImVec2(-1, 0)))
 		{
-			static bool b = true;
+			DynamicArray<MTriplet> he;
+			he.push_back(MTriplet(0, 0, 3));
+			he.push_back(MTriplet(0, 1, 2));
+			ESparseMatrix spm(2,2);
+			spm.setFromTriplets(he.begin(), he.end());
+			cout << spm << endl;
+
+			MatrixXd f(2, 2);
+			f.setConstant(0);
+			f(1, 0) = 1;
+			MatrixXd dd = spm*f;
+			cout << spm*f << endl << endl;
+			cout << f * spm << endl << endl;
+			/*ESparseMatrix analyticHessian(p.size(), p.size());
+			
+
+			addEstimatedHessianEntriesTo(hessianEntries, p);
+			FDHessian.setFromTriplets(hessianEntries.begin(), hessianEntries.end());*/
+
+			/*static bool b = true;
 			b = !b;
 			for (auto&& ds : DraggableSphere::AllDS)
 			{
 				ds->ShowDraggers(b);
-			}
-			
+			}*/			
 		}
 #pragma region		ee_adjustments
 		/*double step = 0.003;

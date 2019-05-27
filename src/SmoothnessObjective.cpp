@@ -2,6 +2,7 @@
 #include "..\include\StartFromFirstObjective.h"
 #include "..\include\FinishAtLastObjective.h"
 #include "..\include\CloseToPointObjective.h"
+#include <iostream>
 
 bool SmoothnessObjective::UseBaseAddGradient = false;
 
@@ -21,7 +22,8 @@ SmoothnessObjective::SmoothnessObjective(int numOfJoints, int numOfPoints, int w
 		a(i, i + numOfJoints) = 1;
 	}
 	A = a;
-}
+	ATA = A.transpose()*A;
+ }
 
 
 SmoothnessObjective::~SmoothnessObjective()
@@ -41,6 +43,14 @@ void SmoothnessObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEnt
 	{
 		ObjectiveFunction::addHessianEntriesTo(hessianEntries, p);
 		return;
+	}
+
+	for (int i = 0; i < ATA.rows(); ++i)
+	{
+		for (int j = 0; j < ATA.cols(); ++j)
+		{
+			addMTripletToList_ignoreUpperElements(hessianEntries, i, j, ATA(i, j) * 2 * weight);
+		}
 	}
 }
 
