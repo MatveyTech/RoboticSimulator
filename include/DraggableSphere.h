@@ -68,6 +68,7 @@ public:
 	void MoveAlongAxis(int direction);
 	void ShowDraggers(bool val);
 	void SetVisibility(bool val);
+	void SetDraggersVisibility(bool val);
 
 	static std::vector<DraggableSphere*> AllDS;
 

@@ -99,6 +99,7 @@ public:
 	void AddRobotModels(bool useSerializedModels);
 	void AddCollisionSpheres();
 	void SetCollisionSpheresVisibility(bool val);
+	void SetDraggersVisibility(bool val);
 	void DrawRobot();
 };
 

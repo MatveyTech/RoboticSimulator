@@ -131,6 +131,11 @@ void DraggableSphere::SetVisibility(bool val)
 	ShowDraggers(val);
 }
 
+void DraggableSphere::SetDraggersVisibility(bool val)
+{
+	ShowDraggers(val);
+}
+
 DraggableSphere::DraggableSphere(P3D loc, double radius, Viewer* viewer) :
 	Location(loc),
 	Radius(radius),
