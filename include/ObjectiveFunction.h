@@ -22,10 +22,9 @@ public:
 	void testHessianWithFD(const dVector& p);
 
 	void testHessianPSD(const dVector& p);
-	virtual void setWeight(double w) { }
+	virtual void setWeight(double w) { weight = w; }
 
 	virtual void printObjectiveDetails(const dVector& p) {}
-	void SetWeight(double w) { weight = w; }
 
 private:
 public:

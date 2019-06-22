@@ -65,8 +65,6 @@ public:
 		int mt,Robot* robot, P3D finalCart, bool onlyFinalCart,std::vector<CollisionSphere*> obstacles);
 	double ComputeValueAll();
 	double ComputeGradientAll();
-	double ComputeValueCurrent();
-	double ComputeGradientCurrent();
 	int GetLastNumOfIterations();
 	void testGradient(int i);
 	void TestHessian(int i);

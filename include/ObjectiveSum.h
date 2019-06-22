@@ -21,6 +21,8 @@ public:
 	virtual double computeValue(const dVector& p);
 	virtual void addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector& p);
 	virtual void addGradientTo(dVector& grad, const dVector& p);
+	virtual void setWeight(double w);
+
 
 private:
 	int m_numOfJoints;
@@ -28,22 +30,18 @@ private:
 
 class PathObjectivesSum : public ObjectiveSum
 {
-	CollisionObjective* m_collisionObjective = nullptr;
-
 public:
 	PathObjectivesSum(const VectorXd& startPos, const VectorXd& finalPos, int numOfPoints, std::vector<int> weights, Robot* robot,
 		P3D finalCart, bool onlyFinalCart, std::vector<CollisionSphere*> obstacles);
 	~PathObjectivesSum();
-
-	CollisionObjective* GetCollisionObjective() { return m_collisionObjective; }
 };
 
 
 
 
-//class CollisionObjectivesSum : public ObjectiveSum
-//{
-//	std::vector<CollisionObjective*> objectives;
-//	CollisionObjective();
-//};
+class CollisionObjectivesSum : public ObjectiveSum
+{
+public:
+	CollisionObjectivesSum(int numOfJoints, int weight, std::vector<CollisionSphere*> obstacles, Robot* robot);
+};
 

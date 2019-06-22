@@ -155,20 +155,6 @@ double AdvancedSimulation::ComputeGradientAll()
 	return grad.norm();
 }
 
-double AdvancedSimulation::ComputeValueCurrent()
-{
-	//return m_objective->computeValue(GetCurrent());
-	return m_objective->GetCollisionObjective()->computeValue(GetCurrent());
-}
-
-double AdvancedSimulation::ComputeGradientCurrent()
-{
-	VectorXd grad(7);
-	grad.setZero();	
-	//m_objective->addGradientTo(grad, GetCurrent());
-	m_objective->GetCollisionObjective()->computeValue(GetCurrent());
-	return grad.norm();
-}
 
 int AdvancedSimulation::GetLastNumOfIterations()
 {

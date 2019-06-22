@@ -897,8 +897,8 @@ void RSApp::CreateMenu()
 		co.testGradientWithFD(simulation->GetCurrent().unaryExpr(&Rad));*/
 		//ctp.testGradientWithFD(j3);
 
-		ImGui::Text("Curr. Value %E", simulation->ComputeValueCurrent());		
-		ImGui::Text("Curr. Grad  %E", simulation->ComputeGradientCurrent());
+		/*ImGui::Text("Curr. Value %E", simulation->ComputeValueCurrent());		
+		ImGui::Text("Curr. Grad  %E", simulation->ComputeGradientCurrent());*/
 
 		static bool testGradient = false;
 		ImGui::Checkbox("Test gradient", &testGradient);
