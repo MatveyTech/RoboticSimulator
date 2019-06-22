@@ -66,13 +66,13 @@ PathObjectivesSum::PathObjectivesSum(const VectorXd& startPos, const VectorXd& f
 {
 	int numOfJoints = startPos.rows();
 
-	objectives.push_back(new StartFromFirstObjective(startPos, weights.at(0)));
-	objectives.push_back(new FinishAtLastObjective(finalPos, weights.at(1)));
+	objectives.push_back(new StartFromFirstObjective(startPos, numOfPoints, weights.at(0)));
+	objectives.push_back(new FinishAtLastObjective(finalPos,numOfPoints, weights.at(1)));
 	objectives.push_back(new SmoothnessObjective(numOfJoints, numOfPoints, weights.at(2)));
-	objectives.push_back(new CloseToPointObjective(numOfJoints, weights.at(3), finalCart, robot));
+	objectives.push_back(new CloseToPointObjective(numOfJoints, numOfPoints, weights.at(3), finalCart, robot));
 	//CollisionSphere* cs = obstacles.front();
 	//objectives.push_back(new CollisionObjective(numOfJoints, weights.at(4), cs->Location, cs->Radius, robot));
-	objectives.push_back(new CollisionObjectivesSum(numOfJoints, weights.at(4), obstacles, robot));
+	objectives.push_back(new CollisionObjectivesSum(numOfJoints, numOfPoints, weights.at(4), obstacles, robot));
 }
 
 PathObjectivesSum::~PathObjectivesSum()
@@ -80,10 +80,10 @@ PathObjectivesSum::~PathObjectivesSum()
 	//delete all objectives
 }
 
-CollisionObjectivesSum::CollisionObjectivesSum(int numOfJoints, int weight, std::vector<CollisionSphere*> obstacles, Robot * robot)
+CollisionObjectivesSum::CollisionObjectivesSum(int numOfJoints, int numOfPoints, int weight, std::vector<CollisionSphere*> obstacles, Robot * robot)
 {
 	for (auto obst : obstacles)
 	{
-		objectives.push_back(new CollisionObjective(numOfJoints, weight, obst->Location, obst->Radius, robot));
+		objectives.push_back(new CollisionObjective(numOfJoints, numOfPoints, weight, obst->Location, obst->Radius, robot));
 	}
 }

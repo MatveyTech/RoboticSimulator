@@ -129,7 +129,7 @@ AdvancedSimulation::AdvancedSimulation(VectorXd& startPoint, VectorXd& endPoint,
 	
 	m_objective = new PathObjectivesSum(startPoint, endPoint, numOfPoints, weights, robot,finalCart,onlyFinalCart, obstacles);
 	MinimizerType = mt == 0 ? MinimizerType::GD : mt == 1 ? MinimizerType::BFGS : MinimizerType::NW;
-	VectorXd pp(NumOfJoints*NumOfPoints);
+	VectorXd pp(NumOfJoints*NumOfPoints+3* NumOfPoints); //3*NumOfPoints is for ee
 	pp.setConstant(RAD(20));
 	if (MinimizerType == MinimizerType::GD)
 		m_gradientBasedMinimizer = new GradientDescentFunctionMinimizer(1);

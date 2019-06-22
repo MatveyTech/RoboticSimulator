@@ -42,6 +42,6 @@ public:
 class CollisionObjectivesSum : public ObjectiveSum
 {
 public:
-	CollisionObjectivesSum(int numOfJoints, int weight, std::vector<CollisionSphere*> obstacles, Robot* robot);
+	CollisionObjectivesSum(int numOfJoints, int numOfPoints, int weight, std::vector<CollisionSphere*> obstacles, Robot* robot);
 };
 

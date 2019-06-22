@@ -5,9 +5,10 @@
 using namespace std;
 
 
-CollisionObjective::CollisionObjective(int numOfJoints, int weight, P3D& point, double& radius, Robot* robot) :
+CollisionObjective::CollisionObjective(int numOfJoints, int numOfPoints, int weight, P3D& point, double& radius, Robot* robot) :
 	kSolver(robot),
 	m_numOfJoints(numOfJoints),
+	m_numOfPoints(numOfPoints),
 	m_point(point),
 	m_radius(radius)	
 {
@@ -21,12 +22,12 @@ CollisionObjective::~CollisionObjective()
 
 
 
-double CollisionObjective::computeValue(const dVector & p)
+double CollisionObjective::computeValue(const dVector & curr)
 {
+	dVector p = curr.head(m_numOfJoints*m_numOfPoints);
 	double radiusSq = m_radius*m_radius*m_safetyMarginSq;
 	double result = 0;
-	int numOfPoints = p.rows() / m_numOfJoints;
-	for (size_t i = 0; i < numOfPoints; i++)
+	for (size_t i = 0; i < m_numOfPoints; i++)
 	{
 		VectorXd q = p.segment(m_numOfJoints*i, m_numOfJoints);		
 		P3D cart_pos = kSolver.CalcForwardKinematics(q);
@@ -38,28 +39,30 @@ double CollisionObjective::computeValue(const dVector & p)
 }
 
 
-void CollisionObjective::addHessianEntriesTo(DynamicArray<MTriplet>&	 hessianEntries, const dVector & p)
+void CollisionObjective::addHessianEntriesTo(DynamicArray<MTriplet>&	 hessianEntries, const dVector & curr)
 {
 	if (UseBaseAddGradient)
 	{
-		ObjectiveFunction::addHessianEntriesTo(hessianEntries, p);
+		ObjectiveFunction::addHessianEntriesTo(hessianEntries, curr);
 		return;
 	}
 }
 
 bool CollisionObjective::UseBaseAddGradient = false;
 
-void CollisionObjective::addGradientTo(dVector & grad, const dVector & p)
+void CollisionObjective::addGradientTo(dVector & grad, const dVector & curr)
 {
 	if (UseBaseAddGradient)
 	{
-		ObjectiveFunction::addGradientTo(grad, p);
+		ObjectiveFunction::addGradientTo(grad, curr);
 		return;
 	}
+
+	dVector p = curr.head(m_numOfJoints*m_numOfPoints);
+
 	double radiusSq = m_radius*m_radius*m_safetyMarginSq;
 
-	int numOfPoints = p.rows() / m_numOfJoints;
-	for (int i = 0; i < numOfPoints; ++i)
+	for (int i = 0; i < m_numOfPoints; ++i)
 	{
 		MatrixNxM J;
 		VectorXd q = p.segment(m_numOfJoints*i, m_numOfJoints);

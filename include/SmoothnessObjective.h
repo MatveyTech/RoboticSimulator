@@ -17,6 +17,7 @@ public:
 
 private:
 	int m_numOfJoints;
+	int m_numOfPoints;
 	MatrixXd A;
 	MatrixXd ATA;
 };

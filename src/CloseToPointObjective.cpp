@@ -3,10 +3,11 @@
 
 bool CloseToPointObjective::UseBaseAddGradient = false;
 
-CloseToPointObjective::CloseToPointObjective(int numOfJoints, int weight, P3D& point, Robot* robot):
+CloseToPointObjective::CloseToPointObjective(int numOfJoints, int numOfPoints, int weight, P3D& point, Robot* robot):
 	kSolver(robot),
 	m_numOfJoints(numOfJoints),
-	m_point(point)
+	m_point(point),
+	m_numOfPoints(numOfPoints)
 {
 	this->weight = weight;
 }
@@ -20,11 +21,11 @@ void CloseToPointObjective::UpdatePoint(P3D point)
 	m_point = point;
 }
 
-double CloseToPointObjective::computeValue(const dVector & p)
+double CloseToPointObjective::computeValue(const dVector & curr)
 {
 	double result = 0;
-	int numOfPoints = p.rows() / m_numOfJoints;
-	for (size_t i = 0; i < numOfPoints; i++)
+	dVector p = curr.head(m_numOfJoints*m_numOfPoints);
+	for (size_t i = 0; i < m_numOfPoints; i++)
 	{
 		VectorXd q = p.segment(m_numOfJoints*i, m_numOfJoints);
 		P3D cart_pos = kSolver.CalcForwardKinematics(q);
@@ -34,20 +35,20 @@ double CloseToPointObjective::computeValue(const dVector & p)
 }
 
 
-void CloseToPointObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & p)
+void CloseToPointObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & curr)
 {
-
+	throw ("Not implemented");
 }
 
-void CloseToPointObjective::addGradientTo(dVector & grad, const dVector & p)
+void CloseToPointObjective::addGradientTo(dVector & grad, const dVector & curr)
 {
 	if (UseBaseAddGradient)
 	{
-		ObjectiveFunction::addGradientTo(grad, p);
+		ObjectiveFunction::addGradientTo(grad, curr);
 		return;
 	}
-	int numOfPoints = p.rows() / m_numOfJoints;
-	for (int i = 0; i < numOfPoints; ++i)
+	dVector p = curr.head(m_numOfJoints*m_numOfPoints);
+	for (int i = 0; i < m_numOfPoints; ++i)
 	{
 		MatrixNxM J;
 		VectorXd q = p.segment(m_numOfJoints*i, m_numOfJoints);

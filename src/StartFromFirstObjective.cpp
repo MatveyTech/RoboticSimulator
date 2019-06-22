@@ -14,9 +14,10 @@ void printVector1(VectorXd pp)
 
 bool StartFromFirstObjective::UseBaseAddGradient = false;
 
-StartFromFirstObjective::StartFromFirstObjective(const VectorXd & startPos, int weight):
+StartFromFirstObjective::StartFromFirstObjective(const VectorXd & startPos, int numOfPoints, int weight):
 	m_startPos(startPos),
-	m_numOfJoints(m_startPos.rows())
+	m_numOfJoints(m_startPos.rows()),
+	m_numOfPoints(numOfPoints)
 {
 	this->weight = weight;
 }
@@ -25,8 +26,9 @@ StartFromFirstObjective::~StartFromFirstObjective()
 {
 }
 
-double StartFromFirstObjective::computeValue(const dVector & p)
+double StartFromFirstObjective::computeValue(const dVector & curr)
 {
+	dVector p = curr.head(m_numOfJoints*m_numOfPoints);
 	VectorXd firstQ = p.topRows(m_numOfJoints);
 	double res = 0;
 	for (size_t i = 0; i < m_numOfJoints; i++)
@@ -37,11 +39,11 @@ double StartFromFirstObjective::computeValue(const dVector & p)
 	return res * weight;
 }
 
-void StartFromFirstObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & p)
+void StartFromFirstObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & curr)
 {
 	if (UseBaseAddGradient)
 	{
-		ObjectiveFunction::addHessianEntriesTo(hessianEntries, p);
+		ObjectiveFunction::addHessianEntriesTo(hessianEntries, curr);
 		return;
 	}
 	for (int i = 0; i < m_numOfJoints; ++i)
@@ -52,13 +54,14 @@ void StartFromFirstObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessia
 
 }
 
-void StartFromFirstObjective::addGradientTo(dVector & grad, const dVector & p)
+void StartFromFirstObjective::addGradientTo(dVector & grad, const dVector & curr)
 {
 	if (UseBaseAddGradient)
 	{
-		ObjectiveFunction::addGradientTo(grad, p);
+		ObjectiveFunction::addGradientTo(grad, curr);
 		return;
 	}
+	dVector p = curr.head(m_numOfJoints*m_numOfPoints);
 	//the derivation is 2ql1 - 2qf1
 	/*int startIndex = p.rows() - m_numOfJoints -1;
 	int stopIndex = p.rows() - 1;*/

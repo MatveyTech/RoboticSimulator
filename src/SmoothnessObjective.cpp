@@ -7,7 +7,8 @@
 bool SmoothnessObjective::UseBaseAddGradient = false;
 
 SmoothnessObjective::SmoothnessObjective(int numOfJoints, int numOfPoints, int weight):
-	m_numOfJoints(numOfJoints)
+	m_numOfJoints(numOfJoints),
+	m_numOfPoints(numOfPoints)
 {
 	this->weight = weight;
 
@@ -30,18 +31,19 @@ SmoothnessObjective::~SmoothnessObjective()
 {
 }
 
-double SmoothnessObjective::computeValue(const dVector & p)
+double SmoothnessObjective::computeValue(const dVector & curr)
 {
-	if (p.rows() % m_numOfJoints != 0)
-		throw("BAD");
+	/*if (p.rows() % m_numOfJoints != 0)
+		throw("BAD");*/
+	dVector p = curr.head(m_numOfJoints*m_numOfPoints);
 	return (A*p).squaredNorm() * weight;
 }
 
-void SmoothnessObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & p)
+void SmoothnessObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & curr)
 {
 	if (UseBaseAddGradient)
 	{
-		ObjectiveFunction::addHessianEntriesTo(hessianEntries, p);
+		ObjectiveFunction::addHessianEntriesTo(hessianEntries, curr);
 		return;
 	}
 
@@ -54,8 +56,9 @@ void SmoothnessObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEnt
 	}
 }
 
-void SmoothnessObjective::addGradientTo(dVector & grad, const dVector & p)
+void SmoothnessObjective::addGradientTo(dVector & grad, const dVector & curr)
 {
+	dVector p = curr.head(m_numOfJoints*m_numOfPoints);
 	if (UseBaseAddGradient)
 	{
 		ObjectiveFunction::addGradientTo(grad, p);
@@ -65,6 +68,6 @@ void SmoothnessObjective::addGradientTo(dVector & grad, const dVector & p)
 		return;
 
 	VectorXd tres = 2 * A.transpose() * A * p * weight;
-	grad += tres;
+	grad.head(m_numOfJoints*m_numOfPoints) += tres;
 	return;
 }

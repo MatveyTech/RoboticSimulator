@@ -7,7 +7,7 @@ using namespace Eigen;
 class FinishAtLastObjective : public ObjectiveFunction
 {
 public:
-	FinishAtLastObjective(const VectorXd & endPos, int weight);
+	FinishAtLastObjective(const VectorXd & endPos,int numOfPoints, int weight);
 	~FinishAtLastObjective();
 
 	virtual double computeValue(const dVector& p);
@@ -19,5 +19,6 @@ public:
 private:
 	const VectorXd& m_endPos;
 	int m_numOfJoints;
+	int m_numOfPoints;
 };
 
