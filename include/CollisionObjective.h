@@ -15,6 +15,8 @@ class CollisionObjective : public ObjectiveFunction
 	double m_safetyMarginSq = 1.1*1.1;
 	SingleArmKinematicsSolver kSolver;
 	double norm_const = 41649.31279 * 10000;
+	bool useEE = false;
+
 public:
 	CollisionObjective(int numOfJoints,int numOfPoints, int weight, P3D& point, double& radius, Robot* robot);
 	~CollisionObjective();
@@ -22,6 +24,10 @@ public:
 	virtual double computeValue(const dVector& p);
 	virtual void addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector& p);
 	virtual void addGradientTo(dVector& grad, const dVector& p);
+
+	void addGradientTo_Original(dVector& grad, const dVector& curr);
+	void addGradientTo_WithEE(dVector& grad, const dVector& curr);
+
 
 	static bool UseBaseAddGradient;
 };

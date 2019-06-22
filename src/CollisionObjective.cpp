@@ -57,7 +57,14 @@ void CollisionObjective::addGradientTo(dVector & grad, const dVector & curr)
 		ObjectiveFunction::addGradientTo(grad, curr);
 		return;
 	}
+	if (useEE)
+		addGradientTo_WithEE(grad,curr);
+	else
+		addGradientTo_Original(grad,curr);
+}
 
+void CollisionObjective::addGradientTo_Original(dVector & grad, const dVector & curr)
+{
 	dVector p = curr.head(m_numOfJoints*m_numOfPoints);
 
 	double radiusSq = m_radius*m_radius*m_safetyMarginSq;
@@ -82,8 +89,13 @@ void CollisionObjective::addGradientTo(dVector & grad, const dVector & curr)
 		MatrixNxM res(1, 7);
 		double dSq = (cart_pos - m_point).squaredNorm();
 		double diff = dSq - radiusSq;
-		double f_val = dSq > radiusSq ? 0 : 2*diff;
+		double f_val = dSq > radiusSq ? 0 : 2 * diff;
 		res = /*2**/Ja.transpose()*(cart_pos - m_point)*f_val;
 		grad.segment(m_numOfJoints*i, m_numOfJoints) += res * norm_const * weight;
 	}
+}
+
+void CollisionObjective::addGradientTo_WithEE(dVector & grad, const dVector & curr)
+{
+
 }
