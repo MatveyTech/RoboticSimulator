@@ -30,7 +30,7 @@ double Rad(double x) // the functor we want to apply
 
 Vector2f RSApp::GetCurrentMousePosition()
 {
-	return Vector2f(viewer.current_mouse_x, viewer.core.viewport(3) - viewer.current_mouse_y);
+	return Vector2f(viewer.current_mouse_x, viewer.core().viewport(3) - viewer.current_mouse_y);
 }
 
 void RSApp::PrintRenderingTime()
@@ -61,7 +61,7 @@ void RSApp::MoveActiveLink(P3D point, bool isAbsolute)
 
 void RSApp::DefineViewerCallbacks()
 {
-	viewer.core.is_animating = true;
+	viewer.core().is_animating = true;
 	viewer.callback_pre_draw = 
 	[&](igl::opengl::glfw::Viewer & v)
 	{
@@ -311,13 +311,13 @@ bool RSApp::VerifyHighlight(DraggableSphere* ds)
 	Eigen::Vector3f bc;
 
 	double x = viewer.current_mouse_x;
-	double y = viewer.core.viewport(3) - viewer.current_mouse_y;
+	double y = viewer.core().viewport(3) - viewer.current_mouse_y;
 
 	ds->ClearHighlight();
 	for (int i = ds->IndexInViewer+1; i <= ds->LastIndexInViewer; ++i)
 	{
-		if (igl::unproject_onto_mesh(Eigen::Vector2f(x, y), viewer.core.view,
-			viewer.core.proj, viewer.core.viewport, viewer.data_list[i].V, viewer.data_list[i].F, fid, bc))
+		if (igl::unproject_onto_mesh(Eigen::Vector2f(x, y), viewer.core().view,
+			viewer.core().proj, viewer.core().viewport, viewer.data_list[i].V, viewer.data_list[i].F, fid, bc))
 		{
 			ds->SetHighlighted(i);
 			m_highlightedSphere = ds;
@@ -379,8 +379,8 @@ RSApp::RSApp(void)
 	m_endDragger = new DraggableSphere(endingPoint, 0.04, &viewer);
 	m_endDragger->SetVisibility(false);
 	m_ikMinimizer = new BFGSFunctionMinimizer(1);
-	m_ikStartPositionObjective = new CloseToPointObjective(7, 1, m_startDragger->Location, robot);
-	m_ikEndPositionObjective  = new CloseToPointObjective(7, 1, m_endDragger->Location, robot);
+	m_ikStartPositionObjective = new CloseToPointObjective(7, 1,1, m_startDragger->Location, robot);
+	m_ikEndPositionObjective  = new CloseToPointObjective(7, 1,1, m_endDragger->Location, robot);
 	m_ikMinimizer = new BFGSFunctionMinimizer(1);
 
 	m_startPosition = VectorXd(7);
@@ -401,7 +401,7 @@ RSApp::RSApp(void)
 	RecreateSimulation(CalcWeights(),MinimizerType::NW);
 	CreateMenu();
 	viewer.selected_data_index = 0;
-	viewer.core.camera_zoom = 0.5;
+	viewer.core().camera_zoom = 0.5;
 	//viewer.core.camera_eye = Eigen::Vector3f(5, 3, 0);
 	//viewer.core.camera_eye += Eigen::Vector3f(0, 5, 0);
 	viewer.resize(1800, 750);
