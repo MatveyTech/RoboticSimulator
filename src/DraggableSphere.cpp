@@ -144,7 +144,7 @@ DraggableSphere::DraggableSphere(P3D loc, double radius, Viewer* viewer) :
 	m_draggableStep(radius*2),
 	m_SphereColor (COLOR(0, 0, 255))
 {
-	std::string sphereFile = "../RoboticSimulator/data/models/sphere.off";
+	std::string sphereFile = string(DATA_FOLDER) + "/models/sphere.off";
 	igl::readOFF(sphereFile, V, F);
 
 	for (int i = 0; i <= 3; ++i)

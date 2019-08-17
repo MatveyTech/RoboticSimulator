@@ -358,11 +358,11 @@ RSApp::RSApp(void)
 {
 	bool useSimpleRobot = true;
 	bool useSerializedModels = false;
-	char* fName;
+	const char* fName;
 	if (useSimpleRobot)
-		fName = "../RoboticSimulator/data/rbs/yumi/yumi_simplified.rbs";
+		fName = (string(DATA_FOLDER) + string("/rbs/yumi/yumi_simplified.rbs")).c_str();
 	else
-		fName = "../RoboticSimulator/data/rbs/yumi/yumi.rbs";
+		fName = (string(DATA_FOLDER) + string("/rbs/yumi/yumi.rbs")).c_str(); 
 	m_eeLocalCoord = kSolver->GetGripLocalCoordinates();
 
 	
@@ -464,8 +464,8 @@ void RSApp::AddRobotModels(bool useSerializedModels)
 	{
 		Eigen::Matrix4d m = i->meshtransformation;
 		cout << i->meshFileName << endl;
-		string VFile = "../RoboticSimulator/data/rbs/yumi/meshes_ser/V_link_" + std::to_string(ii);
-		string FFile = "../RoboticSimulator/data/rbs/yumi/meshes_ser/F_link_" + std::to_string(ii);
+		string VFile = string(DATA_FOLDER) + "/rbs/yumi/meshes_ser/V_link_" + std::to_string(ii);
+		string FFile = string(DATA_FOLDER) + "/rbs/yumi/meshes_ser/F_link_" + std::to_string(ii);
 
 		if (useSerializedModels)
 		{
