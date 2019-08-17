@@ -46,6 +46,7 @@ void CollisionObjective::addHessianEntriesTo(DynamicArray<MTriplet>&	 hessianEnt
 		ObjectiveFunction::addHessianEntriesTo(hessianEntries, curr);
 		return;
 	}
+	ObjectiveFunction::addHessianEntriesTo(hessianEntries, curr);
 }
 
 bool CollisionObjective::UseBaseAddGradient = false;

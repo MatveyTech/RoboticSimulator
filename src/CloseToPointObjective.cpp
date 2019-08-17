@@ -37,7 +37,12 @@ double CloseToPointObjective::computeValue(const dVector & curr)
 
 void CloseToPointObjective::addHessianEntriesTo(DynamicArray<MTriplet>& hessianEntries, const dVector & curr)
 {
-	throw ("Not implemented");
+	if (UseBaseAddGradient)
+	{
+		ObjectiveFunction::addHessianEntriesTo(hessianEntries, curr);
+		return;
+	}
+	ObjectiveFunction::addHessianEntriesTo(hessianEntries, curr);
 }
 
 void CloseToPointObjective::addGradientTo(dVector & grad, const dVector & curr)
