@@ -34,6 +34,7 @@ include_directories(${CMAKE_SOURCE_DIR}/../libigl/external/glad/include)
 include_directories(${CMAKE_SOURCE_DIR}/../libigl/external/imgui/examples)
 include_directories(${CMAKE_SOURCE_DIR}/../libigl/external/libigl-imgui)
 
+add_definitions(-DIGL_STATIC_LIBRARY)
 add_definitions(-DDATA_FOLDER="${CMAKE_CURRENT_SOURCE_DIR}/data") 
 
 add_executable(${PROJECT_NAME}_bin ${SRCFILES})
