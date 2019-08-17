@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.1)
 project(RoboticSimulator)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-set(P ${CMAKE_BINARY_DIR}/glad/$(ConfigurationName)/glad3.lib)
 
 # libigl
 option(LIBIGL_WITH_OPENGL            "Use OpenGL"         ON)
@@ -12,9 +11,9 @@ option(LIBIGL_WITH_VIEWER            "Use OpenGL viewer"  ON)
 option(LIBIGL_USE_STATIC_LIBRARY     "Use Static lib"     ON)
 
 
-MESSAGE (STATUS ${CMAKE_BINARY_DIR}/glad/$(ConfigurationName)/)
-MESSAGE (STATUS ${P}/glad/$(ConfigurationName)/)
-MESSAGE ("---------")
+#MESSAGE (STATUS ${CMAKE_BINARY_DIR}/glad/$(ConfigurationName)/)
+#MESSAGE ("---------")
+
 
 find_package(LIBIGL REQUIRED QUIET)
 
@@ -35,11 +34,9 @@ include_directories(${CMAKE_SOURCE_DIR}/../libigl/external/glad/include)
 include_directories(${CMAKE_SOURCE_DIR}/../libigl/external/imgui/examples)
 include_directories(${CMAKE_SOURCE_DIR}/../libigl/external/libigl-imgui)
 
+add_definitions(-DDATA_FOLDER="${CMAKE_CURRENT_SOURCE_DIR}/data") 
 
 add_executable(${PROJECT_NAME}_bin ${SRCFILES})
-
-MESSAGE (STATUS ${CMAKE_BINARY_DIR}/glad/$(ConfigurationName)/)
-MESSAGE (STATUS ${P}/glad/$(ConfigurationName)/)
 
 set(BIN_F C:/ReposBuild/RoboticSimulator/)
 

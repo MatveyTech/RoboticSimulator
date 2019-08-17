@@ -1,0 +1,13 @@
+1.Just after clone this repository, please clone libigl repository:
+git clone --recursive https://github.com/libigl/libigl.git
+
+2.libil folder should be at the same level as the RoboticSimulator folder
+
+
+************************************************************
+It's required to update BIN_F variable (will be solved soon)
+
+set(BIN_F C:/ReposBuild/RoboticSimulator/)
+************************************************************
+
+3.Use Cmake. The source folder is RoboticSimulator folder

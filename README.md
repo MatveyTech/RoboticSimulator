@@ -1,13 +1,7 @@
-# libigl example project
+# RoboticSimulator Project
 
-A blank project example showing how to use libigl and cmake. Feel free and
-encouraged to copy or fork this project as a way of starting a new personal
-project using libigl.
+Matvey
 
-## See the tutorial first
-
-Then build, run and understand the [libigl
-tutorial](http://libigl.github.io/libigl/tutorial/).
 
 ## Compile
 
