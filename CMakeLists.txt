@@ -27,13 +27,13 @@ file(GLOB SRCFILES
 		${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
 	)
 
-include_directories(${CMAKE_SOURCE_DIR}/libigl/external)
-include_directories(${CMAKE_SOURCE_DIR}/libigl/external/eigen)
-include_directories(${CMAKE_SOURCE_DIR}/libigl/include)
-include_directories(${CMAKE_SOURCE_DIR}/libigl/external/glfw/include)
-include_directories(${CMAKE_SOURCE_DIR}/libigl/external/glad/include)
-include_directories(${CMAKE_SOURCE_DIR}/libigl/external/imgui/examples)
-include_directories(${CMAKE_SOURCE_DIR}/libigl/external/libigl-imgui)
+include_directories(${CMAKE_SOURCE_DIR}/../libigl/external)
+include_directories(${CMAKE_SOURCE_DIR}/../libigl/external/eigen)
+include_directories(${CMAKE_SOURCE_DIR}/../libigl/include)
+include_directories(${CMAKE_SOURCE_DIR}/../libigl/external/glfw/include)
+include_directories(${CMAKE_SOURCE_DIR}/../libigl/external/glad/include)
+include_directories(${CMAKE_SOURCE_DIR}/../libigl/external/imgui/examples)
+include_directories(${CMAKE_SOURCE_DIR}/../libigl/external/libigl-imgui)
 
 
 add_executable(${PROJECT_NAME}_bin ${SRCFILES})
