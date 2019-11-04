@@ -24,13 +24,15 @@ def FK_2(links,joint_axes,tetas):
     
     w = joint_axes
     
-    R0=CreateRotationMatrix(theta[0],w[:,0])
-    R1=CreateRotationMatrix(theta[1],w[:,1])
+    R0=CreateRotationMatrix(tetas[0],w[:,0])
+    R1=CreateRotationMatrix(tetas[1],w[:,1])
     
     #place of the joint2 in world coordinates
     P1=np.dot(R0,links[:,0])
     P2= np.dot(R0,(links[:,0]+np.dot(R1,links[:,1])))
-        
+    
+#    print(np.rad2deg(tetas[0]),np.rad2deg(tetas[1]),P2)
+#    input()
     return P2
 
 
