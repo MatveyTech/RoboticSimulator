@@ -40,10 +40,10 @@ def FK_4(links,joint_axes,tetas):
     
     w = joint_axes
     
-    R0=CreateRotationMatrix(theta[0],w[:,0])
-    R1=CreateRotationMatrix(theta[1],w[:,1])
-    R2=CreateRotationMatrix(theta[2],w[:,2])
-    R3=CreateRotationMatrix(theta[3],w[:,3])
+    R0=CreateRotationMatrix(tetas[0],w[:,0])
+    R1=CreateRotationMatrix(tetas[1],w[:,1])
+    R2=CreateRotationMatrix(tetas[2],w[:,2])
+    R3=CreateRotationMatrix(tetas[3],w[:,3])
 
     #place of the joint2 in world coordinates
     P1=np.dot(R0,links[:,0])
@@ -54,66 +54,64 @@ def FK_4(links,joint_axes,tetas):
     return P4
     
 
-#joint locations in local coordinates. Root is always at [0,0,0]
-links = np.array([[5,5,5,5],[0,0,0,0],[0,0,0,0]])
-
-#joint rotation axes in local coordinates
-w=np.array([
-        [0,0,0,0],
-        [0,0,0,0],
-        [1,1,1,1]
-        ])
-
-#Example of using FK functions
+def IK_4_Newthon(links,w,target_point,starting_theta = np.array([0,0,0,0])):
+    l = links
+    theta = starting_theta
+    num_of_iterations = 0
     
-theta = np.array([0,0,0,0])
-
-end_effector = FK_4(links,w,theta)
-
-print (end_effector)
+    while True:
+        num_of_iterations = num_of_iterations + 1
+        
+        R0=CreateRotationMatrix(theta[0],w[:,0])
+        R1=CreateRotationMatrix(theta[1],w[:,1])
+        R2=CreateRotationMatrix(theta[2],w[:,2])
+        R3=CreateRotationMatrix(theta[3],w[:,3])
+        
+        J = np.zeros((3, 4))
+        J[:,0] = np.cross(w[:,0],np.dot(R0,(l[:,0]+np.dot(R1,(l[:,1]+np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))))
+        J[:,1] = np.dot(R0,np.cross(w[:,1], np.dot(R1,l[:,1]+np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))
+        J[:,2] = np.dot(R0,np.dot(R1,np.cross(w[:,0],np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))
+        J[:,3] = np.dot(R0,np.dot(R1,np.dot(R3,np.cross(w[:,0],np.dot(R3,l[:,3])))))
+        
+        #print("J : ",J)
+        
+        FK = FK_4(links,w,theta)
+        #print(FK)
+        #print ("FK : ", FK)         
+        
+        p = np.dot(-np.linalg.pinv(J),(FK-target_point))        
+        #print (p)
+        norm_p = np.linalg.norm(p)
+        print ("norm p :", norm_p) 
+        if norm_p < 0.0001:
+            break
+        print ("Iteration #", num_of_iterations)
+        theta=theta+p;
+    return theta,num_of_iterations
+    
 #%%
 #joint locations in local coordinates. Root is always at [0,0,0]
-links = np.array([[5,5,5,5],[0,0,0,0],[0,0,0,0]])
-l = links
 
-w=np.array([
-        [0,0,0,0],
-        [0,0,0,0],
-        [1,1,1,1]
-        ])
 
 #this one is input for FK
-theta = np.array([0,0,0,0])
-X = np.array([-20,0,0])
 
-while True:
-    R0=CreateRotationMatrix(theta[0],w[:,0])
-    R1=CreateRotationMatrix(theta[1],w[:,1])
-    R2=CreateRotationMatrix(theta[2],w[:,2])
-    R3=CreateRotationMatrix(theta[3],w[:,3])
-    
-    J = np.zeros((3, 4))
-    J[:,0] = np.cross(w[:,0],np.dot(R0,(l[:,0]+np.dot(R1,(l[:,1]+np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))))
-    J[:,1] = np.dot(R0,np.cross(w[:,1], np.dot(R1,l[:,1]+np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))
-    J[:,2] = np.dot(R0,np.dot(R1,np.cross(w[:,0],np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))
-    J[:,3] = np.dot(R0,np.dot(R1,np.dot(R3,np.cross(w[:,0],np.dot(R3,l[:,3])))))
-    
-    print(J)
-    
-    FK = FK_4(links,w,theta)
-    
-    
-    
-    p = np.dot(-np.linalg.pinv(J),(FK-X))
-    
-    print (p)
-    
-    if np.linalg.norm(p) < 0.0001:
-        break
-    print ("increasing theta")
-    theta=theta+p;
 
-print (theta)
+#%%
+r_links = np.array([[5,5,5,5],
+                    [0,0,0,0],
+                    [0,0,0,0]])
+
+w=np.array([[0,0,0,0],
+            [0,0,0,0],
+            [1,1,1,1]])
+
+target = np.array([20,20,0])
+
+res_theta,num_of_it = IK_4_Newthon(r_links,w,target)
+    
+print ("\nNumber of iterations :", num_of_it) 
+print (np.rad2deg(res_theta)%360)
+print ("FK : ", FK_4(r_links,w,res_theta))
 #%%
 
 
