@@ -2,23 +2,12 @@
 """
 Created on Sat Sep  7 15:43:34 2019
 
-@author: rzhavm2
+@author: Matvey
 """
-
-#%%
+#from math_utils import CreateRotationMatrix
+import math_utils
 import numpy as np
-
 np.set_printoptions(suppress=True,precision=2)
-
-def CreateRotationMatrix(teta,u):
-    """    
-    Returns rotation matrix to rotate teta readians around u
-    """
-    [x,y,z] = u
-    c = np.cos(teta)
-    s = np.sin(teta)
-    res = np.array([[c+x*x*(1-c),x*y*(1-c)-z*s,x*z*(1-c)+y*s],[y*x*(1-c)+z*s,c+y*y*(1-c),y*z*(1-c)-x*s],[z*x*(1-c)-y*s,z*y*(1-c)+x*s,c+z*z*(1-c)]]) 
-    return res
 
 def FK_2(links,joint_axes,tetas):
     
@@ -31,8 +20,6 @@ def FK_2(links,joint_axes,tetas):
     P1=np.dot(R0,links[:,0])
     P2= np.dot(R0,(links[:,0]+np.dot(R1,links[:,1])))
     
-#    print(np.rad2deg(tetas[0]),np.rad2deg(tetas[1]),P2)
-#    input()
     return P2
 
 
@@ -73,58 +60,57 @@ def IK_4_Newthon(links,w,target_point,starting_theta = np.array([0,0,0,0])):
         J[:,2] = np.dot(R0,np.dot(R1,np.cross(w[:,0],np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))
         J[:,3] = np.dot(R0,np.dot(R1,np.dot(R3,np.cross(w[:,0],np.dot(R3,l[:,3])))))
         
-        #print("J : ",J)
-        
         FK = FK_4(links,w,theta)
-        #print(FK)
-        #print ("FK : ", FK)         
-        
-        p = np.dot(-np.linalg.pinv(J),(FK-target_point))        
-        #print (p)
+       
+        p = np.dot(-np.linalg.pinv(J),(FK-target_point))
         norm_p = np.linalg.norm(p)
-        print ("norm p :", norm_p) 
         if norm_p < 0.0001:
             break
-        print ("Iteration #", num_of_iterations)
         theta=theta+p;
     return theta,num_of_iterations
+
+def CalcInverseKinematics2J2D(links,target):
+    a =np.linalg.norm(links[:,0])
+    b =np.linalg.norm(links[:,1])
+    c =np.linalg.norm(target)
+
+    angles = GetTriangleAngles(a,b,c)
+    t = np.arcsin(target[1]/c)
+    teta1 = -(t+angles[1]) 
+    teta2 = np.pi - angles[2] 
+    return teta1, teta2
     
-#%%
-#joint locations in local coordinates. Root is always at [0,0,0]
-
-
-#this one is input for FK
-
-
-#%%
-r_links = np.array([[5,5,5,5],
-                    [0,0,0,0],
-                    [0,0,0,0]])
-
-w=np.array([[0,0,0,0],
-            [0,0,0,0],
-            [1,1,1,1]])
-
-target = np.array([20,20,0])
-
-res_theta,num_of_it = IK_4_Newthon(r_links,w,target)
     
-print ("\nNumber of iterations :", num_of_it) 
-print (np.rad2deg(res_theta)%360)
-print ("FK : ", FK_4(r_links,w,res_theta))
-#%%
-
-
-links = np.array([[5,0],
-                  [0,6],
-                  [0,0]])
-w = np.array([
-        [0,1],
-        [0,0],
-        [1,0]
-        ])
-
-#this one is input for FK
-theta = np.array([np.deg2rad(0),np.deg2rad(45)])
-ee = FK_2(links,w,theta)
-print(ee)
+def CalcInverseKinematics2J3D(links,w,target):    
+    
+    l1 = np.linalg.norm(links[:,0])
+    l2 = np.linalg.norm(links[:,1])
+    x,y,z = target
+    #alpha = np.arctan(np.abs(x)/np.abs(y))
+    j1_zero_vec = normalize(links[:,0])
+    j2_zero_vec = normalize(links[:,1])
+    #print("Call1")
+    alpha = GetAngleBetweenVec(np.array([x,y,0]),j1_zero_vec,w[:,0])
+    b = np.sqrt(x*x+y*y)
+    c = np.sqrt(l2*l2-z*z)
+    beta = Get_C_OppositeAngle(b,l1,c)   
+    #print(np.rad2deg(alpha),np.rad2deg(beta))
+    
+    teta1_1 = (2*np.pi- alpha - beta) 
+    R1 = CreateRotationMatrix(teta1_1,w[:,0])
+    link1_rotated = np.dot(R1,links[:,0])
+    w1_rotated = np.dot(R1,w[:,1])    
+    j2_zero_vec_rotated = np.dot(R1,j2_zero_vec)    
+    l2_vec = target - link1_rotated 
+    teta1_2 = GetAngleBetweenVec(j2_zero_vec_rotated,l2_vec,w1_rotated)
+    
+    teta2_1 = (2*np.pi- alpha + beta) 
+    R1 = CreateRotationMatrix(teta2_1,w[:,0])
+    link1_rotated = np.dot(R1,links[:,0])
+    w1_rotated = np.dot(R1,w[:,1])    
+    j2_zero_vec_rotated = np.dot(R1,j2_zero_vec)    
+    l2_vec = target - link1_rotated 
+    teta2_2 = GetAngleBetweenVec(j2_zero_vec_rotated,l2_vec,w1_rotated)
+            
+    return np.array([[teta1_1 % (2*np.pi) ,teta1_2 % (2*np.pi)],
+                     [teta2_1 % (2*np.pi) ,teta2_2 % (2*np.pi)]])
