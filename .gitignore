@@ -33,3 +33,4 @@
 
 build/*
 /ThirdParty
+/Python scripts/__pycache__/
