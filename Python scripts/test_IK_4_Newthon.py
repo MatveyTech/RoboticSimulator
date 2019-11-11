@@ -5,7 +5,8 @@ Created on Sat Nov  9 21:38:18 2019
 @author: rzhavm2
 """
 import numpy as np
-import Kinematics
+#import Kinematics
+from Kinematics import *
 
 r_links = np.array([[5,5,5,5],
                     [0,0,0,0],
@@ -15,7 +16,7 @@ w=np.array([[0,0,0,0],
             [0,0,0,0],
             [1,1,1,1]])
 
-target = np.array([10,10,0])
+target = np.array([0,20,0])
 
 res_theta,num_of_it = IK_4_Newthon(r_links,w,target)
     
