@@ -8,7 +8,7 @@ import numpy as np
 from numpy.linalg import norm
 
 comparisonFloat = 0.05
-verySmallFloat = 0.000001
+epsilon = 0.000001
 smallFloat = 0.001
 
 def CreateRotationMatrix(teta,u):
@@ -40,16 +40,16 @@ def GetAngleBetweenVec(v1, v2, cr):
         return 0
     #print (v1,v2)
     c = np.dot(v1,v2)
-    if c < -1 and np.abs(-1 - c) < verySmallFloat:
+    if c < -1 and np.abs(-1 - c) < epsilon:
         c = -1
-    if c > 1 and np.abs(1 - c) < verySmallFloat:
+    if c > 1 and np.abs(1 - c) < epsilon:
         c = 1
     #print("C : % 5.2f" % c)  
     teta = np.arccos(c)
     R=CreateRotationMatrix(teta,cr)
     cand1 = np.dot(R,v1)
     prod1 = np.dot(cand1,v2)
-    if np.abs(prod1 - 1) < verySmallFloat:
+    if np.abs(prod1 - 1) < epsilon:
         return teta
     else:
         teta = 2*np.pi-teta

@@ -18,7 +18,7 @@ w=np.array([[0,0,0,0],
 
 target = np.array([0,20,0])
 
-res_theta,num_of_it = IK_4_Newthon(r_links,w,target)
+res_theta,num_of_it = IK_4_GaussNewthon(r_links,w,target)
     
 print ("\nNumber of iterations :", num_of_it) 
 print (np.rad2deg(res_theta)%360)

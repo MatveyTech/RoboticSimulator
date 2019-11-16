@@ -40,7 +40,7 @@ def FK_4(links,joint_axes,tetas):
     return P4
     
 
-def IK_4_Newthon(links,w,target_point,starting_theta = np.array([0,0,0,0])):
+def IK_4_GaussNewthon(links,w,target_point,starting_theta = np.array([0,0,0,0])):
     l = links
     theta = starting_theta
     num_of_iterations = 0
@@ -68,19 +68,7 @@ def IK_4_Newthon(links,w,target_point,starting_theta = np.array([0,0,0,0])):
         theta=theta+p;
     return theta,num_of_iterations
 
-def CalcInverseKinematics2J2D(links,target):
-    a =np.linalg.norm(links[:,0])
-    b =np.linalg.norm(links[:,1])
-    c =np.linalg.norm(target)
-
-    angles = GetTriangleAngles(a,b,c)
-    t = np.arcsin(target[1]/c)
-    teta1 = -(t+angles[1]) 
-    teta2 = np.pi - angles[2] 
-    return teta1, teta2
-    
-    
-def CalcInverseKinematics2J3D(links,w,target):    
+def IK_2_ClosedFormula(links,w,target):   
     
     l1 = np.linalg.norm(links[:,0])
     l2 = np.linalg.norm(links[:,1])
@@ -113,3 +101,16 @@ def CalcInverseKinematics2J3D(links,w,target):
             
     return np.array([[teta1_1 % (2*np.pi) ,teta1_2 % (2*np.pi)],
                      [teta2_1 % (2*np.pi) ,teta2_2 % (2*np.pi)]])
+
+def CalcInverseKinematics2J2D(links,target):
+    a =np.linalg.norm(links[:,0])
+    b =np.linalg.norm(links[:,1])
+    c =np.linalg.norm(target)
+
+    angles = GetTriangleAngles(a,b,c)
+    t = np.arcsin(target[1]/c)
+    teta1 = -(t+angles[1]) 
+    teta2 = np.pi - angles[2] 
+    return teta1, teta2
+    
+    
