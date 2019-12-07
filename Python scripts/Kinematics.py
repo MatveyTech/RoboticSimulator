@@ -69,7 +69,12 @@ def IK_4_GaussNewthon(links,w,target_point,starting_theta = np.array([0,0,0,0]))
     return theta,num_of_iterations
 
 def IK_2_ClosedFormula(links,w,target):   
-    
+    #handle special case is when target is 0,0,0
+    if (target == 0).all():
+        ang = GetAngleBetweenVec(links[:,1],-links[:,0],w[:,1])
+        return np.array([[0 ,ang % (2*np.pi)],
+                         [0 ,ang % (2*np.pi)]])
+        
     l1 = np.linalg.norm(links[:,0])
     l2 = np.linalg.norm(links[:,1])
     x,y,z = target
