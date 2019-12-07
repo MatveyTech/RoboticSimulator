@@ -53,6 +53,21 @@ def FK_4(links,joint_axes,tetas):
     P4= np.dot(R0,+links[:,0]+np.dot(R1,links[:,1]+np.dot(R2,links[:,2]+np.dot(R3,links[:,3]))))
     
     return P4
+
+def CalcJacobian(l,w,theta):
+    
+    R0=CreateRotationMatrix(theta[0],w[:,0])
+    R1=CreateRotationMatrix(theta[1],w[:,1])
+    R2=CreateRotationMatrix(theta[2],w[:,2])
+    R3=CreateRotationMatrix(theta[3],w[:,3])
+    
+    J = np.zeros((3, 4))
+    J[:,0] = np.cross(w[:,0],np.dot(R0,(l[:,0]+np.dot(R1,(l[:,1]+np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))))
+    J[:,1] = np.dot(R0,np.cross(w[:,1], np.dot(R1,l[:,1]+np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))
+    J[:,2] = np.dot(R0,np.dot(R1,np.cross(w[:,0],np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))
+    J[:,3] = np.dot(R0,np.dot(R1,np.dot(R3,np.cross(w[:,0],np.dot(R3,l[:,3])))))
+    
+    return J
     
 
 def IK_4_GaussNewthon(links,w,target_point,starting_theta = np.array([0,0,0,0])):
@@ -68,11 +83,7 @@ def IK_4_GaussNewthon(links,w,target_point,starting_theta = np.array([0,0,0,0]))
         R2=CreateRotationMatrix(theta[2],w[:,2])
         R3=CreateRotationMatrix(theta[3],w[:,3])
         
-        J = np.zeros((3, 4))
-        J[:,0] = np.cross(w[:,0],np.dot(R0,(l[:,0]+np.dot(R1,(l[:,1]+np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))))
-        J[:,1] = np.dot(R0,np.cross(w[:,1], np.dot(R1,l[:,1]+np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))
-        J[:,2] = np.dot(R0,np.dot(R1,np.cross(w[:,0],np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))
-        J[:,3] = np.dot(R0,np.dot(R1,np.dot(R3,np.cross(w[:,0],np.dot(R3,l[:,3])))))
+        J = CalcJacobian(links,w,theta)
         
         FK = FK_4(links,w,theta)
        
