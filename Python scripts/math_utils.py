@@ -62,7 +62,7 @@ def GetAngleBetweenVec(v1, v2, cr):
     
 def Get_C_OppositeAngle(a,b,c):
     #return np.rad2deg(np.arccos((a*a+b*b-c*c)/(2*a*b)))
-    if c==0:
+    if c==0 or np.abs(a+c-b) < epsilon or np.abs(b+c-a) < epsilon:
         return 0
     return np.arccos((a*a+b*b-c*c)/(2*a*b))
     
