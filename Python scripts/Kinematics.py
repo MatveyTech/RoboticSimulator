@@ -21,6 +21,21 @@ def FK_2(links,joint_axes,tetas):
     
     return P2
 
+def FK_3(links,joint_axes,tetas):
+    
+    w = joint_axes
+    
+    R0=CreateRotationMatrix(tetas[0],w[:,0])
+    R1=CreateRotationMatrix(tetas[1],w[:,1])
+    R2=CreateRotationMatrix(tetas[2],w[:,2])
+
+    #place of the joint2 in world coordinates
+    P1=np.dot(R0,links[:,0])
+    P2= np.dot(R0,(links[:,0]+np.dot(R1,links[:,1])))
+    P3= np.dot(R0,+links[:,0]+np.dot(R1,(links[:,1]+np.dot(R2,links[:,2]))))
+    
+    return P3
+
 
 def FK_4(links,joint_axes,tetas):
     
