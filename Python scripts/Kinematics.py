@@ -36,9 +36,7 @@ def FK_3(links,joint_axes,tetas):
     
     return P3
 
-
-def FK_4(links,joint_axes,tetas):
-    
+def FK_4_All(links,joint_axes,tetas):
     w = joint_axes
     
     R0=CreateRotationMatrix(tetas[0],w[:,0])
@@ -51,10 +49,36 @@ def FK_4(links,joint_axes,tetas):
     P2= np.dot(R0,(links[:,0]+np.dot(R1,links[:,1])))
     P3= np.dot(R0,+links[:,0]+np.dot(R1,(links[:,1]+np.dot(R2,links[:,2]))))
     P4= np.dot(R0,+links[:,0]+np.dot(R1,links[:,1]+np.dot(R2,links[:,2]+np.dot(R3,links[:,3]))))
-    
-    return P4
+    return [P1,P2,P3,P4]
+
+def FK_4(links,joint_axes,tetas):
+    p_list = FK_4_All(links,joint_axes,tetas)    
+    return p_list[3]
+
 
 def CalcJacobian(l,w,theta):
+    size = l.shape[1]
+    if size == 4:
+        return CalcJacobian4(l,w,theta)
+    elif size == 2:
+        return CalcJacobian2(l,w,theta)
+    else:
+        raise "Jacobian not of size 2 or 4"
+        
+    
+
+def CalcJacobian2(l,w,theta):
+    
+    R0=CreateRotationMatrix(theta[0],w[:,0])
+    R1=CreateRotationMatrix(theta[1],w[:,1])
+        
+    J = np.zeros((3, 2))
+    J[:,0] = np.cross(w[:,0],np.dot(R0,(l[:,0]+np.dot(R1,(l[:,1])))))
+    J[:,1] = np.dot(R0,np.cross(w[:,1], np.dot(R1,l[:,1])))
+        
+    return J
+
+def CalcJacobian4(l,w,theta):
     
     R0=CreateRotationMatrix(theta[0],w[:,0])
     R1=CreateRotationMatrix(theta[1],w[:,1])
