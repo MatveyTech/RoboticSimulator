@@ -154,8 +154,8 @@ def Test_IK_With_1_Joint():
 #    print ("teta :", teta)
     tetas[teta-1] = res
     print ("tetas :", np.rad2deg(tetas))
-    t = FK_4(r_links,w,tetas)
-    print ("FK_4 :", t)
+    t = FK(r_links,w,tetas)
+    print ("FK :", t)
 
 
 def Build_Single_X_Matrix(x_i):
@@ -214,7 +214,7 @@ def calculateGradient(links,w,target,starting_position):
     
     J = CalcJacobian(links,w,starting_position)
     J = np.transpose(J)
-    b = np.dot(J,FK_4(links,w,starting_position)-target)
+    b = np.dot(J,FK(links,w,starting_position)-target)
     return b
 
 def calculate_A(mat_M,vec_b):
@@ -247,6 +247,8 @@ def test_A(links,w,target,starting_position,_b,_A):
 #tgt = np.array([-20,0,0])
 #st_pos = np.array([np.deg2rad(180),0,0,0],dtype=float)
 #st_pos = np.array([np.deg2rad(45),np.deg2rad(45),np.deg2rad(45),np.deg2rad(45)],dtype=float)
+
+
 
 links = np.array([[5,5,5,5],
                   [0,0,0,0],
@@ -302,9 +304,9 @@ while True:
     num_of_iterations = num_of_iterations + 1
        
     J = CalcJacobian(links,w,theta)   
-    FK = FK_4(links,w,theta)
+    forwardK = FK(links,w,theta)
    
-    p = np.dot(-np.linalg.pinv(J),(FK-tgt))
+    p = np.dot(-np.linalg.pinv(J),(forwardK-tgt))
     #p = -np.dot(np.linalg.inv(A),b)
     norm_p = np.linalg.norm(p)
     

@@ -8,7 +8,7 @@ from math_utils import *
 import numpy as np
 np.set_printoptions(suppress=True,precision=2)
 
-def FK_2(links,joint_axes,tetas):
+def FK_2_ALL(links,joint_axes,tetas):
     
     w = joint_axes
     
@@ -19,9 +19,14 @@ def FK_2(links,joint_axes,tetas):
     P1=np.dot(R0,links[:,0])
     P2= np.dot(R0,(links[:,0]+np.dot(R1,links[:,1])))
     
-    return P2
+    return [P1,P2]
 
-def FK_3(links,joint_axes,tetas):
+def FK_2(links,joint_axes,tetas):
+    p_list = FK_2_All(links,joint_axes,tetas)    
+    return p_list[1]
+    
+
+def FK_3_ALL(links,joint_axes,tetas):
     
     w = joint_axes
     
@@ -34,9 +39,14 @@ def FK_3(links,joint_axes,tetas):
     P2= np.dot(R0,(links[:,0]+np.dot(R1,links[:,1])))
     P3= np.dot(R0,+links[:,0]+np.dot(R1,(links[:,1]+np.dot(R2,links[:,2]))))
     
-    return P3
+    return [P1,P2,P3]
 
-def FK_4_All(links,joint_axes,tetas):
+def FK_3(links,joint_axes,tetas):
+    p_list = FK_3_All(links,joint_axes,tetas)    
+    return p_list[2]
+    
+
+def FK_4_ALL(links,joint_axes,tetas):
     w = joint_axes
     
     R0=CreateRotationMatrix(tetas[0],w[:,0])
@@ -52,8 +62,38 @@ def FK_4_All(links,joint_axes,tetas):
     return [P1,P2,P3,P4]
 
 def FK_4(links,joint_axes,tetas):
-    p_list = FK_4_All(links,joint_axes,tetas)    
+    p_list = FK_ALL(links,joint_axes,tetas)    
     return p_list[3]
+
+def FK(links,joint_axes,tetas):
+    cl = links.shape[1]
+    cj = joint_axes.shape[1]
+    ct = tetas.shape[0]
+    if cl != cj or cj != ct:
+        raise "FK: Bad dimentions!!!"
+    if cl == 2:
+        return FK_2(links,joint_axes,tetas)
+    elif cl == 3:
+        return FK_3(links,joint_axes,tetas)
+    elif cl == 4:
+        return FK_4(links,joint_axes,tetas)
+    else:
+        raise "FK: Current implementation works only on 2,3 or 4 links!"
+        
+def FK_ALL(links,joint_axes,tetas):
+    cl = links.shape[1]
+    cj = joint_axes.shape[1]
+    ct = tetas.shape[0]
+    if cl != cj or cj != ct:
+        raise "FK_ALL: Bad dimentions!!!"
+    if cl == 2:
+        return FK_2_ALL(links,joint_axes,tetas)
+    elif cl == 3:
+        return FK_3_ALL(links,joint_axes,tetas)
+    elif cl == 4:
+        return FK_4_ALL(links,joint_axes,tetas)
+    else:
+        raise "FK: Current implementation works only on 2,3 or 4 links!"
 
 
 def CalcJacobian(l,w,theta):
@@ -62,8 +102,10 @@ def CalcJacobian(l,w,theta):
         return CalcJacobian4(l,w,theta)
     elif size == 2:
         return CalcJacobian2(l,w,theta)
+    elif size == 3:
+        return CalcJacobian3(l,w,theta)
     else:
-        raise "Jacobian not of size 2 or 4"
+        raise "Jacobian not of size 2, 3 or 4"
         
     
 
@@ -75,6 +117,19 @@ def CalcJacobian2(l,w,theta):
     J = np.zeros((3, 2))
     J[:,0] = np.cross(w[:,0],np.dot(R0,(l[:,0]+np.dot(R1,(l[:,1])))))
     J[:,1] = np.dot(R0,np.cross(w[:,1], np.dot(R1,l[:,1])))
+        
+    return J
+
+def CalcJacobian3(l,w,theta):
+    
+    R0=CreateRotationMatrix(theta[0],w[:,0])
+    R1=CreateRotationMatrix(theta[1],w[:,1])
+    R2=CreateRotationMatrix(theta[2],w[:,2])    
+    
+    J = np.zeros((3, 3))
+    J[:,0] = np.cross(w[:,0],np.dot(R0,(l[:,0]+np.dot(R1,(l[:,1]+np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))))
+    J[:,1] = np.dot(R0,np.cross(w[:,1], np.dot(R1,l[:,1]+np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))
+    J[:,2] = np.dot(R0,np.dot(R1,np.cross(w[:,0],np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))
         
     return J
 

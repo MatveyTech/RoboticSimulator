@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib import style
 import numpy as np
-from Kinematics import FK_4_All
+from Kinematics import FK_ALL
 
 class Vis:
     def __init__(self,l,w):
@@ -32,7 +32,7 @@ class Vis:
 
 
     def DrawRobot(self,tetas, iter_num,target=np.array([0,0,0]),wait_for_click_to_cont = False):
-        p_list = FK_4_All(self.links,self.j_axes,tetas)
+        p_list = FK_ALL(self.links,self.j_axes,tetas)
         frame_xs = [20,-20,-20,20]
         frame_ys = [20,20,-20,-20]
         
