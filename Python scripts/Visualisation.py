@@ -31,7 +31,7 @@ class Vis:
         self.j_axes = w
 
 
-    def DrawRobot(self,tetas, target=np.array([0,0,0]),wait_for_click_to_cont = False):
+    def DrawRobot(self,tetas, iter_num,target=np.array([0,0,0]),wait_for_click_to_cont = False):
         p_list = FK_4_All(self.links,self.j_axes,tetas)
         frame_xs = [20,-20,-20,20]
         frame_ys = [20,20,-20,-20]
@@ -59,5 +59,11 @@ class Vis:
         #self.ax.plot(target_xs,target_ys,'rX',linewidth=5)
         self.ax.plot(target_xs,target_ys,marker='o',markersize=9)
         #self.ax.plot(joints_xs,joints_xy, marker='o',markersize=6, color='green')
+        
+        #self.ax.text(0.95, 0.01, 'colored text in axes coords', verticalalignment='bottom', horizontalalignment='left',transform=self.ax.transAxes,color='green', fontsize=15)
+        #self.ax.plot([2], [1], 'o')
+        self.ax.annotate('Target', xy=(target[0], target[1]), xytext=(0,20), arrowprops=dict(facecolor='black', shrink=0.05))
+        iterationString = 'Iteration:{0}'.format(iter_num)
+        self.ax.text(-20, 25, iterationString)
         if wait_for_click_to_cont:
             x = plt.ginput()

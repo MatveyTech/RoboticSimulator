@@ -8,6 +8,7 @@ Created on Mon Nov 11 08:56:50 2019
 import numpy as np
 #import Kinematics
 from Kinematics import *
+from Visualisation import Vis
 
 def BuildNew1JointsRobot(links,w,teta):
     offset,new_links, new_w = BuildNew2JointsRobot(links,w,teta,teta)
@@ -171,97 +172,203 @@ def GetCloserT(pair,current):
         return pair[0]  
 
 def SingleIteration(st_pos,links,w,target,i,j):
+    if i > i:
+        raise "the first index shouldn't begreater than the second"
     if i == j:
-        #print ("IK_With_1_Joint")
         res = IK_With_1_Joint(links,w,target,i)
         x = np.copy(st_pos)
         x[i-1] = res
-#        print ("x: ",np.rad2deg(x))
-#        print ("FK_4", FK_4(links,w,x))
-        #print (np.rad2deg(x))
-    else:  
-        #print ("IK_With_2_Joint")
-        x1,x2 = i,j
-        if x1 > x2:
-            x1,x2 = x2,x1
-        res = IK_With_2_Joints(links,w,target,x1,x2)
+    else: 
+        res = IK_With_2_Joints(links,w,target,i,j)
         closer = GetCloserT(res,np.array([st_pos[i-1],st_pos[j-1]]))
         x = np.copy(st_pos)
-        x[x1-1] = closer[0]
-        x[x2-1] = closer[1] 
-#        print ("x: ",np.rad2deg(x))
-#        print ("FK_4", FK_4(links,w,x))
+        x[i-1] = closer[0]
+        x[j-1] = closer[1] 
     return x
     
     
 
-def Build_Big_X_Matrix():
-    target = np.array([0,15,0])
+def Build_Big_M_Matrix(links,w,target,starting_position):   
     
-    starting_position = np.array([0,0,0],dtype=float)
-    
-#    links = np.array([[5,5,5,5],
-#                      [0,0,0,0],
-#                      [0,0,0,0]])
-    links = np.array([[5,5,5],
-                      [0,0,0],
-                      [0,0,0]])
-    
-    w=np.array([[0,0,0],
-                [0,0,0],
-                [1,1,1]])
-    counter = 0
     n = links.shape[1]
     res = np.empty([0, n*n])
     for i in range(1,n+1):
-        for j in range(1,n+1):
-            counter = counter + 1
-            print ("\n\nCurrent tetas : ",i,j)
+        for j in range(i+1,n+1):
+            #print ("\n\nCurrent tetas : ",i,j)
             sing_x = SingleIteration(starting_position,links,w,target,i,j)
-            mat = Build_Single_X_Matrix(sing_x)
-            print (mat)
+            #print("x_ij:",i,j,np.rad2deg(sing_x))
+            p_ij = sing_x - starting_position
+            #print("p_ij:",i,j,np.rad2deg(p_ij))
+            #sing_x = SingleIteration(starting_position,links,w,target,3,4)
+            mat = Build_Single_X_Matrix(p_ij)
+            #print (mat)
+#            print ("res shape: ",res.shape)
+#            print ("mat shape: ",mat.shape)
+            
             res = np.row_stack((res,mat))
 #            if counter==5:
 #                break
     return res
-                
-            #remove these later. Just for debugging
-#            SingleIteration(starting_position,links,w,target,2,1)
-#            break
-                #break
-    #print (np.rad2deg(res))
-    #print ("res",res)
-    #print (res[0][0])
+
+def calculateGradient(links,w,target,starting_position):
     
-    return None
-m = Build_Big_X_Matrix()
-print ("F I N A L  ____ R E S")
-print (m.shape)
-print(m)
-#print(Build_Single_X_Matrix(np.array([1,2,3,4])))
-#print(Build_Single_X_Matrix(np.array([1,2,3,4])))
-#Test_IK_With_1_Joint()
-#TestBuildNew2JointsRobot()
-#Test_CorrectPointToRobotEnvelope2D()
-#Test_IK_With_2_Joints()
-#l3 = np.array([[5,5,5,5],
-#                    [0,0,0,0],
-#                    [0,0,0,0]])
+    J = CalcJacobian(links,w,starting_position)
+    J = np.transpose(J)
+    b = np.dot(J,FK_4(links,w,starting_position)-target)
+    return b
+
+def calculate_A(mat_M,vec_b):
+#    mat_M_T = np.transpose(mat_M)
+#    m1 = np.dot(mat_M_T,mat_M)
+#    m2 = np.linalg.inv(m1)
+#    m3 = np.dot(m2,mat_M_T)
+#    res = np.dot(m3,vec_b)
+    res = np.dot(np.linalg.pinv(mat_M),vec_b)
+    new_shape_size = int(np.sqrt(res.shape[0]))
+    return res.reshape(new_shape_size,new_shape_size)   
+
+def test_A(links,w,target,starting_position,_b,_A):   
+    
+    n = links.shape[1]
+    res = np.empty([0, n*n])
+    for i in range(1,n+1):
+        for j in range(i+1,n+1):
+            x_ij = SingleIteration(starting_position,links,w,target,i,j)
+            p_ij = x_ij - starting_position
+            curr_res = -_b + np.dot(_A,p_ij)
+            print("",curr_res)
+            input("Wait here")
+    
+          
+    
+    
+                
+#tgt = np.array([-20,0,0])
+#tgt = np.array([-20,0,0])
+#st_pos = np.array([np.deg2rad(180),0,0,0],dtype=float)
+#st_pos = np.array([np.deg2rad(45),np.deg2rad(45),np.deg2rad(45),np.deg2rad(45)],dtype=float)
+
+links = np.array([[5,5,5,5],
+                  [0,0,0,0],
+                  [0,0,0,0]])
+
+    
+w=np.array([[0,0,0,0],
+            [0,0,0,0],
+            [1,1,1,1]])
+    
+
+st_pos = np.array([np.deg2rad(0),0,0,0],dtype=float)
+            
+#links = np.array([[5,5],
+#                  [0,0],
+#                  [0,0]])
+#
 #    
-#w3 = np.array([[0,0,0,0],
+#w=np.array([[0,0],
+#            [0,0],
+#            [1,1]])
+#    
+#
+#st_pos = np.array([np.deg2rad(0),0],dtype=float)
+
+
+
+
+
+
+tgt = np.array([0,5,0])
+
+M = Build_Big_M_Matrix(links,w,tgt,st_pos)
+b = -calculateGradient(links,w,tgt,st_pos)
+bb_required_size = int(M.shape[0] / b.shape[0])
+bb = np.tile(b, bb_required_size)
+A = calculate_A(M,bb)
+
+#w, v = np.linalg.eig(A)
+#print (A)
+#print (w)
+
+#input("HERE7")
+
+
+
+theta = st_pos
+num_of_iterations = 0
+v =Vis(links,w)
+v.DrawRobot(theta,num_of_iterations,tgt,True)
+
+while True:
+    num_of_iterations = num_of_iterations + 1
+       
+    J = CalcJacobian(links,w,theta)   
+    FK = FK_4(links,w,theta)
+   
+    p = np.dot(-np.linalg.pinv(J),(FK-tgt))
+    #p = -np.dot(np.linalg.inv(A),b)
+    norm_p = np.linalg.norm(p)
+    
+    theta=theta+p;
+    v.DrawRobot(theta,num_of_iterations, tgt,True)
+    if norm_p < 0.0001:
+        break
+
+print ("Done. Number of iterations: ", num_of_iterations)
+
+#print(A)
+#A=np.array([[89.71,0],
+#             [0,21.75]])
+#A=np.array([[8.91,26.73],
+#             [6.52,19.57]])
+
+#pp =np.array([0.52,1.57])
+#tt = np.dot(A,pp)
+#print("A*(x*-x))= ",tt)    
+#    
+#A_INV = np.linalg.pinv(A)
+#p = np.dot(A_INV,b)
+#
+#print("p: ",p)
+
+#test_A(links,w,tgt,st_pos,b,A)
+##%%
+#import numpy as np
+##import Kinematics
+#from Kinematics import *
+#from Visualisation import Vis
+#
+#
+#links = np.array([[5,5,5,5],
+#                  [0,0,0,0],
+#                  [0,0,0,0]])
+#
+#    
+#w=np.array([[0,0,0,0],
 #            [0,0,0,0],
 #            [1,1,1,1]])
-#offset,new_links, new_w = BuildNew2JointsRobot(l3,w3,3,4)
-#new_target = CorrectPointToRobotEnvelope2D_2J(new_links,np.array([-5,0,0]),offset) 
-#print (new_target)  
-#%%
-#w1=np.array([[0,0,0,0],
-#                [0,0,0,0],
-#                [1,1,1,1]])
-#w2=np.array([[0,0,0,0],
-#                [0,0,0,0],
-#                [3,3,3,3]])
-#print (w1.shape)
-#xx = np.row_stack((w1,w2))
-#print (xx.shape)
-#print (xx)
+#
+#
+#
+#v =Vis(links,w)
+#theta = np.array([0,0,0,np.deg2rad(90)])
+#v.DrawRobot(theta)
+#
+##%%
+#while True:
+#    num_of_iterations = num_of_iterations + 1
+#       
+#    J = CalcJacobian(links,w,theta)   
+#    FK = FK_4(links,w,theta)
+#   
+#    #p = np.dot(-np.linalg.pinv(J),(FK-tgt))
+#    p = np.dot(-np.linalg.inv(A),(FK-tgt))
+#    
+#    norm_p = np.linalg.norm(p)
+#    
+#    theta=theta+p;
+#    v.DrawRobot(theta,tgt,True)
+#    if norm_p < 0.0001:
+#        break
+#
+
+
