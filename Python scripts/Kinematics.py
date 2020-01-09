@@ -22,7 +22,7 @@ def FK_2_ALL(links,joint_axes,tetas):
     return [P1,P2]
 
 def FK_2(links,joint_axes,tetas):
-    p_list = FK_2_All(links,joint_axes,tetas)    
+    p_list = FK_2_ALL(links,joint_axes,tetas)    
     return p_list[1]
     
 
@@ -42,7 +42,7 @@ def FK_3_ALL(links,joint_axes,tetas):
     return [P1,P2,P3]
 
 def FK_3(links,joint_axes,tetas):
-    p_list = FK_3_All(links,joint_axes,tetas)    
+    p_list = FK_3_ALL(links,joint_axes,tetas)    
     return p_list[2]
     
 
@@ -127,9 +127,9 @@ def CalcJacobian3(l,w,theta):
     R2=CreateRotationMatrix(theta[2],w[:,2])    
     
     J = np.zeros((3, 3))
-    J[:,0] = np.cross(w[:,0],np.dot(R0,(l[:,0]+np.dot(R1,(l[:,1]+np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))))
-    J[:,1] = np.dot(R0,np.cross(w[:,1], np.dot(R1,l[:,1]+np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))
-    J[:,2] = np.dot(R0,np.dot(R1,np.cross(w[:,0],np.dot(R2,l[:,2]+np.dot(R3,l[:,3])))))
+    J[:,0] = np.cross(w[:,0],np.dot(R0,(l[:,0]+np.dot(R1,(l[:,1]+np.dot(R2,l[:,2]))))))
+    J[:,1] = np.dot(R0,np.cross(w[:,1], np.dot(R1,l[:,1]+np.dot(R2,l[:,2]))))
+    J[:,2] = np.dot(R0,np.dot(R1,np.cross(w[:,0],np.dot(R2,l[:,2]))))
         
     return J
 

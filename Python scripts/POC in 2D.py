@@ -250,36 +250,48 @@ def test_A(links,w,target,starting_position,_b,_A):
 
 
 
-links = np.array([[5,5,5,5],
-                  [0,0,0,0],
-                  [0,0,0,0]])
-
-    
-w=np.array([[0,0,0,0],
-            [0,0,0,0],
-            [1,1,1,1]])
-    
-
-st_pos = np.array([np.deg2rad(0),0,0,0],dtype=float)
+#links = np.array([[5,5,5,5],
+#                  [0,0,0,0],
+#                  [0,0,0,0]])
+#
+#    
+#w=np.array([[0,0,0,0],
+#            [0,0,0,0],
+#            [1,1,1,1]])
+#    
+#
+#st_pos = np.array([np.deg2rad(0),0,0,0],dtype=float)
             
-#links = np.array([[5,5],
-#                  [0,0],
-#                  [0,0]])
+#links = np.array([[5,5,5],
+#                  [0,0,0],
+#                  [0,0,0]])
 #
 #    
-#w=np.array([[0,0],
-#            [0,0],
-#            [1,1]])
+#w=np.array([[0,0,0],
+#            [0,0,0],
+#            [1,1,1]])
 #    
 #
-#st_pos = np.array([np.deg2rad(0),0],dtype=float)
+#st_pos = np.array([np.deg2rad(45),0,0],dtype=float)
+            
+links = np.array([[5,5],
+                  [0,0],
+                  [0,0]])
+
+    
+w=np.array([[0,0],
+            [0,0],
+            [1,1]])
+    
+
+st_pos = np.array([np.deg2rad(45),0],dtype=float)
 
 
 
 
 
 
-tgt = np.array([0,5,0])
+tgt = np.array([-5,0,0])
 
 M = Build_Big_M_Matrix(links,w,tgt,st_pos)
 b = -calculateGradient(links,w,tgt,st_pos)
