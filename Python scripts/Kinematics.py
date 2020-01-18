@@ -6,7 +6,8 @@ Created on Sat Sep  7 15:43:34 2019
 """
 from math_utils import *
 import numpy as np
-np.set_printoptions(suppress=True,precision=2)
+np.set_printoptions(suppress=True,precision=3)
+np.set_printoptions(linewidth=160)
 
 def FK_2_ALL(links,joint_axes,tetas):
     

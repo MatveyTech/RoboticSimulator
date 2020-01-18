@@ -5,6 +5,7 @@ Created on Fri Dec 20 13:02:57 2019
 @author: rzhavm2
 """
 
+import sys
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib import style
@@ -67,3 +68,6 @@ class Vis:
         self.ax.text(-20, 25, iterationString)
         if wait_for_click_to_cont:
             x = plt.ginput()
+            if x == 'q':
+                print ("Exiting")
+                sys.exit()
