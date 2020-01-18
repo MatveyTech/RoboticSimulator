@@ -6,6 +6,7 @@ Created on Mon Nov 11 08:56:50 2019
 """
 
 import numpy as np
+import random
 #import Kinematics
 from Kinematics import *
 from Visualisation import Vis
@@ -223,13 +224,42 @@ def calculate_A(mat_M,vec_b):
     mat_M_T = np.transpose(mat_M)
     m1 = np.dot(mat_M_T,mat_M)
     temp = 1.0001  * np.identity(m1.shape[0])
-    m2 = np.linalg.inv(m1)
+    m2 = np.linalg.inv(m1+temp)
     m3 = np.dot(m2,mat_M_T)
     res = np.dot(m3,vec_b)
     
     #res = np.dot(np.linalg.pinv(mat_M),vec_b)
     new_shape_size = int(np.sqrt(res.shape[0]))
     return res.reshape(new_shape_size,new_shape_size)   
+
+
+def calculate_A_symmetric3(mat_M,vec_b):
+    S = np.array([[1,0,0,0,0,0],
+                  [0,1,0,0,0,0],
+                  [0,0,1,0,0,0],
+                  [0,1,0,0,0,0],
+                  [0,0,0,1,0,0],
+                  [0,0,0,0,1,0],
+                  [0,0,1,0,0,0],
+                  [0,0,0,0,1,0],
+                  [0,0,0,0,0,1]])
+    
+    mat_MS = np.dot(mat_M,S)    
+    mat_MS_T = np.transpose(mat_MS)
+    m1 = np.dot(mat_MS_T,mat_MS)
+    temp = 1.0001  * np.identity(m1.shape[0])
+    m2 = np.linalg.inv(m1)
+    m3 = np.dot(m2,mat_MS_T)
+    As = np.dot(m3,vec_b)
+    
+    #res = np.dot(np.linalg.pinv(mat_M),vec_b)
+    
+    
+    res_A = np.array([As[0],As[1],As[2],As[1],As[3],As[4],As[2],As[4],As[5]])
+    
+    
+    new_shape_size = int(np.sqrt(res_A.shape[0]))
+    return res_A.reshape(new_shape_size,new_shape_size)   
 
 def test_A(links,w,target,starting_position,_b,_A):   
     
@@ -262,105 +292,121 @@ def CalcAandB(p_links,p_w,p_tgt,p_curr_pos):
 #    eig_val_M, eig_vec_M = np.linalg.eig(M)
 #    print ("The M eigen val:",eig_val_M)
     
-    M_T = np.transpose(M)
-    eig_val_M2, eig_vec_M2 = np.linalg.eig(np.dot(M_T,M))
-    #print ("The MTM eigen val:",eig_val_M2)
-    threshold = 0.001
-    print ("MTM: Eigen values smaller than % 5.3f : %2d" %(threshold, (eig_val_M2 < threshold).sum()))
+    
     #input (M.shape)
     b = -calculateGradient(p_links,p_w,p_tgt,p_curr_pos)
     bb_required_size = int(M.shape[0] / b.shape[0])
     bb = np.tile(b, bb_required_size)
-    res_a = calculate_A(M,bb) 
-    return res_a,b         
-    
-    
+    #res_a = calculate_A(M,bb) 
+    res_a = calculate_A_symmetric3(M,bb)     
+    return res_a,b,M        
+
+def drand(min_value,max_value):
+    return random.uniform(min_value,max_value)
+
+def GetInitialValues3(random):
+    if random:
+        mil = 3.0
+        mal = 9.99
+        _l = np.array([[drand(mil,mal),drand(mil,mal),drand(mil,mal)],
+                       [0,0,0],
+                       [0,0,0]])
+        _w=np.array([[0,0,0],
+                    [0,0,0],
+                    [1,1,1]])
+        
+        _st_pos = np.array([drand(0,2*np.pi),2*np.pi,2*np.pi],dtype=float)
                 
-#tgt = np.array([-20,0,0])
-#tgt = np.array([-20,0,0])
-#st_pos = np.array([np.deg2rad(180),0,0,0],dtype=float)
-#st_pos = np.array([np.deg2rad(45),np.deg2rad(45),np.deg2rad(45),np.deg2rad(45)],dtype=float)
+        #for calculating theta let's take any random numbers for thetas
+        #and calculate forward kinematics
+        
+        rand_teta_for_target = np.array([drand(0,2*np.pi),2*np.pi,2*np.pi],dtype=float)
+        
+        _tgt = FK(_l,_w,rand_teta_for_target)
 
-
-
-#links = np.array([[5,5,5,5],
-#                  [0,0,0,0],
-#                  [0,0,0,0]])
-#
-#    
-#w=np.array([[0,0,0,0],
-#            [0,0,0,0],
-#            [1,1,1,1]])
-#    
-#
-#st_pos = np.array([np.deg2rad(45),0,0,0],dtype=float)
-            
-links = np.array([[5,6.5,7.5],
-                  [0,0,0],
-                  [0,0,0]])
+    else:
+        _l = np.array([[7.384429970370899,4.8504221913021155,7.454179908846238],
+                       [0,0,0],
+                       [0,0,0]])
 
     
-w=np.array([[0,0,0],
-            [0,0,0],
-            [1,1,1]])
+        _w=np.array([[0,0,0],
+                    [0,0,0],
+                    [1,1,1]])
     
 
-st_pos = np.array([np.deg2rad(45),np.deg2rad(32.4),np.deg2rad(23)],dtype=float)
-            
-#links = np.array([[5,5],
-#                  [0,0],
-#                  [0,0]])
+        _st_pos = np.array([2.996439138969021,6.283185307179586,6.283185307179586],dtype=float)
+        
+        _tgt = np.array([-8.611993745953681,17.705692519457983,0])
+        
+#        _l = np.array([[5,5,5],
+#                       [0,0,0],
+#                       [0,0,0]])
 #
 #    
-#w=np.array([[0,0],
-#            [0,0],
-#            [1,1]])
+#        _w=np.array([[0,0,0],
+#                    [0,0,0],
+#                    [1,1,1]])
 #    
-#
-#st_pos = np.array([np.deg2rad(45),0],dtype=float)
+#        rad10 = np.deg2rad(10)
+#        _st_pos = np.array([rad10,rad10,rad10],dtype=float)
+#        
+#        _tgt = np.array([0,10,0])
+    
+    return _l,_w,_st_pos,_tgt
+        
+randomValues=False
+links,w,st_pos,tgt = GetInitialValues3(random=randomValues)
 
-
-
-
-
-
-tgt = np.array([3,7.25,0])
-
-
-
-#B = 0.001  * np.identity(A.shape[0])
-#C = 20  * np.identity(A.shape[0])
-#A = A+B
-
-#q, p = np.linalg.eig(A)
-#print (A)
-#print ("q",q)
-#print ("p",p)
-#
-#input("HERE7")
-
+if randomValues:
+    print ("Random calculated links:\n",links)
+    print ("Random calculated starting position:\n",st_pos)
+    print ("Random calculated target:\n",tgt)
+else:
+    print ("NOT Random calculated links:\n",links)
+    print ("NOT Random calculated starting position:\n",st_pos)
+    print ("NOT Random calculated target:\n",tgt)
 
 
 theta = st_pos
-theta = np.array([2.83,4.43,3.86])
 num_of_iterations = 0
 #v =Vis(links,w)
 #v.DrawRobot(theta,num_of_iterations,tgt,True)
 
 while True:
     num_of_iterations = num_of_iterations + 1
+    
+    print ("\n-------------------Iteration:",num_of_iterations)
+    
+#    print ("Random calculated links:\n",links)
+#    print ("Random calculated starting position:\n",st_pos)
+#    print ("Random calculated target:\n",tgt)
        
     J = CalcJacobian(links,w,theta)   
     forwardK = FK(links,w,theta)
    
     #p = np.dot(-np.linalg.pinv(J),(forwardK-tgt))
     #print ("Current teta:",theta)
-    A,b = CalcAandB(links,w,tgt,theta)
+    A,b,M = CalcAandB(links,w,tgt,theta)
     
-    #print ("A:\n",A)
+    #print ("A:\n",A) 
+    
+    M_T = np.transpose(M)
+    M2 = np.dot(M_T,M)
+    eig_val_M2, eig_vec_M2 = np.linalg.eig(M2)
+    #print ("The MTM eigen val:",eig_val_M2)
+    threshold = 0.003
+    #print ("Eigen values M2:",eig_val_M2)
+    small_eigen_values = (eig_val_M2 < threshold).sum()
+    print ("MTM: Eigen values smaller than % 5.3f : %2d" %(threshold, small_eigen_values))
+    
     print ("Extreme values(A):",np.amax(A),np.amin(A))
     
-   
+    
+    if small_eigen_values > 0:
+         print ("\nS T O P P E D. There are %d values above the threshold(%5.3f) " %(small_eigen_values,threshold))
+         break
+    
 #    B = 100.00001  * np.identity(A.shape[0])
 #    A=A+B
     
@@ -374,20 +420,46 @@ while True:
     
     p = np.dot(np.linalg.inv(A),b)
     
-    norm_p = np.linalg.norm(p)
+    norm_p = np.linalg.norm(p)    
     
-    theta=(theta+p) % (2*np.pi);
+#    i = input()  
+#    
+#    if i == "q":
+#        break
     
-    i = input()
-    if i == "q":
-        break
     
     #print ("Norm(p) ",norm_p)
-    #print ("(p) ",p)
-    #print ("(Gradient) ",np.linalg.norm(-b))
+    
+    
     #v.DrawRobot(theta,num_of_iterations, tgt,True)
-#    if norm_p < 0.001:
-#        break
+    
+    print ("(p) ",p)
+    print ("norm_p is:", norm_p)
+    print ("(Gradient) ",np.linalg.norm(-b))
+    
+    print ("The A matrix:\n",A)
+    eig_val, eig_vec = np.linalg.eig(A)    
+    print ("A matrix eig_val",eig_val)        
+    
+    print ("Target position:",tgt)
+    print ("Current position:",FK(links,w,theta))
+    
+    if norm_p < 0.001:
+        print ("\n\n Finished: \n")
+        
+        print ("(p) ",p)
+        print ("norm_p is:", norm_p)
+        print ("(Gradient) ",np.linalg.norm(-b))
+        
+        print ("The A matrix:\n",A)
+        eig_val, eig_vec = np.linalg.eig(A)    
+        print ("A matrix eig_val",eig_val)        
+        
+        print ("Target position:",tgt)
+        print ("Current position:",FK(links,w,theta))
+        break
+    theta=(theta+p) % (2*np.pi)
+    #input ("Enter")
 
 print ("Done. Number of iterations: ", num_of_iterations)
 

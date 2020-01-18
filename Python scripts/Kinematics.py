@@ -6,7 +6,7 @@ Created on Sat Sep  7 15:43:34 2019
 """
 from math_utils import *
 import numpy as np
-np.set_printoptions(suppress=True,precision=3)
+np.set_printoptions(suppress=False,precision=20)
 np.set_printoptions(linewidth=160)
 
 def FK_2_ALL(links,joint_axes,tetas):
@@ -71,6 +71,9 @@ def FK(links,joint_axes,tetas):
     cj = joint_axes.shape[1]
     ct = tetas.shape[0]
     if cl != cj or cj != ct:
+        print ("links size:",cl)
+        print ("axes  size:",cj)
+        print ("tetas size:",ct)
         raise "FK: Bad dimentions!!!"
     if cl == 2:
         return FK_2(links,joint_axes,tetas)

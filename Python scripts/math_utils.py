@@ -6,6 +6,7 @@ Created on Wed Nov  6 10:31:51 2019
 """
 import numpy as np
 from numpy.linalg import norm
+import math
 
 comparisonFloat = 0.05
 epsilon = 0.000001
@@ -58,13 +59,18 @@ def GetAngleBetweenVec(v1, v2, cr):
         prod2 = np.dot(cand2,v2)
         if np.abs(prod2 - 1) < smallFloat:
             return teta
+        else:
+            print("Bug here")
     raise ValueError('The vec angle function failed')
     
 def Get_C_OppositeAngle(a,b,c):
     #return np.rad2deg(np.arccos((a*a+b*b-c*c)/(2*a*b)))
     if c==0 or np.abs(a+c-b) < epsilon or np.abs(b+c-a) < epsilon:
         return 0
-    return np.arccos((a*a+b*b-c*c)/(2*a*b))
+    res = np.arccos((a*a+b*b-c*c)/(2*a*b))
+    if math.isnan(res):
+        print ("BUG!! Shouldn't happen")
+    return res
     
 
 def GetTriangleAngles(a,b,c):

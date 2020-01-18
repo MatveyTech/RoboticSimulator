@@ -291,7 +291,7 @@ st_pos = np.array([np.deg2rad(45),0],dtype=float)
 
 
 
-tgt = np.array([-5,0,0])
+tgt = np.array([-10,0,0])
 
 M = Build_Big_M_Matrix(links,w,tgt,st_pos)
 b = -calculateGradient(links,w,tgt,st_pos)
@@ -322,7 +322,7 @@ while True:
     #p = -np.dot(np.linalg.inv(A),b)
     norm_p = np.linalg.norm(p)
     
-    theta=theta+p;
+    theta=theta+p
     v.DrawRobot(theta,num_of_iterations, tgt,True)
     if norm_p < 0.0001:
         break
