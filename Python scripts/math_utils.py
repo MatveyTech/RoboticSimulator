@@ -9,7 +9,7 @@ from numpy.linalg import norm
 import math
 
 comparisonFloat = 0.05
-epsilon = 0.000001
+epsilon = 0.00001
 smallFloat = 0.001
 
 def CreateRotationMatrix(teta,u):
@@ -65,6 +65,11 @@ def GetAngleBetweenVec(v1, v2, cr):
     
 def Get_C_OppositeAngle(a,b,c):
     #return np.rad2deg(np.arccos((a*a+b*b-c*c)/(2*a*b)))
+    n1 = a+c-b
+    n2 = b+c-a
+    n3 = a+b-c
+    if np.abs(a+b-c) < epsilon:
+        return np.pi
     if c==0 or np.abs(a+c-b) < epsilon or np.abs(b+c-a) < epsilon:
         return 0
     res = np.arccos((a*a+b*b-c*c)/(2*a*b))
