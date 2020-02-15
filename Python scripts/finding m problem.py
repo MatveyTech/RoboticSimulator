@@ -16,7 +16,7 @@ def BuildNew1JointsRobot(links,w,teta):
     offset,new_links, new_w = BuildNew2JointsRobot(links,w,teta,teta)
     return offset,new_links[:,-1], new_w[:,-1]
 
-def BuildNew2JointsRobot(links,w,teta1,teta2):
+def BuildNew2JointsRobotOld(links,w,teta1,teta2):
     """    
     This function works only for 2D now!!!!!
     """
@@ -37,6 +37,30 @@ def BuildNew2JointsRobot(links,w,teta1,teta2):
     #print ("\nEnd of second link :", end_of_second_link) 
     #return end_of_first_link,end_of_second_link
     new_w = np.column_stack(([w[:,teta1-1],w[:,teta2-1]]))
+    return offset, np.column_stack((end_of_first_link,end_of_second_link)), new_w
+
+
+def BuildNew2JointsRobot(links,w,teta1,teta2,curr_pos):
+    """    
+    This function works only for 2D now!!!!!
+    teta1 and teta2 are starting from 1..
+    """
+    ii = teta1-1
+    jj = teta2-1
+    
+    temp_curr_pos = np.copy(curr_pos)
+    
+    temp_curr_pos[ii]=0
+    temp_curr_pos[jj]=0
+    
+    fkall = FK_ALL(links,w,temp_curr_pos)
+    fk_ext = [np.array([0,0,0]),*fkall]    
+    
+    offset = fk_ext[ii]
+    end_of_first_link = fk_ext[jj] - fk_ext[ii]
+    end_of_second_link = fk_ext[-1]  - fk_ext[jj]
+       
+    new_w = np.column_stack(([w[:,ii],w[:,jj]]))
     return offset, np.column_stack((end_of_first_link,end_of_second_link)), new_w
 
 def TestBuildNew2JointsRobot():
@@ -98,8 +122,8 @@ def Test_CorrectPointToRobotEnvelope2D_2J():
     assert (res2 == np.array([-1,0,0])).all(),"Assert failed!"
     
 
-def IK_With_2_Joints(links,w,target,teta1,teta2):
-    offset,new_links, new_w = BuildNew2JointsRobot(links,w,teta1,teta2)
+def IK_With_2_Joints(links,w,target,teta1,teta2,curr_pos):
+    offset,new_links, new_w = BuildNew2JointsRobot(links,w,teta1,teta2,curr_pos)
     new_target_orig_space = CorrectPointToRobotEnvelope2D_2J(new_links,target,offset)
     new_target_new_space = new_target_orig_space - offset
     #[[t11,t12],[t21,t22]] = IK_2_ClosedFormula(new_links,new_w,new_target)
@@ -175,24 +199,24 @@ def GetCloserT(pair,current):
     else:
         return pair[1]  
 
-def SingleIteration(st_pos,links,w,target,i,j):
+def SingleIteration(curr_pos,links,w,target,i,j):
     if i > i:
         raise "the first index shouldn't begreater than the second"
     if i == j:
         res = IK_With_1_Joint(links,w,target,i)
-        x = np.copy(st_pos)
+        x = np.copy(curr_pos)
         x[i-1] = res
     else: 
-        res = IK_With_2_Joints(links,w,target,i,j)
+        res = IK_With_2_Joints(links,w,target,i,j,curr_pos)
         
         
         
-        closer = GetCloserT(res,np.array([st_pos[i-1],st_pos[j-1]]))
+        closer = GetCloserT(res,np.array([curr_pos[i-1],curr_pos[j-1]]))
         #print ("i: %d, j: %d, closer %d" %(i,j, closer))
         #print("i,j,closer ", i,j,closer)
         
         
-        x = np.copy(st_pos)
+        x = np.copy(curr_pos)
         x[i-1] = closer[0]
         x[j-1] = closer[1] 
         
@@ -210,16 +234,17 @@ def SingleIteration(st_pos,links,w,target,i,j):
     
     
 
-def Build_Big_M_Matrix(links,w,target,starting_position):   
+def Build_Big_M_Matrix(links,w,target,curr_pos):   
     
     n = links.shape[1]
     res = np.empty([0, n*n])
     for i in range(1,n+1):
         for j in range(i+1,n+1):
             #print ("\n\nCurrent tetas : ",i,j)
-            sing_x = SingleIteration(starting_position,links,w,target,i,j)
+            sing_x = SingleIteration(curr_pos,links,w,target,i,j)
+            #
             #print("x_ij:",i,j,np.rad2deg(sing_x))
-            p_ij = sing_x - starting_position
+            p_ij = sing_x - curr_pos
             #print("p_ij:",i,j,np.rad2deg(p_ij))
             #sing_x = SingleIteration(starting_position,links,w,target,3,4)
             mat = Build_Single_X_Matrix(p_ij)
@@ -236,7 +261,8 @@ def calculateGradient(links,w,target,curr_pos):
     
     J = CalcJacobian(links,w,curr_pos)
     J = np.transpose(J)
-    grad = np.dot(J,FK(links,w,curr_pos)-target)
+    _fk = FK(links,w,curr_pos)
+    grad = np.dot(J,_fk-target)
     return grad
 
 def calculate_A(mat_M,vec_b):
@@ -347,21 +373,7 @@ def GetInitialValues3(random):
         _tgt = FK(_l,_w,rand_teta_for_target)
 
     else:
-        _l = np.array([[3.3466,8.9891,8.177],
-                       [0,0,0],
-                       [0,0,0]])
-
-    
-        _w=np.array([[0,0,0],
-                    [0,0,0],
-                    [1,1,1]])
-    
-
-        _st_pos = np.array([3.2003,3.8838,5.2478],dtype=float)
-        
-        _tgt = np.array([6.8304,8.0209,0])
-#        
-#        _l = np.array([[5,5,5],
+#        _l = np.array([[3.3466,8.9891,8.177],
 #                       [0,0,0],
 #                       [0,0,0]])
 #
@@ -370,10 +382,24 @@ def GetInitialValues3(random):
 #                    [0,0,0],
 #                    [1,1,1]])
 #    
-#        rad10 = np.deg2rad(10)
-#        _st_pos = np.array([rad10,rad10,rad10],dtype=float)
+#
+#        _st_pos = np.array([3.2003,3.8838,5.2478],dtype=float)
 #        
-#        _tgt = np.array([0,10,0])
+#        _tgt = np.array([6.8304,8.0209,0])
+#        
+        _l = np.array([[5,5,5],
+                       [0,0,0],
+                       [0,0,0]])
+
+    
+        _w=np.array([[0,0,0],
+                    [0,0,0],
+                    [1,1,1]])
+    
+        rad10 = np.deg2rad(20)
+        _st_pos = np.array([rad10,rad10,rad10],dtype=float)
+        
+        _tgt = np.array([0,10,0])
     
     return _l,_w,_st_pos,_tgt
 
@@ -410,12 +436,12 @@ def plotPandGradient(_p,_gr,title="Title"):
     
     plt.show()
 
-
+################################ I N P U T S #############################
 randomValues=True
-useVisualization = True
-max_numOfIterations = 500
+useVisualization = False
+max_numOfIterations = 800
 useNewthonMethod=False
-
+################################ I N P U T S #############################
 
 
 
@@ -448,14 +474,29 @@ while True:
     
     num_of_iterations = num_of_iterations + 1    
     print ("-------------------Iteration:",num_of_iterations)
+    
+    
        
     J = CalcJacobian(links,w,theta)   
     forwardK = FK(links,w,theta)
+#    print("Current Joints:",theta)
+#    temp_x = SingleIteration(theta,links,w,tgt,1,2)
+#    print("Suggested joints:",temp_x)
+#    print("Target:",tgt)
+#    print("FK:",FK(links,w,temp_x))   
+##    
+##    
+##    #temp_gr = np.dot(np.transpose(J),(forwardK-tgt))
+#    temp_gr = calculateGradient(links,w,tgt,temp_x)
+##        
+##    
+#    print ("temp_gr",temp_gr)
+#    break
 
     #print ("Current teta:",theta)
     A,b,M = CalcAandB(links,w,tgt,theta)
     #input(M)
-    A = tweakA(A)
+    #A = tweakA(A)
     
     #print ("A:\n",A) 
     
@@ -488,7 +529,7 @@ while True:
     if useNewthonMethod:
         p = np.dot(-np.linalg.pinv(J),(forwardK-tgt))
     else:
-        p = -0.5*np.dot(np.linalg.pinv(A),gr)
+        p = -np.dot(np.linalg.pinv(A),gr)
 #    print("gr:",gr)
 #    print("b:",b)
 #    input()
@@ -536,12 +577,13 @@ while True:
     
     if useVisualization:
         v.DrawRobot(theta,num_of_iterations, tgt,True)
-    theta=(theta+p*0.01) % (2*np.pi)
+    theta=(theta+p*0.05) % (2*np.pi)
     #input ("Enter")
 
 print ("Done. Number of iterations: ", num_of_iterations)
 
-plotPandGradient(all_ps,all_grads,'Newthon' if useNewthonMethod else 'Thesis')
+if useVisualization:
+    plotPandGradient(all_ps,all_grads,'Newthon' if useNewthonMethod else 'Thesis')
 #plotPandGradient(all_grads,all_ps)
 
 #print(A)
