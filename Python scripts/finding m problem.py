@@ -438,8 +438,8 @@ def plotPandGradient(_p,_gr,title="Title"):
 
 ################################ I N P U T S #############################
 randomValues=True
-useVisualization = False
-max_numOfIterations = 800
+useVisualization = True
+max_numOfIterations = 200
 useNewthonMethod=False
 ################################ I N P U T S #############################
 
@@ -465,7 +465,7 @@ num_of_iterations = 0
 
 if useVisualization:
     v =Vis(links,w)
-    v.DrawRobot(theta,num_of_iterations,tgt,True)
+    v.DrawRobot(theta,np.array([0,0,0]),num_of_iterations,tgt,True)
 
 all_ps = []
 all_grads = []
@@ -473,9 +473,7 @@ all_grads = []
 while True:
     
     num_of_iterations = num_of_iterations + 1    
-    print ("-------------------Iteration:",num_of_iterations)
-    
-    
+    print ("-------------------Iteration:",num_of_iterations)   
        
     J = CalcJacobian(links,w,theta)   
     forwardK = FK(links,w,theta)
@@ -495,10 +493,6 @@ while True:
 
     #print ("Current teta:",theta)
     A,b,M = CalcAandB(links,w,tgt,theta)
-    #input(M)
-    #A = tweakA(A)
-    
-    #print ("A:\n",A) 
     
     M_T = np.transpose(M)
     M2 = np.dot(M_T,M)
@@ -507,21 +501,9 @@ while True:
     threshold = 0.003
     #print ("Eigen values M2:",eig_val_M2)
     small_eigen_values = (eig_val_M2 < threshold).sum()
-    print ("MTM: Eigen values smaller than % 5.3f : %2d" %(threshold, small_eigen_values))
+    #print ("MTM: Eigen values smaller than % 5.3f : %2d" %(threshold, small_eigen_values))
+    #print ("Extreme values(A):",np.amax(A),np.amin(A))
     
-    print ("Extreme values(A):",np.amax(A),np.amin(A))
-    
-    
-#    if small_eigen_values > 0:
-#         print ("\nS T O P P E D. There are %d values above the threshold(%5.3f) " %(small_eigen_values,threshold))
-#         breaktweakA),b)
-    
-    
-#    if useNewthonMethod:
-#        H = np.linalgtrans.pinv(J)
-#        
-#    else:
-#        H = np.linalg.pinv(A)
         
     b=forwardK-tgt
     gr = np.dot(np.transpose(J),(forwardK-tgt))
@@ -530,10 +512,7 @@ while True:
         p = np.dot(-np.linalg.pinv(J),(forwardK-tgt))
     else:
         p = -np.dot(np.linalg.pinv(A),gr)
-#    print("gr:",gr)
-#    print("b:",b)
-#    input()
-#    break
+
     b = gr
     
     norm_p = np.linalg.norm(p) 
@@ -543,20 +522,15 @@ while True:
     all_grads.append(norm(grad))
     
     print ("\nP: %s, %5.3f\n" %(np.array2string(p), norm_p))
-    #print ("Gradient pure, Gradient from A calc ",norm(grad),norm(-b))
     print ("Gradient: %5.3f" %(norm(grad)))
-    #input()
     print ("The A matrix:\n",A)
     eig_val, eig_vec = np.linalg.eig(A)    
-    print ("A matrix eig_val",eig_val) 
-#    all_a_eig_vals.S
-    #print ("M matrix\n",M)
-       
+    print ("A matrix eig_val",eig_val)       
     
     print ("Target position:",tgt)
     print ("Current position:",FK(links,w,theta))
     
-    if norm_p < 0.001:
+    if norm_p < 0.01:
         print ("\n\n Finished: \n")
         
         print ("(p) ",p)
@@ -576,91 +550,11 @@ while True:
         break
     
     if useVisualization:
-        v.DrawRobot(theta,num_of_iterations, tgt,True)
-    theta=(theta+p*0.05) % (2*np.pi)
+        v.DrawRobot(theta,np.array([0,0,0]),num_of_iterations, tgt,True)
+    theta=(theta+p*0.1) % (2*np.pi)
     #input ("Enter")
 
 print ("Done. Number of iterations: ", num_of_iterations)
 
 if useVisualization:
     plotPandGradient(all_ps,all_grads,'Newthon' if useNewthonMethod else 'Thesis')
-#plotPandGradient(all_grads,all_ps)
-
-#print(A)
-#A=np.array([[89.71,0],
-#             [0,21.75]])
-#A=np.array([[8.91,26.73],
-#             [6.52,19.57]])
-
-#pp =np.array([0.52,1.57])
-#tt = np.dot(A,pp)
-#print("A*(x*-x))= ",tt)    
-#    
-#A_INV = np.linalg.pinv(A)
-#p = np.dot(A_INV,b)
-#
-#print("p: ",p)
-
-#test_A(links,w,tgt,st_pos,b,A)
-##%%
-#import numpy as np
-##import Kinematics
-#from Kinematics import *
-#from Visualisation import Vis
-#
-#
-#links = np.array([[5,5,5,5],
-#                  [0,0,0,0],
-#                  [0,0,0,0]])
-#
-#    
-#w=np.array([[0,0,0,0],
-#            [0,0,0,0],
-#            [1,1,1,1]])
-#
-#
-#
-#v =Vis(links,w)
-#theta = np.array([0,0,0,np.deg2rad(90)])
-#v.DrawRobot(theta)
-#
-##%%
-#while True:
-#    num_of_iterations = num_of_iterations + 1
-#       
-#    J = CalcJacobian(links,w,theta)   
-#    FK = FK_4(links,w,theta)
-#   
-#    #p = np.dot(-np.linalg.pinv(J),(FK-tgt))
-#    p = np.dot(-np.linalg.inv(A),(FK-tgt))
-#    
-#    norm_p = np.linalg.norm(p)
-#    
-#    theta=theta+p;
-#    v.DrawRobot(theta,tgt,True)
-#    if norm_p < 0.0001:
-#        break
-#
-#%%
-#test_links = np.array([[5,6],
-#                       [0,0],
-#                       [0,0]])
-#
-#test_w=np.array([[0,0],
-#                 [0,0],
-#                 [1,1]])
-#    
-#test_target = np.array([0,9,0])
-#    
-#temp_res = IK_2_ClosedFormula(test_links,test_w,test_target)
-#print(temp_res)
-#
-##%%
-#tmp_new_links = np.load('c:/temp/1/new_links.npy')
-#tmp_new_w = np.load('c:/temp/1/new_w.npy')
-#tmp_new_target_new_space = np.load('c:/temp/1/new_target_new_space.npy')
-#
-#
-#
-#tmp_res = IK_2_ClosedFormula(tmp_new_links,tmp_new_w,tmp_new_target_new_space)
-#tmp_fk = FK(tmp_new_links,tmp_new_w,tmp_res[0])

@@ -32,19 +32,25 @@ class Vis:
         self.j_axes = w
 
 
-    def DrawRobot(self,tetas, iter_num,target=np.array([0,0,0]),wait_for_click_to_cont = False):
-        p_list = FK_ALL(self.links,self.j_axes,tetas)
+    def DrawRobot(self,tetas, tetas2, iter_num,target=np.array([0,0,0]),wait_for_click_to_cont = False):
+        
         frame_xs = [20,-20,-20,20]
         frame_ys = [20,20,-20,-20]
         
         xs = [0]
-        ys = [0]
+        ys = [0]       
         
-        
-        
+        p_list = FK_ALL(self.links,self.j_axes,tetas)
         for p in p_list:
             xs.append(p[0])
             ys.append(p[1])
+            
+        p2_list = FK_ALL(self.links,self.j_axes,tetas2)
+        xs2 = [0]
+        ys2 = [0]   
+        for p in p2_list:
+            xs2.append(p[0])
+            ys2.append(p[1])
             
         target_xs = target[0]
         target_ys = target[1]
@@ -56,9 +62,10 @@ class Vis:
         
         self.ax.clear()
         self.ax.plot(xs,ys,marker='o',markersize=9)
+        self.ax.plot(xs2,ys2,marker='o',markersize=9,color='red')
         self.ax.plot(frame_xs,frame_ys,color='black', linestyle='dashed', linewidth=0)
         #self.ax.plot(target_xs,target_ys,'rX',linewidth=5)
-        self.ax.plot(target_xs,target_ys,marker='o',markersize=9)
+        self.ax.plot(target_xs,target_ys,marker='o',markersize=15,color='orange')
         #self.ax.plot(joints_xs,joints_xy, marker='o',markersize=6, color='green')
         
         #self.ax.text(0.95, 0.01, 'colored text in axes coords', verticalalignment='bottom', horizontalalignment='left',transform=self.ax.transAxes,color='green', fontsize=15)
