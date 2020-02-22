@@ -443,9 +443,6 @@ max_numOfIterations = 200
 useNewthonMethod=False
 ################################ I N P U T S #############################
 
-
-
-
 links,w,st_pos,tgt = GetInitialValues3(random=randomValues)
 
 if randomValues:
@@ -460,101 +457,107 @@ else:
 fk = FK(links,w,st_pos)
 
 #tgt = fk + np.array([0,0.01,0])
-theta = st_pos
+
+theta_newton = np.copy(st_pos)
+theta_thesis = np.copy(st_pos)
+
+
 num_of_iterations = 0
 
 if useVisualization:
     v =Vis(links,w)
-    v.DrawRobot(theta,np.array([0,0,0]),num_of_iterations,tgt,True)
+    v.DrawRobot(theta_newton,theta_thesis,num_of_iterations,tgt,True)
 
 all_ps = []
 all_grads = []
 
+newton_reached = False
+thesis_reached = False
+
 while True:
     
     num_of_iterations = num_of_iterations + 1    
-    print ("-------------------Iteration:",num_of_iterations)   
+    #print ("-------------------Iteration:",num_of_iterations)   
        
-    J = CalcJacobian(links,w,theta)   
-    forwardK = FK(links,w,theta)
-#    print("Current Joints:",theta)
-#    temp_x = SingleIteration(theta,links,w,tgt,1,2)
-#    print("Suggested joints:",temp_x)
-#    print("Target:",tgt)
-#    print("FK:",FK(links,w,temp_x))   
-##    
-##    
-##    #temp_gr = np.dot(np.transpose(J),(forwardK-tgt))
-#    temp_gr = calculateGradient(links,w,tgt,temp_x)
-##        
-##    
-#    print ("temp_gr",temp_gr)
-#    break
+    J_newton = CalcJacobian(links,w,theta_newton)   
+    forwardK_newton = FK(links,w,theta_newton)
+    
+    J_thesis = CalcJacobian(links,w,theta_thesis)   
+    forwardK_thesis = FK(links,w,theta_thesis)
 
-    #print ("Current teta:",theta)
-    A,b,M = CalcAandB(links,w,tgt,theta)
-    
-    M_T = np.transpose(M)
-    M2 = np.dot(M_T,M)
-    eig_val_M2, eig_vec_M2 = np.linalg.eig(M2)
-    #print ("The MTM eigen val:",eig_val_M2)
-    threshold = 0.003
-    #print ("Eigen values M2:",eig_val_M2)
-    small_eigen_values = (eig_val_M2 < threshold).sum()
-    #print ("MTM: Eigen values smaller than % 5.3f : %2d" %(threshold, small_eigen_values))
-    #print ("Extreme values(A):",np.amax(A),np.amin(A))
-    
-        
-    b=forwardK-tgt
-    gr = np.dot(np.transpose(J),(forwardK-tgt))
-#    p = -np.dot(H,g)
-    if useNewthonMethod:
-        p = np.dot(-np.linalg.pinv(J),(forwardK-tgt))
-    else:
-        p = -np.dot(np.linalg.pinv(A),gr)
+    A,b,M = CalcAandB(links,w,tgt,theta_thesis)
 
-    b = gr
+    gr_newton = np.dot(np.transpose(J_newton),(forwardK_newton-tgt))
+    gr_thesis = np.dot(np.transpose(J_thesis),(forwardK_thesis-tgt))
     
-    norm_p = np.linalg.norm(p) 
-    all_ps.append(norm_p)
+    p_newton = np.dot(-np.linalg.pinv(J_newton),(forwardK_newton-tgt))
+    p_newton_threshold = np.linalg.norm(p_newton)
+    p_thesis = -np.dot(np.linalg.pinv(A),gr_thesis)
+    p_thesis_threshold = np.linalg.norm(p_thesis)
     
-    grad = calculateGradient(links,w,tgt,theta)
-    all_grads.append(norm(grad))
+    stop_treshold = 0.01
     
-    print ("\nP: %s, %5.3f\n" %(np.array2string(p), norm_p))
-    print ("Gradient: %5.3f" %(norm(grad)))
-    print ("The A matrix:\n",A)
-    eig_val, eig_vec = np.linalg.eig(A)    
-    print ("A matrix eig_val",eig_val)       
+    if  not newton_reached and p_newton_threshold < stop_treshold:
+        print("Newton reached the stop threshold")
+        print("Newton threshold",p_newton_threshold)
+        print("Thesis threshold",p_thesis_threshold)
+        print ("Iteration #", num_of_iterations)
+        print("\n")
+        newton_reached = True
+        #break
     
-    print ("Target position:",tgt)
-    print ("Current position:",FK(links,w,theta))
-    
-    if norm_p < 0.01:
-        print ("\n\n Finished: \n")
-        
-        print ("(p) ",p)
-        print ("norm_p is:", norm_p)
-        print ("(Gradient) ",np.linalg.norm(-b))
-        
-        print ("The A matrix:\n",A)
-        eig_val, eig_vec = np.linalg.eig(A)    
-        print ("A matrix eig_val",eig_val)        
-        
-        print ("Target position:",tgt)
-        print ("Current position:",FK(links,w,theta))
+    if  not thesis_reached and p_thesis_threshold < stop_treshold:
+        print("Thesis reached the stop threshold")
+        print("Newton threshold",p_newton_threshold)
+        print("Thesis threshold",p_thesis_threshold)
+        print ("Iteration #", num_of_iterations)
+        print("\n")
+        thesis_reached = True
+        #break
+    if newton_reached and thesis_reached:
         break
+#    norm_p = np.linalg.norm(p) 
+#    all_ps.append(norm_p)
+#    
+#    grad = calculateGradient(links,w,tgt,theta)
+#    all_grads.append(norm(grad))
+#    
+#    print ("\nP: %s, %5.3f\n" %(np.array2string(p), norm_p))
+#    print ("Gradient: %5.3f" %(norm(grad)))
+#    print ("The A matrix:\n",A)
+#    eig_val, eig_vec = np.linalg.eig(A)    
+#    print ("A matrix eig_val",eig_val)       
+#    
+#    print ("Target position:",tgt)
+#    print ("Current position:",FK(links,w,theta))
+#    
+#    if norm_p < 0.01:
+#        print ("\n\n Finished: \n")
+#        
+#        print ("(p) ",p)
+#        print ("norm_p is:", norm_p)
+#        print ("(Gradient) ",np.linalg.norm(-b))
+#        
+#        print ("The A matrix:\n",A)
+#        eig_val, eig_vec = np.linalg.eig(A)    
+#        print ("A matrix eig_val",eig_val)        
+#        
+#        print ("Target position:",tgt)
+#        print ("Current position:",FK(links,w,theta))
+#        break
     
     if num_of_iterations  >= max_numOfIterations:
         print ("We reached max num of iterations")        
         break
     
     if useVisualization:
-        v.DrawRobot(theta,np.array([0,0,0]),num_of_iterations, tgt,True)
-    theta=(theta+p*0.1) % (2*np.pi)
+        v.DrawRobot(theta_newton,theta_thesis,num_of_iterations, tgt,True)
+    step = 0.1
+    theta_newton=(theta_newton+p_newton*step) % (2*np.pi)
+    theta_thesis=(theta_thesis+p_thesis*step) % (2*np.pi)
     #input ("Enter")
 
 print ("Done. Number of iterations: ", num_of_iterations)
 
-if useVisualization:
-    plotPandGradient(all_ps,all_grads,'Newthon' if useNewthonMethod else 'Thesis')
+#if useVisualization:
+#    plotPandGradient(all_ps,all_grads,'Newthon' if useNewthonMethod else 'Thesis')
