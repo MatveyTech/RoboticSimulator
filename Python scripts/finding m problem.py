@@ -554,7 +554,7 @@ useNewthonMethod=False
 ################################ I N P U T S #############################
 
 num_of_tests = 50
-for test_ind in range(1,num_of_tests+1):
+for test_ind in range(0,num_of_tests+1):
 
     links,w,st_pos,tgt = GetInitialValues3(random=randomValues)
     
