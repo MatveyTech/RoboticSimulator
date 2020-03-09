@@ -479,7 +479,7 @@ def plotValues(newton_p,thesis_p,title="Title"):
     plt.savefig('foo77.png')
     plt.show()
     
-def saveFileResults(newton_p,thesis_p,v,tetas,target,fileName):
+def saveFileResults(newton_p,thesis_p,l,w,tetas,target,fileName):
     n = len(newton_p)
     
     fig, axs = plt.subplots(2,figsize=(20, 10))
@@ -496,7 +496,7 @@ def saveFileResults(newton_p,thesis_p,v,tetas,target,fileName):
     xs = [0]
     ys = [0]       
     
-    p_list = FK_ALL(v.links,v.j_axes,tetas)
+    p_list = FK_ALL(l,w,tetas)
     for p in p_list:
         xs.append(p[0])
         ys.append(p[1])
@@ -546,6 +546,31 @@ def doLineSearch(thetas,descent,links,w,target):
         else:
             alpha = alpha / 2
     raise("line search failed")
+    
+class ThesisMinimizer:
+    
+    def __init__(self,links,w,theta,tgt):
+        self.links = links
+        self.j_axes = w
+        self.theta = theta
+        self.tgt = tgt
+    
+    def MakeStep():
+        J_thesis = CalcJacobian(self.links,self.j_axes,self.theta)   
+        forwardK_thesis = FK(self.links,self.j_axes,self.theta)    
+        #A,b,M = CalcAandB(links,w,tgt,theta_thesis)
+        A,M = CalcAandBImproved(self.links,self.j_axes,self.tgt,self.theta)        
+        gr_thesis = np.dot(np.transpose(J_thesis),(forwardK_thesis-self.tgt))        
+        p_thesis = -np.dot(np.linalg.pinv(A),gr_thesis)        
+        step_thesis = None
+        try:
+            step_thesis = doLineSearch(theta_thesis,p_thesis,self.links,self.j_axes,self.tgt)
+        except:
+            print("BAD LINE SEARCH")
+            step_thesis = 1.0
+            
+        self.theta = (self.theta+p_thesis*step_thesis) % (2*np.pi)    
+        return self.theta
 ############################### I N P U T S #############################
 randomValues=True
 useVisualization = False
@@ -553,7 +578,7 @@ max_numOfIterations = 500
 useNewthonMethod=False
 ################################ I N P U T S #############################
 
-num_of_tests = 50
+num_of_tests = 10
 for test_ind in range(0,num_of_tests+1):
 
     links,w,st_pos,tgt = GetInitialValues3(random=randomValues)
@@ -575,7 +600,7 @@ for test_ind in range(0,num_of_tests+1):
     
     num_of_iterations = 0
     
-    if useVisualization:
+    if useVisualization:        
         v =Vis(links,w)
         v.DrawRobot(theta_newton,theta_thesis,num_of_iterations,tgt,True)
     
@@ -589,8 +614,7 @@ for test_ind in range(0,num_of_tests+1):
     print ('Test Number:{0}'.format(test_ind))
     goodOutputFileName = 'c:/temp/thesis test/test{0}.png'.format(test_ind)
     badOutputFileName = 'c:/temp/thesis test/test{0}.txt'.format(test_ind)
-    while True:
-        
+    while True:        
         num_of_iterations = num_of_iterations + 1    
         #print ("-------------------Iteration:",num_of_iterations)   
            
@@ -646,37 +670,8 @@ for test_ind in range(0,num_of_tests+1):
             thesis_reached = True
             #break
         if newton_reached and thesis_reached:            
-            saveFileResults(objective_values_newton,objective_values_thesis,v,st_pos,tgt,goodOutputFileName)
+            saveFileResults(objective_values_newton,objective_values_thesis,links,w,st_pos,tgt,goodOutputFileName)
             break
-    #    norm_p = np.linalg.norm(p) 
-    #    all_ps.append(norm_p)
-    #    
-    #    grad = calculateGradient(links,w,tgt,theta)
-    #    all_grads.append(norm(grad))
-    #    
-    #    print ("\nP: %s, %5.3f\n" %(np.array2string(p), norm_p))
-    #    print ("Gradient: %5.3f" %(norm(grad)))
-    #    print ("The A matrix:\n",A)
-    #    eig_val, eig_vec = np.linalg.eig(A)    
-    #    print ("A matrix eig_val",eig_val)       
-    #    
-    #    print ("Target position:",tgt)
-    #    print ("Current position:",FK(links,w,theta))
-    #    
-    #    if norm_p < 0.01:
-    #        print ("\n\n Finished: \n")
-    #        
-    #        print ("(p) ",p)
-    #        print ("norm_p is:", norm_p)
-    #        print ("(Gradient) ",np.linalg.norm(-b))
-    #        
-    #        print ("The A matrix:\n",A)
-    #        eig_val, eig_vec = np.linalg.eig(A)    
-    #        print ("A matrix eig_val",eig_val)        
-    #        
-    #        print ("Target position:",tgt)
-    #        print ("Current position:",FK(links,w,theta))
-    #        break
         
         if num_of_iterations  >= max_numOfIterations:
             error="We reached max num of iterations"
@@ -686,9 +681,6 @@ for test_ind in range(0,num_of_tests+1):
         
         if useVisualization:
             v.DrawRobot(theta_newton,theta_thesis,num_of_iterations, tgt,True)
-        
-    #    grad_newton = calculateGradient(links,w,tgt,theta_newton)
-    #    grad_thesis = calculateGradient(links,w,tgt,theta_thesis)
         
         step_newton = None
         step_thesis = None

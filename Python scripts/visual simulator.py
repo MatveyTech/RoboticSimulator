@@ -157,7 +157,7 @@ while True:
     windowSurface.fill(WHITESMOKE)
     DrawGrid(screenW,10,windowSurface)
     DrawFrame(windowSurface)
-    pygame.draw.circle(windowSurface, BLACK, TransformToScreen((0,0)), 7, 5)
+    #pygame.draw.circle(windowSurface, BLACK, TransformToScreen((0,0)), 7, 5)
     mouse = pygame.mouse.get_pos()
     
     DrawMouseCoordinates(mouse,windowSurface) 
