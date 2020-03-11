@@ -11,6 +11,7 @@ import random
 from Kinematics import *
 from Visualisation import Vis
 import matplotlib.pyplot as plt
+from ThesisMinimizer import ThesisMinimizer
 
 def WriteTextToFile(filename, text):
     f = open(filename, 'w')
@@ -21,52 +22,10 @@ def BuildNew1JointsRobot(links,w,teta):
     offset,new_links, new_w = BuildNew2JointsRobot(links,w,teta,teta)
     return offset,new_links[:,-1], new_w[:,-1]
 
-def BuildNew2JointsRobotOld(links,w,teta1,teta2):
-    """    
-    This function works only for 2D now!!!!!
-    """
-    offset = np.array([0,0,0])
-    for i in range(1,teta1):
-        #print (i)
-        offset = offset + links[:,i-1]
-    end_of_first_link = np.array([0,0,0])
-    #print ("\nThe offset :", offset) 
-    for i in range(teta1,teta2):
-        #print (i)
-        end_of_first_link = end_of_first_link + links[:,i-1]
-    end_of_second_link = np.array([0,0,0])
-    #print ("\nEnd of first link :", end_of_first_link) 
-    for i in range(teta2,links.shape[1]+1):
-        #print (i)
-        end_of_second_link = end_of_second_link + links[:,i-1]    
-    #print ("\nEnd of second link :", end_of_second_link) 
-    #return end_of_first_link,end_of_second_link
-    new_w = np.column_stack(([w[:,teta1-1],w[:,teta2-1]]))
-    return offset, np.column_stack((end_of_first_link,end_of_second_link)), new_w
 
 
-def BuildNew2JointsRobot(links,w,teta1,teta2,curr_pos):
-    """    
-    This function works only for 2D now!!!!!
-    teta1 and teta2 are starting from 1..
-    """
-    ii = teta1-1
-    jj = teta2-1
-    
-    temp_curr_pos = np.copy(curr_pos)
-    
-    temp_curr_pos[ii]=0
-    temp_curr_pos[jj]=0
-    
-    fkall = FK_ALL(links,w,temp_curr_pos)
-    fk_ext = [np.array([0,0,0]),*fkall]    
-    
-    offset = fk_ext[ii]
-    end_of_first_link = fk_ext[jj] - fk_ext[ii]
-    end_of_second_link = fk_ext[-1]  - fk_ext[jj]
-       
-    new_w = np.column_stack(([w[:,ii],w[:,jj]]))
-    return offset, np.column_stack((end_of_first_link,end_of_second_link)), new_w
+
+
 
 def TestBuildNew2JointsRobot():
     r_links = np.array([[5,5,5,5],
@@ -90,25 +49,6 @@ def TestBuildNew2JointsRobot():
     print ("W : :") 
     print (new_w)
 
-def CorrectPointToRobotEnvelope2D_2J(links,target,robot_offset = np.array([0,0,0])):
-    """    
-    Returns nearest point to 'target' point, robot can reach
-    """
-    l1_length = np.linalg.norm(links[:,0])
-    l2_length = np.linalg.norm(links[:,1])
-    target_length = np.linalg.norm(target-robot_offset)
-    inner_radius = np.abs(l1_length-l2_length)
-    outer_radius = l1_length + l2_length
-    
-    if target_length <= outer_radius and target_length >= inner_radius:
-        return target
-    dir_vec = normalize(target-robot_offset)
-    if target_length > outer_radius:
-        return robot_offset + outer_radius * dir_vec
-    elif target_length < inner_radius:
-        return robot_offset + inner_radius * dir_vec
-    else:
-        raise Exception("Shouldn't happen")
 
 def CorrectPointToRobotEnvelope2D_1J(link,target,robot_offset = np.array([0,0,0])):
     target_length = np.linalg.norm(target-robot_offset)
@@ -127,13 +67,6 @@ def Test_CorrectPointToRobotEnvelope2D_2J():
     assert (res2 == np.array([-1,0,0])).all(),"Assert failed!"
     
 
-def IK_With_2_Joints(links,w,target,teta1,teta2,curr_pos):
-    offset,new_links, new_w = BuildNew2JointsRobot(links,w,teta1,teta2,curr_pos)
-    new_target_orig_space = CorrectPointToRobotEnvelope2D_2J(new_links,target,offset)
-    new_target_new_space = new_target_orig_space - offset
-    #[[t11,t12],[t21,t22]] = IK_2_ClosedFormula(new_links,new_w,new_target)
-    res = IK_2_ClosedFormula(new_links,new_w,new_target_new_space)
-    return res
 
 def IK_With_1_Joint(links,w,target,joint_number):
     """
@@ -189,55 +122,7 @@ def Test_IK_With_1_Joint():
     print ("FK :", t)
 
 
-def Build_Single_X_Matrix(x_i):
-    s = x_i.size
-    res = np.zeros((s,s*s))
-    for i in range(s):
-        res[i,i*s:i*s+s] = x_i
-    return res
-
-def GetCloserT(pair,current):
-    dist1 = np.linalg.norm(pair[0]-current)
-    dist2 = np.linalg.norm(pair[1]-current)
-    if dist1 <= dist2:
-        return pair[0]  
-    else:
-        return pair[1]  
-
-def SingleIteration(curr_pos,links,w,target,i,j):
-    if i > i:
-        raise "the first index shouldn't begreater than the second"
-    if i == j:
-        res = IK_With_1_Joint(links,w,target,i)
-        x = np.copy(curr_pos)
-        x[i-1] = res
-    else: 
-        res = IK_With_2_Joints(links,w,target,i,j,curr_pos)
-        
-        
-        
-        closer = GetCloserT(res,np.array([curr_pos[i-1],curr_pos[j-1]]))
-        #print ("i: %d, j: %d, closer %d" %(i,j, closer))
-        #print("i,j,closer ", i,j,closer)
-        
-        
-        x = np.copy(curr_pos)
-        x[i-1] = closer[0]
-        x[j-1] = closer[1] 
-        
-#        y = np.zeros(st_pos.shape)
-#        y[i-1] = closer[0]
-#        y[j-1] = closer[1] 
-#        
-#        t_fk = FK(links,w,y)
-#        t_fk_norm = np.linalg.norm(t_fk) 
-#        print("t_fk(y)", t_fk,y)
-
-        #print(res)
-        
-    return x
-    
-    
+ 
 
 def Build_Big_M_Matrix(links,w,target,curr_pos):   
     
@@ -262,38 +147,7 @@ def Build_Big_M_Matrix(links,w,target,curr_pos):
 #                break
     return res
 
-def Build_Big_M_Matrix_and_bb(links,w,target,curr_pos):       
-    n = links.shape[1]
-    res = np.empty([0, n*n])
-    b = -calculateGradient(links,w,target,curr_pos)
-    res_bb = []
-    for i in range(1,n+1):
-        for j in range(i+1,n+1):
-            #print ("\n\nCurrent tetas : ",i,j)
-            sing_x = SingleIteration(curr_pos,links,w,target,i,j)
-            #
-            #print("x_ij:",i,j,np.rad2deg(sing_x))
-            p_ij = sing_x - curr_pos
-            #print("p_ij:",i,j,np.rad2deg(p_ij))
-            #sing_x = SingleIteration(starting_position,links,w,target,3,4)
-            mat = Build_Single_X_Matrix(p_ij)
-            improved_mat = mat[[i-1,j-1], :]
-            #print (mat)
-#            print ("res shape: ",res.shape)
-#            print ("mat shape: ",mat.shape)
-            
-            res = np.row_stack((res,improved_mat))
-            res_bb.append(b[i-1])
-            res_bb.append(b[j-1])
-    return res,np.asarray(res_bb)
 
-def calculateGradient(links,w,target,curr_pos):
-    
-    J = CalcJacobian(links,w,curr_pos)
-    J = np.transpose(J)
-    _fk = FK(links,w,curr_pos)
-    grad = np.dot(J,_fk-target)
-    return grad
 
 def calculate_A(mat_M,vec_b):
     mat_M_T = np.transpose(mat_M)
@@ -308,32 +162,7 @@ def calculate_A(mat_M,vec_b):
     return res.reshape(new_shape_size,new_shape_size)   
 
 
-def calculate_A_symmetric3(mat_M,vec_b):
-    S = np.array([[1,0,0,0,0,0],
-                  [0,1,0,0,0,0],
-                  [0,0,1,0,0,0],
-                  [0,1,0,0,0,0],
-                  [0,0,0,1,0,0],
-                  [0,0,0,0,1,0],
-                  [0,0,1,0,0,0],
-                  [0,0,0,0,1,0],
-                  [0,0,0,0,0,1]])
-    
-    mat_MS = np.dot(mat_M,S)    
-    mat_MS_T = np.transpose(mat_MS)
-    m1 = np.dot(mat_MS_T,mat_MS)
-    m2 = np.linalg.inv(m1)
-    m3 = np.dot(m2,mat_MS_T)
-    As = np.dot(m3,vec_b)
-    
-    #res = np.dot(np.linalg.pinv(mat_M),vec_b)
-    
-    
-    res_A = np.array([As[0],As[1],As[2],As[1],As[3],As[4],As[2],As[4],As[5]])
-    
-    
-    new_shape_size = int(np.sqrt(res_A.shape[0]))
-    return res_A.reshape(new_shape_size,new_shape_size)   
+ 
 
 def test_A(links,w,target,starting_position,_b,_A):   
     
@@ -358,11 +187,7 @@ def CalcAandB(p_links,p_w,p_tgt,p_curr_pos):
     res_a = calculate_A_symmetric3(M,bb)     
     return res_a,b,M        
 
-def CalcAandBImproved(p_links,p_w,p_tgt,p_curr_pos):
-    M,bb = Build_Big_M_Matrix_and_bb(p_links,p_w,p_tgt,p_curr_pos)   
-    #res_a = calculate_A(M,bb) 
-    res_a = calculate_A_symmetric3(M,bb)     
-    return res_a,M      
+    
 
 def drand(min_value,max_value):
     return random.uniform(min_value,max_value)
@@ -524,53 +349,9 @@ def NewPlotFunc(newton_p):
     plt.ylabel('some numbers')
     plt.show()
 
-def CalcObjectiveValue(thetas,tgt,links,w):
-    fk = FK(links,w,thetas)
-    t = fk - tgt
-    res = t[0]*t[0] + t[1]*t[1] + t[2]*t[2]
-    return res
+
     
-    
-def doLineSearch(thetas,descent,links,w,target):
-    lineSearchStartValue = 1
-    maxNumOfIterations = 15
-    
-    alpha = lineSearchStartValue
-    initialObjValue = CalcObjectiveValue(thetas,target,links,w)
-    
-    for i in range(0,maxNumOfIterations):
-        new_thetas = (thetas + descent * alpha) % (2*np.pi)
-        newObjValue = CalcObjectiveValue(new_thetas,target,links,w)
-        if newObjValue < initialObjValue:
-            return alpha
-        else:
-            alpha = alpha / 2
-    raise("line search failed")
-    
-class ThesisMinimizer:
-    
-    def __init__(self,links,w,theta,tgt):
-        self.links = links
-        self.j_axes = w
-        self.theta = theta
-        self.tgt = tgt
-    
-    def MakeStep():
-        J_thesis = CalcJacobian(self.links,self.j_axes,self.theta)   
-        forwardK_thesis = FK(self.links,self.j_axes,self.theta)    
-        #A,b,M = CalcAandB(links,w,tgt,theta_thesis)
-        A,M = CalcAandBImproved(self.links,self.j_axes,self.tgt,self.theta)        
-        gr_thesis = np.dot(np.transpose(J_thesis),(forwardK_thesis-self.tgt))        
-        p_thesis = -np.dot(np.linalg.pinv(A),gr_thesis)        
-        step_thesis = None
-        try:
-            step_thesis = doLineSearch(theta_thesis,p_thesis,self.links,self.j_axes,self.tgt)
-        except:
-            print("BAD LINE SEARCH")
-            step_thesis = 1.0
-            
-        self.theta = (self.theta+p_thesis*step_thesis) % (2*np.pi)    
-        return self.theta
+
 ############################### I N P U T S #############################
 randomValues=True
 useVisualization = False
@@ -625,7 +406,9 @@ for test_ind in range(0,num_of_tests+1):
         forwardK_thesis = FK(links,w,theta_thesis)
     
         #A,b,M = CalcAandB(links,w,tgt,theta_thesis)
-        A,M = CalcAandBImproved(links,w,tgt,theta_thesis)
+        tm = ThesisMinimizer(links,w,theta_thesis,tgt)
+        #tm.MakeStep()
+        A,M = tm.CalcAandBImproved(links,w,tgt,theta_thesis)
         
     
         gr_newton = np.dot(np.transpose(J_newton),(forwardK_newton-tgt))
@@ -691,15 +474,9 @@ for test_ind in range(0,num_of_tests+1):
             WriteTextToFile('c:/temp/thesis test/test{0}_line_search_failed.txt'.format(test_ind),"line_search_failed")
             break
         
-    #    step_newton = 1
-    #    step_thesis = 1
-        
-        
-        #print("step_newton",step_newton)
-        #print("step thesis",step_thesis)
-        
+        theta_thesis=tm.MakeStep()        
+        #theta_thesis=(theta_thesis+p_thesis*step_thesis) % (2*np.pi)     
         theta_newton=(theta_newton+p_newton*step_newton) % (2*np.pi)
-        theta_thesis=(theta_thesis+p_thesis*step_thesis) % (2*np.pi)      
         
     
     #print("Newton value:",CalcObjectiveValue(theta_newton,tgt,links,w))

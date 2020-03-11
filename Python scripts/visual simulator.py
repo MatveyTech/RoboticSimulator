@@ -2,6 +2,8 @@ import pygame, sys
 from pygame.locals import *
 import numpy as np
 from Kinematics import FK_ALL
+from Kinematics import FK
+from ThesisMinimizer import ThesisMinimizer
 
 # set up the colors
 BLACK = (0, 0, 0)
@@ -81,8 +83,8 @@ class Robot:
                     [1,1,1]])
     
         rad10 = np.deg2rad(10)
-        self.tetas = np.array([rad10,rad10,rad10],dtype=float)
-        #self.tetas = np.array([3.3176, 2.2951, 4.9843])
+        #self.tetas = np.array([rad10,rad10,rad10],dtype=float)
+        self.tetas = np.array([0.4102, 5.7474, 1.005])
         
         
     def Draw(self,ws):
@@ -103,6 +105,17 @@ class Robot:
             pygame.draw.circle(ws, BLACK, p_from, 15, 0)
             ind = ind+1
         pygame.draw.circle(ws, BLACK, p_to, 23, 0)   
+        
+    def Move(self,tetas):
+        self.tetas = tetas
+        
+    def IsCloseToTarget(self,target):
+        threshold = 2
+        
+        fk = FK(self.links,self.j_axes,self.tetas)   
+        delta = fk - target
+        dist = np.sqrt(delta[0]*delta[0]+delta[1]*delta[1]+delta[2]*delta[2])
+        return dist < threshold
         
 def DrawGrid(w,rows,surface):
     sizeBtwn = w // rows
@@ -146,14 +159,22 @@ pygame.display.set_caption('Thesis')
 
 pygame.draw.circle(windowSurface, BLACK, TransformToScreen((0,0)), 7, 5)
 
-ds1_position = (50,100)
-ds = DraggableCircle(BLUE,ds1_position,15,screenSize)
+ds1_position = (250,450)
+ds = DraggableCircle(BLUE,ds1_position,30,screenSize)
 draggingObject = None
 
+
+
 robot = Robot()
+tm = ThesisMinimizer(robot.links,robot.j_axes,robot.tetas,np.array([ds1_position[0],ds1_position[1],0]))
+
 
 # run the game loop
+i = 0
 while True:
+    i = i+ 1
+#    if i==20:
+#        breakדקךכץאקא
     windowSurface.fill(WHITESMOKE)
     DrawGrid(screenW,10,windowSurface)
     DrawFrame(windowSurface)
@@ -161,13 +182,17 @@ while True:
     mouse = pygame.mouse.get_pos()
     
     DrawMouseCoordinates(mouse,windowSurface) 
-  
      
     if draggingObject == ds:
         ds.Move(mouse)
+        tm.UpdateTarget(np.array([ds.position[0],ds.position[1],0]))
     
     ds.Draw(windowSurface,mouse)
     
+    if not robot.IsCloseToTarget(tm.tgt):
+        print ("Making step")
+        tm.MakeStep()
+        robot.Move(tm.theta)
     robot.Draw(windowSurface)
     
     pygame.display.update()
@@ -177,6 +202,7 @@ while True:
             pygame.quit()
             sys.exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            
             if ds.IsMouseOnObject(mouse):
                 draggingObject = ds
         elif event.type == pygame.MOUSEBUTTONUP:

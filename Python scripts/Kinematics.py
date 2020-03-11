@@ -226,5 +226,13 @@ def CalcInverseKinematics2J2D(links,target):
     teta1 = -(t+angles[1]) 
     teta2 = np.pi - angles[2] 
     return teta1, teta2
+
+def calculateGradient(links,w,target,curr_pos):
     
+    J = CalcJacobian(links,w,curr_pos)
+    J = np.transpose(J)
+    #_fk = FK(links,w,curr_pos)
+    fff = FK(links,w,curr_pos)
+    grad = np.dot(J,fff-target)
+    return grad    
     
