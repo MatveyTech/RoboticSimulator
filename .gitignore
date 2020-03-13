@@ -34,3 +34,6 @@
 build/*
 /ThirdParty
 /Python scripts/__pycache__/
+/CS_GUI/.vs
+/CS_GUI/CS_GUI/bin/
+/CS_GUI/CS_GUI/obj
