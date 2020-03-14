@@ -157,37 +157,33 @@ screenSize = (screenW, screenH)
 windowSurface = pygame.display.set_mode(screenSize, 0, 32)
 pygame.display.set_caption('Thesis')
 
-pygame.draw.circle(windowSurface, BLACK, TransformToScreen((0,0)), 7, 5)
+tgt_st = DraggableCircle(BLUE,( 250,450),30,screenSize)
+tgt_en   = DraggableCircle(BLUE,(-250,450),30,screenSize)
 
-ds1_position = (250,450)
-ds = DraggableCircle(BLUE,ds1_position,30,screenSize)
 draggingObject = None
 
 
 
 robot = Robot()
-tm = ThesisMinimizer(robot.links,robot.j_axes,robot.tetas,np.array([ds1_position[0],ds1_position[1],0]))
+#tm = ThesisMinimizer(robot.links,robot.j_axes,robot.tetas,np.array([ds1_position[0],ds1_position[1],0]))
+tm = ThesisMinimizer(robot.links,robot.j_axes,robot.tetas,np.array([600,0,0]))
 
 
 # run the game loop
-i = 0
 while True:
-    i = i+ 1
-#    if i==20:
-#        breakדקךכץאקא
     windowSurface.fill(WHITESMOKE)
     DrawGrid(screenW,10,windowSurface)
     DrawFrame(windowSurface)
-    #pygame.draw.circle(windowSurface, BLACK, TransformToScreen((0,0)), 7, 5)
     mouse = pygame.mouse.get_pos()
     
     DrawMouseCoordinates(mouse,windowSurface) 
      
-    if draggingObject == ds:
-        ds.Move(mouse)
-        tm.UpdateTarget(np.array([ds.position[0],ds.position[1],0]))
+    if draggingObject != None:
+        draggingObject.Move(mouse)
+        tm.UpdateTarget(np.array([draggingObject.position[0],draggingObject.position[1],0]))
     
-    ds.Draw(windowSurface,mouse)
+    tgt_st.Draw(windowSurface,mouse)
+    tgt_en.Draw(windowSurface,mouse)
     
     if not robot.IsCloseToTarget(tm.tgt):
         print ("Making step")
@@ -203,7 +199,9 @@ while True:
             sys.exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
             
-            if ds.IsMouseOnObject(mouse):
-                draggingObject = ds
+            if tgt_st.IsMouseOnObject(mouse):
+                draggingObject = tgt_st
+            elif tgt_en.IsMouseOnObject(mouse):
+                draggingObject = tgt_en
         elif event.type == pygame.MOUSEBUTTONUP:
             draggingObject = None
