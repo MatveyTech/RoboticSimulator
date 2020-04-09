@@ -6,27 +6,50 @@ Created on Sat Mar 28 21:53:56 2020
 """
 
 from Types import Variables
+from Kinematics import FK
+from Kinematics import CalcJacobian
+from math_utils import norm_2
 import numpy as np
 
-def norm_2(x):
-    if (x.shape[0]!=3):
-        raise "norm_2 is working now only with the dimention of 3!"    
-    return x[0] * x[0] + x[1] * x[1] + x[2] * x[2]
+
 
 class MyClass:
   def method(self, arg):
     print(arg)
+    
 
 class CompitabilityObj:
-    def __init__(self):
-        self.x = 5
+    def __init__(self,nj,npts,links,axes):
+        self.nj = nj
+        self.npts = npts
+        self.links = links
+        self.axes = axes
         
-    def ComputeValue(self,p):
-        pass
+        
+    def ComputeValue(self,curr):
+        val = 0
+        for i in range(self.npts):
+            theta_i = curr.GetTheta(i)
+            ee_i = curr.GetEE(i)
+            fk_i = FK(self.links,self.axes, theta_i)
+            tres = norm_2(fk_i-ee_i)
+            val += tres
+        return val
     
-    def ComputeGradient(self,p):
-        pass
-    
+    def ComputeGradient(self,curr,grad):
+        for i in range(self.npts):
+            theta_i = curr.GetTheta(i)
+            ee_i = curr.GetEE(i)
+            jac_i = CalcJacobian(self.links,self.axes,theta_i)   
+            fk_i = FK(self.links,self.axes, theta_i)            
+            grad_t = np.dot(np.transpose(jac_i),(fk_i- ee_i))
+            grad_e = fk_i- ee_i
+            tgrad = Variables(curr.nj,curr.npts)
+            tgrad.SetTheta(i,grad_t)
+            tgrad.AddEE(i,grad_e)
+        grad  += tgrad.data   
+        
+        
     def ComputeHessian(self,p):
         pass
     
@@ -75,7 +98,7 @@ class StartObj:
         firstPos = curr.GetEE(0)
         grad_val = 2 *(firstPos - self.ee_start)*self.weight
         tgrad = Variables(curr.nj,curr.npts)
-        tgrad.AddEE(0, grad_val)
+        tgrad.SetEE(0, grad_val)
         grad  += tgrad.data  
     
     def AddHessianTo(self,curr,hess):
@@ -101,7 +124,7 @@ class FinalObj:
         lastPos = curr.GetEE(curr.LastIndex)
         grad_val = 2 *(lastPos - self.ee_final)*self.weight
         tgrad = Variables(curr.nj,curr.npts)
-        tgrad.AddEE(curr.LastIndex, grad_val)  
+        tgrad.SetEE(curr.LastIndex, grad_val)  
         grad  += tgrad.data  
     
     def AddHessianTo(self,curr,hess):
@@ -123,6 +146,7 @@ class FinalObj:
 #v.SetTheta(0,np.array([10,20,30]))
 #v.SetEE(9,np.array([100,200,300]))
 #print (v.GetLastEEInd())
+           
 
 so = FinalObj(np.array([0,0,0]))
 v = Variables(3,10)
@@ -134,6 +158,14 @@ so.AddHessianTo(v,hess)
 v.SetEE(0,np.array([5,5,5]))
 v.SetEE(2,np.array([1,2,3]))
 sm_o = SmoothnessObj(3,10)
+
+
+li = np.array([[200, 150, 250],[0,0,0],[0,0,0]])
+ax = np.array([[0,0,0],[0,0,0],[1,1,1]])
+
+v = Variables(3,10)
+co = CompitabilityObj(10,li,ax)
+print(co.ComputeValue(v))
 #print(sm_o.ComputeValue(v))
 
 #from tkinter import *
