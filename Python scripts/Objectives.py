@@ -6,53 +6,11 @@ Created on Sat Mar 28 21:53:56 2020
 """
 
 from Types import Variables
-from Kinematics import FK
-from Kinematics import CalcJacobian
 from math_utils import norm_2
 import numpy as np
+from CompitabilityObjective import CompitabilityObj
 
-
-
-class MyClass:
-  def method(self, arg):
-    print(arg)
-    
-
-class CompitabilityObj:
-    def __init__(self,nj,npts,links,axes):
-        self.nj = nj
-        self.npts = npts
-        self.links = links
-        self.axes = axes
-        
-        
-    def ComputeValue(self,curr):
-        val = 0
-        for i in range(self.npts):
-            theta_i = curr.GetTheta(i)
-            ee_i = curr.GetEE(i)
-            fk_i = FK(self.links,self.axes, theta_i)
-            tres = norm_2(fk_i-ee_i)
-            val += tres
-        return val
-    
-    def ComputeGradient(self,curr,grad):
-        for i in range(self.npts):
-            theta_i = curr.GetTheta(i)
-            ee_i = curr.GetEE(i)
-            jac_i = CalcJacobian(self.links,self.axes,theta_i)   
-            fk_i = FK(self.links,self.axes, theta_i)            
-            grad_t = np.dot(np.transpose(jac_i),(fk_i- ee_i))
-            grad_e = fk_i- ee_i
-            tgrad = Variables(curr.nj,curr.npts)
-            tgrad.SetTheta(i,grad_t)
-            tgrad.AddEE(i,grad_e)
-        grad  += tgrad.data   
-        
-        
-    def ComputeHessian(self,p):
-        pass
-    
+  
 
 class SmoothnessObj:
     def __init__(self,nj,npoints,w=1):
@@ -164,7 +122,7 @@ li = np.array([[200, 150, 250],[0,0,0],[0,0,0]])
 ax = np.array([[0,0,0],[0,0,0],[1,1,1]])
 
 v = Variables(3,10)
-co = CompitabilityObj(10,li,ax)
+co = CompitabilityObj(3,10,li,ax)
 print(co.ComputeValue(v))
 #print(sm_o.ComputeValue(v))
 

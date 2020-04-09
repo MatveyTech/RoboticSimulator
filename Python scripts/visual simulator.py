@@ -219,7 +219,7 @@ tgt_en   = DraggableCircle(BLUE,(-250,450),30,screenSize)
 
 draggingObject = None
 
-State = AppState.Rest
+
 
 robot_start = Robot()
 robot_final = Robot()
