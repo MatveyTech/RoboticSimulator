@@ -54,8 +54,9 @@ class SmoothnessObj:
         grad += tres
         
     
-    def ComputeHessian(self,p):
-        pass
+    def ComputeHessian(self,curr,hess):
+        res = 2 * self.weight * self.ATA
+        hess += res
     
 
 class StartObj:
@@ -73,7 +74,9 @@ class StartObj:
     def AddGradientTo(self,curr,grad):
         firstPos = curr.GetEE(0)
         grad_val = 2 *(firstPos - self.ee_start)*self.weight
-        grad.AddEE(0, grad_val)        
+        tgrad = Variables(curr.nj,curr.npts)
+        tgrad.AddEE(0, grad_val)
+        grad  += tgrad.data  
     
     def AddHessianTo(self,curr,hess):
         fr = curr.GetFirstEEInd()
@@ -97,7 +100,9 @@ class FinalObj:
     def AddGradientTo(self,curr,grad):
         lastPos = curr.GetEE(curr.LastIndex)
         grad_val = 2 *(lastPos - self.ee_final)*self.weight
-        grad.AddEE(curr.LastIndex, grad_val)        
+        tgrad = Variables(curr.nj,curr.npts)
+        tgrad.AddEE(curr.LastIndex, grad_val)  
+        grad  += tgrad.data  
     
     def AddHessianTo(self,curr,hess):
         fr = curr.GetLastEEInd()
