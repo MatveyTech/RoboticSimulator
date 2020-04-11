@@ -13,9 +13,8 @@ epsilon = 0.00001
 smallFloat = 0.001
 
 def norm_2(x):
-    if (x.shape[0]!=3):
-        raise "norm_2 is working now only with the dimention of 3!"    
-    return x[0] * x[0] + x[1] * x[1] + x[2] * x[2]
+    return np.sum(x*x)
+
 
 
 def CreateRotationMatrix(teta,u):
