@@ -14,7 +14,7 @@ class Variables:
         self.LastIndex = npts - 1
         self.nE = 3
         self.bS = nj + self.nE #blockSize
-        if data == None:
+        if data is None:
             data = np.zeros(self.bS*self.nP)
         if data.shape[0] != self.bS*self.nP :
             raise "Variables class: Can't initialize variables class. Bad data dimentions!!!"
