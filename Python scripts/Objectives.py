@@ -26,7 +26,7 @@ class SmoothnessObj:
         self.ATA = np.dot(np.transpose(self.A),self.A)
         
     def ComputeValue(self,curr):
-        m = np.dot(self.A,curr)
+        m = np.dot(self.A,curr.data)
         return norm_2(m) * self.weight
         
     
@@ -72,7 +72,7 @@ class FinalObj:
         self.weight = w
         
     def ComputeValue(self,curr):
-        lastPos = curr.GetEE(var.LastIndex)
+        lastPos = curr.GetEE(curr.LastIndex)
         if lastPos.shape[0] != 3 :
             raise "FinalObj is working now only with the EE dimention of 3!"
         diff = lastPos - self.ee_final
@@ -90,6 +90,26 @@ class FinalObj:
         to = curr.GetLastEEInd() + curr.nE
         for x in range(fr,to):
             hess[x,x] = hess[x,x] + 2
+
+
+class TheObjective:
+    def __init__(self,ee_start,ee_final,nj,npts,links,axes):
+        self.StartObjective = StartObj(ee_start)
+        self.FinalObjective = FinalObj(ee_final)
+        self.SmoothnessObjective = SmoothnessObj(nj,npts)
+        self.CompitabilityObjective  = CompitabilityObj(nj,npts,links,axes)
+        self.AllObjectives = [self.StartObjective,self.FinalObjective,self.SmoothnessObjective,self.CompitabilityObjective]
+        
+    def ComputeValue(self,curr):
+        res = 0
+        for obj in self.AllObjectives: 
+            res += obj.ComputeValue(curr)
+        return res
+    
+    def AddGradientTo(self,curr,grad):
+        for obj in self.AllObjectives: 
+            obj.ComputeValue(curr,grad)
+    
     
 #so = StartObj(np.array([0,0,0]))
 #
@@ -123,20 +143,8 @@ ax = np.array([[0,0,0],[0,0,0],[1,1,1]])
 
 v = Variables(3,10)
 co = CompitabilityObj(3,10,li,ax)
-print(co.ComputeValue(v))
-#print(sm_o.ComputeValue(v))
+o = TheObjective(np.array([0,0,0]),np.array([0,0,0]),3,10,li,ax)
+print(o.ComputeValue(v))
 
-#from tkinter import *
-#
-#def show_values():
-#    print (w1.get(), w2.get())
-#
-#master = Tk()
-#w1 = Scale(master, from_=0, to=42)
-#w1.pack()
-#w2 = Scale(master, from_=0, to=200, orient=HORIZONTAL)
-#w2.pack()
-#Button(master, text='Show', command=show_values).pack()
-#
-#mainloop()
-#print("HI")
+
+
