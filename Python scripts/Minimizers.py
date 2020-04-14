@@ -7,6 +7,8 @@ Created on Sat Apr 11 16:38:59 2020
 
 from Types import Variables
 from math_utils import norm_2
+from math_utils import epsilon
+import numpy as np
 
 class GradientBasedFunctionMinimizer:
     
@@ -20,7 +22,7 @@ class GradientBasedFunctionMinimizer:
         currentPoint = p.Copy()
         for i in range(0,maxIterations):
             searchDirection = self.computeSearchDirection(objective,currentPoint)
-            if norm_2(searchDirection) < 0.00001:
+            if norm_2(searchDirection) < epsilon:
                 optimizationConverged = True
                 break
             alpha,currentPoint = self.doLineSearch(objective,currentPoint,searchDirection)
@@ -54,15 +56,19 @@ class GradientBasedFunctionMinimizer:
 
 class GradientDescentFunctionMinimizer(GradientBasedFunctionMinimizer):
         
-    def computeSearchDirection(self):
-        print("computeSearchDirection GradientDescentFunctionMinimizer")
+    def computeSearchDirection(self,objective,p):
+        grad = np.zeros(p.data.shape)
+        objective.AddGradientTo(p,grad)
+        return grad
 
 class NewtonFunctionMinimizer(GradientBasedFunctionMinimizer):
         
     def computeSearchDirection(self):
         print("computeSearchDirection NewtonFunctionMinimizer")
         
-#x = NewtonFunctionMinimizer()
+#x = GradientDescentFunctionMinimizer()
+#y = x.computeSearchDirection(None,np.array([1,2,3,4]))
+#print(y)
 #x.minimize(None)
 #
 #x1 = pi = Variables(curr.nJ,curr.nP,newData)
