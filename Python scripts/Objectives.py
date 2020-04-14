@@ -108,7 +108,7 @@ class TheObjective:
     
     def AddGradientTo(self,curr,grad):
         for obj in self.AllObjectives: 
-            obj.ComputeValue(curr,grad)
+            obj.AddGradientTo(curr,grad)
     
     
 #so = StartObj(np.array([0,0,0]))
