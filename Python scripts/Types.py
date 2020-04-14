@@ -5,6 +5,7 @@ Created on Sun Mar 29 00:02:36 2020
 @author: rzhavm2
 """
 import numpy as np
+import copy 
 
 class Variables:
     
@@ -95,8 +96,9 @@ class Variables:
     def __str__(self):
         x = np.reshape(self.data, (self.nP,self.bS))
         return x.__str__()
-#    
-#v = Variables(2,3,np.arange(15.0))
+    
+    def Copy(self):
+        return copy.deepcopy(self)  
 #v.data[0]=6
 #v.data[5]=7.2
 #v.data[6]=-0.5
