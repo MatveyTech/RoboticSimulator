@@ -35,7 +35,7 @@ class SmoothnessObj:
         grad += tres
         
     
-    def ComputeHessian(self,curr,hess):
+    def AddHessianTo(self,curr,hess):
         res = 2 * self.weight * self.ATA
         hess += res
     
@@ -116,6 +116,10 @@ class TheObjective:
         for obj in self.AllObjectives: 
             obj.AddGradientTo(curr,grad)
             
+    def AddHessianTo(self,curr,hess):
+        for obj in self.AllObjectives: 
+            obj.AddHessianTo(curr,hess)
+            
     def AddEstimatedGradientTo(self,curr,grad):
         dp = 1e-6
         data = curr.data
@@ -152,6 +156,34 @@ class TheObjective:
 #        
             
             
+    def AddEstimatedHessianTo(self,curr,hess):
+        dp = 1e-5
+        data = curr.data
+        for i in range(curr.shape):
+            C_P = np.zeros(data.shape,np.float64)
+            C_M = np.zeros(data.shape,np.float64)
+            tmpVal = data[i]
+            data[i] = tmpVal + dp
+            self.AddGradientTo(curr,C_P)
+            data[i] = tmpVal - dp
+            self.AddGradientTo(curr,C_M)  
+            data[i] = tmpVal
+            res = (C_P - C_M)/(2*dp)
+            hess[i] += res
+            
+    
+    def TestHessianWithFD(self,curr):
+        hess_shape = (curr.data.shape[0],curr.data.shape[0])
+        analytic_hess = np.zeros(hess_shape,np.float64)
+        fd_hess = np.zeros(hess_shape,np.float64)
+        self.AddHessianTo(curr,analytic_hess)
+        self.AddEstimatedHessianTo(curr,fd_hess)         
+#        size = 12
+#        print(analytic_hess[0:size,0:size])
+#        print(fd_hess[0:size,0:size])
+        na = norm_2(analytic_hess)
+        nf = norm_2(fd_hess)
+        print ("The hessian error is:",(na-nf)/na)
             
 
 #x = np.array([8e-2,6,7,7])

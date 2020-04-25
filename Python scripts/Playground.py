@@ -79,10 +79,11 @@ p = v
 #ps = []
 counter = 0
 print (p)
-while c is False and counter<100000:
+while c is False and counter<10000:
     counter +=1
     print ("Iteration:",counter)
     #obj.TestGradientWithFD(p)
+    obj.TestHessianWithFD(p)
     p,c = m.minimize(obj,p)  
     #print(obj.ComputeValue(p))
     #ps.append(p)
@@ -91,10 +92,10 @@ print("\n\n")
 print (p,c)
 print("Num of iterations: ",counter)
 
-for i in range(p.nP):
-    t = p.GetTheta(i)
-    e = p.GetEE(i)
-    print (FK(li,ax,t)-e)
+#for i in range(p.nP):
+#    t = p.GetTheta(i)
+#    e = p.GetEE(i)
+#    print (FK(li,ax,t)-e)
 
 #fk = FK(li,ax, np.array([1.1440029882e+03,  7.8483575105e+02,  5.2133984492e+02]))
 #print (fk)  
