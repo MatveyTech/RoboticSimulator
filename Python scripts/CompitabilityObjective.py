@@ -7,6 +7,7 @@ Created on Thu Apr  9 22:23:11 2020
 from Kinematics import FK
 from Kinematics import CalcJacobian
 from math_utils import norm_2
+from Types import Variables
 import numpy as np
 
 
@@ -14,12 +15,7 @@ import numpy as np
 
 
 class CompitabilityObj:
-    def __init__(self,nj,npts,links,axes):
-        self.nj = nj
-        self.npts = npts
-        self.links = links
-        self.axes = axes       
-        
+           
         
     def GetCloserT(self,pair,current):
         dist1 = np.linalg.norm(pair[0]-current)
@@ -185,6 +181,14 @@ class CompitabilityObj:
     
     
 #   #   #                    P    U    B    L    I    C    S        #####
+    
+    def __init__(self,nj,npts,links,axes,w=1):
+        self.nj = nj
+        self.npts = npts
+        self.links = links
+        self.axes = axes       
+        self.weight = w
+        self.inner_w = 1e-2
         
         
     def ComputeValue(self,curr):
@@ -195,21 +199,42 @@ class CompitabilityObj:
             fk_i = FK(self.links,self.axes, theta_i)
             tres = norm_2(fk_i-ee_i)
             val += tres
-        return val
+        #return val * self.weight * 2
+        return self.inner_w * val * self.weight
     
-    def ComputeGradient(self,curr,grad):
+    def AddGradientTo(self,curr,grad):
+        tgrad = Variables(curr.nJ,curr.nP)
         for i in range(self.npts):
             theta_i = curr.GetTheta(i)
             ee_i = curr.GetEE(i)
             jac_i = CalcJacobian(self.links,self.axes,theta_i)   
-            fk_i = FK(self.links,self.axes, theta_i)            
-            grad_t = np.dot(np.transpose(jac_i),(fk_i- ee_i))
-            grad_e = fk_i- ee_i
-            tgrad = Variables(curr.nj,curr.npts)
+            fk_i = FK(self.links,self.axes, theta_i)  
+            #print(theta_i,ee_i,theta_i,fk_i)
+            grad_t = np.dot(np.transpose(jac_i),(fk_i- ee_i)) 
+            grad_e = (fk_i- ee_i) * (-1)
             tgrad.SetTheta(i,grad_t)
-            tgrad.AddEE(i,grad_e)
-        grad  += tgrad.data   
+            tgrad.SetEE(i,grad_e)
+        grad  += self.inner_w * tgrad.data  * 2  * self.weight
         
         
     def ComputeHessian(self,p):
+        #* self.weight
         pass
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

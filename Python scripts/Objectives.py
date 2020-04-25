@@ -19,7 +19,7 @@ class SmoothnessObj:
         blockSize = ne+nj
         c = blockSize * npoints
         r = c - blockSize - nj
-        self.A = np.zeros((r,c))
+        self.A = np.zeros((r,c),dtype='f')
         for i in range(0,r):
             self.A[i,i+nj]=-1
             self.A[i,i+nj+blockSize]=1        
@@ -31,7 +31,7 @@ class SmoothnessObj:
         
     
     def AddGradientTo(self,curr,grad):
-        tres = 2 * self.weight * np.dot(self.ATA,curr)
+        tres = 2 * self.weight * np.dot(self.ATA,curr.data)
         grad += tres
         
     
@@ -55,7 +55,7 @@ class StartObj:
     def AddGradientTo(self,curr,grad):
         firstPos = curr.GetEE(0)
         grad_val = 2 *(firstPos - self.ee_start)*self.weight
-        tgrad = Variables(curr.nj,curr.npts)
+        tgrad = Variables(curr.nJ,curr.nP)
         tgrad.SetEE(0, grad_val)
         grad  += tgrad.data  
     
@@ -63,7 +63,7 @@ class StartObj:
         fr = curr.GetFirstEEInd()
         to = curr.GetFirstEEInd() + curr.nE
         for x in range(fr,to):
-            hess[x,x] = hess[x,x] + 2
+            hess[x,x] = hess[x,x] + 2 * self.weight
     
     
 class FinalObj:
@@ -81,7 +81,7 @@ class FinalObj:
     def AddGradientTo(self,curr,grad):
         lastPos = curr.GetEE(curr.LastIndex)
         grad_val = 2 *(lastPos - self.ee_final)*self.weight
-        tgrad = Variables(curr.nj,curr.npts)
+        tgrad = Variables(curr.nJ,curr.nP)
         tgrad.SetEE(curr.LastIndex, grad_val)  
         grad  += tgrad.data  
     
@@ -89,28 +89,76 @@ class FinalObj:
         fr = curr.GetLastEEInd()
         to = curr.GetLastEEInd() + curr.nE
         for x in range(fr,to):
-            hess[x,x] = hess[x,x] + 2
+            hess[x,x] = hess[x,x] + 2 * self.weight
 
 
 class TheObjective:
-    def __init__(self,ee_start,ee_final,nj,npts,links,axes):
-        self.StartObjective = StartObj(ee_start)
-        self.FinalObjective = FinalObj(ee_final)
-        self.SmoothnessObjective = SmoothnessObj(nj,npts)
-        self.CompitabilityObjective  = CompitabilityObj(nj,npts,links,axes)
-        self.AllObjectives = [self.StartObjective,self.FinalObjective,self.SmoothnessObjective,self.CompitabilityObjective]
+    def __init__(self,ee_start,ee_final,nj,npts,links,axes,weights):
+        self.StartObjective = StartObj(ee_start,weights[0])
+        self.FinalObjective = FinalObj(ee_final,weights[1])
+        self.SmoothnessObjective = SmoothnessObj(nj,npts,weights[2])
+        self.CompitabilityObjective  = CompitabilityObj(nj,npts,links,axes,weights[3])
+        self.AllObjectives = []
+        self.AllObjectives.append(self.StartObjective)
+        self.AllObjectives.append(self.FinalObjective)
+        self.AllObjectives.append(self.SmoothnessObjective)
+        self.AllObjectives.append(self.CompitabilityObjective)
         
+               
     def ComputeValue(self,curr):
         res = 0
         for obj in self.AllObjectives: 
+
             res += obj.ComputeValue(curr)
         return res
     
     def AddGradientTo(self,curr,grad):
         for obj in self.AllObjectives: 
             obj.AddGradientTo(curr,grad)
+            
+    def AddEstimatedGradientTo(self,curr,grad):
+        dp = 1e-6
+        data = curr.data
+        for i in range(curr.shape):
+            tmpVal = data[i]
+            data[i] = tmpVal + dp            
+            f_P = self.ComputeValue(curr)		
+            data[i] = tmpVal - dp
+            f_M = self.ComputeValue(curr)
+            data[i] = tmpVal
+            res = (f_P - f_M)/(2*dp)
+            grad[i] += res
     
-    
+    def TestGradientWithFD(self,curr):
+        analytic_gr = np.zeros(curr.data.shape,dtype='f')
+        fd_gr = np.zeros(curr.data.shape,dtype='f')
+        self.AddGradientTo(curr,analytic_gr)
+        self.AddEstimatedGradientTo(curr,fd_gr)
+        na = norm_2(analytic_gr)
+        nf = norm_2(fd_gr)
+        if np.abs(na) < 1e-10:
+            if np.abs(nf) > 1e-10:
+                print("B A D  (Zero gradient) !! Objective Function: testing gradients...norms: analytic: {0:9.8f}, FD: {1:9.8f}.".format(na,nf))                
+            else:
+                print("Both gradients are 0")
+        elif ((na-nf)/na < 1e-5):
+            pass
+            #print("Objective Function: testing gradients...norms: analytic: {0:9.8f}, FD: {1:9.8f}.".format(na,nf))
+        else:
+            print("B A D  !! Objective Function: testing gradients...norms: analytic: {0:9.8f}, FD: {1:9.8f}.".format(na,nf))
+            print((na-nf)/na)
+            print(analytic_gr-fd_gr)
+            #print(fd_gr)
+#        
+            
+            
+            
+
+#x = np.array([8e-2,6,7,7])
+#print (x.shape[0])
+#for i in x:
+#    i = i+1
+#    
 #so = StartObj(np.array([0,0,0]))
 #
 #from numpy import linalg as LA
@@ -126,25 +174,25 @@ class TheObjective:
 #print (v.GetLastEEInd())
            
 
-so = FinalObj(np.array([0,0,0]))
-v = Variables(3,10)
-hess = np.zeros((60,60))
-#print(v)
-so.AddHessianTo(v,hess)
-#print(hess)
-
-v.SetEE(0,np.array([5,5,5]))
-v.SetEE(2,np.array([1,2,3]))
-sm_o = SmoothnessObj(3,10)
-
-
-li = np.array([[200, 150, 250],[0,0,0],[0,0,0]])
-ax = np.array([[0,0,0],[0,0,0],[1,1,1]])
-
-v = Variables(3,10)
-co = CompitabilityObj(3,10,li,ax)
-o = TheObjective(np.array([0,0,0]),np.array([0,0,0]),3,10,li,ax)
-print(o.ComputeValue(v))
+#so = FinalObj(np.array([0,0,0]))
+#v = Variables(3,10)
+#hess = np.zeros((60,60))
+##print(v)
+#so.AddHessianTo(v,hess)
+##print(hess)
+#
+#v.SetEE(0,np.array([5,5,5]))
+#v.SetEE(2,np.array([1,2,3]))
+#sm_o = SmoothnessObj(3,10)
+#
+#
+#li = np.array([[200, 150, 250],[0,0,0],[0,0,0]])
+#ax = np.array([[0,0,0],[0,0,0],[1,1,1]])
+#
+#v = Variables(3,10)
+#co = CompitabilityObj(3,10,li,ax)
+#o = TheObjective(np.array([0,0,0]),np.array([0,0,0]),3,10,li,ax)
+#print(o.ComputeValue(v))
 
 
 

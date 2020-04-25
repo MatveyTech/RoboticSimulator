@@ -12,15 +12,18 @@ import numpy as np
 
 class GradientBasedFunctionMinimizer:
     
+    def __init__(self,maxIterations=1):
+        self.maxiterations = maxIterations
+        
+    
     def computeSearchDirection(self):
         raise "GradientBasedFunctionMinimizer is a abstract class"
     
     def minimize(self,objective,p):
         
-        maxIterations = 1
         optimizationConverged = False
         currentPoint = p.Copy()
-        for i in range(0,maxIterations):
+        for i in range(0,self.maxiterations):
             searchDirection = self.computeSearchDirection(objective,currentPoint)
             if norm_2(searchDirection) < epsilon:
                 optimizationConverged = True
@@ -57,7 +60,7 @@ class GradientBasedFunctionMinimizer:
 class GradientDescentFunctionMinimizer(GradientBasedFunctionMinimizer):
         
     def computeSearchDirection(self,objective,p):
-        grad = np.zeros(p.data.shape)
+        grad = np.zeros(p.data.shape,np.float64)
         objective.AddGradientTo(p,grad)
         return grad
 

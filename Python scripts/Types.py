@@ -10,11 +10,12 @@ import copy
 class Variables:
     
     def VerifyThetaInRange(self):
-        f = lambda x: x % (2*np.pi)
-        for i in range(self.nP):
-            t = f(self.GetTheta(i))            
-            blockInd = i*self.bS
-            self.data[blockInd:blockInd+self.nJ] = t
+        pass
+#        f = lambda x: x % (2*np.pi)
+#        for i in range(self.nP):
+#            t = f(self.GetTheta(i))            
+#            blockInd = i*self.bS
+#            self.data[blockInd:blockInd+self.nJ] = t
             
             
     def __init__(self, nj,npts,data=None): 
@@ -23,13 +24,14 @@ class Variables:
         self.nP = npts
         self.LastIndex = npts - 1
         self.nE = 3
-        self.bS = nj + self.nE #blockSize
+        self.bS = nj + self.nE #blockSize        
         if data is None:
-            data = np.zeros(self.bS*self.nP)
+            data = np.zeros(self.bS*self.nP,np.float64)
         if data.shape[0] != self.bS*self.nP :
             raise "Variables class: Can't initialize variables class. Bad data dimentions!!!"
         #self.data = np.zeros((self.nJ+self.nE)*self.nP)
         self.data = data
+        self.shape = data.shape[0]
         self.VerifyThetaInRange()        
     
      
@@ -99,6 +101,9 @@ class Variables:
     
     def Copy(self):
         return copy.deepcopy(self)  
+    
+#    def __getitem__(self, key):
+#        return self.data[key]
 #v.data[0]=6
 #v.data[5]=7.2
 #v.data[6]=-0.5
