@@ -183,7 +183,21 @@ class TheObjective:
 #        print(fd_hess[0:size,0:size])
         na = norm_2(analytic_hess)
         nf = norm_2(fd_hess)
-        print ("The hessian error is:",(na-nf)/na)
+        
+        if np.abs(na) < 1e-10:
+            if np.abs(nf) > 1e-10:
+                print("B A D  (Zero hessian) !! Objective Function: testing hessians...norms: analytic: {0:9.8f}, FD: {1:9.8f}.".format(na,nf))                
+            else:
+                print("Both hessians are 0")
+        elif ((na-nf)/na < 1e-5):
+            #pass
+            print("Objective Function: testing hessians...norms: analytic: {0:9.8f}, FD: {1:9.8f}.".format(na,nf))
+        else:
+            print("B A D  !! Objective Function: testing hessians...norms: analytic: {0:9.8f}, FD: {1:9.8f}.".format(na,nf))
+            print((na-nf)/na)
+            #print(analytic_gr-fd_gr)
+            #print(fd_gr)
+        #print ("The hessian error is:",(na-nf)/na)
             
 
 #x = np.array([8e-2,6,7,7])

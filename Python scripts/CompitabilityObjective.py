@@ -217,9 +217,20 @@ class CompitabilityObj:
         grad  += self.inner_w * tgrad.data  * 2  * self.weight
         
         
-    def ComputeHessian(self,p):
-        #* self.weight
-        pass
+    def AddHessianTo(self,curr,hess):
+        dp = 1e-5
+        data = curr.data
+        for i in range(curr.shape):
+            C_P = np.zeros(data.shape,np.float64)
+            C_M = np.zeros(data.shape,np.float64)
+            tmpVal = data[i]
+            data[i] = tmpVal + dp
+            self.AddGradientTo(curr,C_P)
+            data[i] = tmpVal - dp
+            self.AddGradientTo(curr,C_M)  
+            data[i] = tmpVal
+            res = (C_P - C_M)/(2*dp)
+            hess[i] += res
     
     
     

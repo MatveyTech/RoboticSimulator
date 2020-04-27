@@ -7,6 +7,7 @@ Created on Tue Apr 14 17:15:07 2020
 
 
 from Minimizers import GradientDescentFunctionMinimizer
+from Minimizers import NewtonFunctionMinimizer
 from Objectives import TheObjective
 from Objectives import StartObj
 from Objectives import FinalObj
@@ -55,6 +56,7 @@ st_point = np.array([10,0,0],dtype='f')
 end_point = np.array([-10,0,0],dtype='f')
 
 m = GradientDescentFunctionMinimizer(1)
+m = NewtonFunctionMinimizer()
 
 numT = 3
 numP = 5
@@ -79,18 +81,19 @@ p = v
 #ps = []
 counter = 0
 print (p)
-while c is False and counter<10000:
+while c is False and counter<100000:
     counter +=1
     print ("Iteration:",counter)
     #obj.TestGradientWithFD(p)
-    obj.TestHessianWithFD(p)
+    #obj.TestHessianWithFD(p)
     p,c = m.minimize(obj,p)  
     #print(obj.ComputeValue(p))
     #ps.append(p)
     #print (p,c)
-print("\n\n")
+print("\n")
 print (p,c)
-print("Num of iterations: ",counter)
+res_str = print("\n\033[1;31;47mMinimization method: {0}. Num of iterations: {1}.".format(m.GetName(),counter))
+
 
 #for i in range(p.nP):
 #    t = p.GetTheta(i)

@@ -8,6 +8,7 @@ Created on Sat Apr 11 16:38:59 2020
 from Types import Variables
 from math_utils import norm_2
 from math_utils import epsilon
+from math_utils import AddEpsToDiagonal
 import numpy as np
 
 class GradientBasedFunctionMinimizer:
@@ -52,12 +53,14 @@ class GradientBasedFunctionMinimizer:
                 alpha = alpha / 2
         
         print("line search failed!")
-        return alpha,pi
-    
+        return alpha,pi    
     
 
 
 class GradientDescentFunctionMinimizer(GradientBasedFunctionMinimizer):
+    
+    def GetName(self):
+        return "Gradient Descent Minimizer"
         
     def computeSearchDirection(self,objective,p):
         grad = np.zeros(p.data.shape,np.float64)
@@ -65,9 +68,21 @@ class GradientDescentFunctionMinimizer(GradientBasedFunctionMinimizer):
         return grad
 
 class NewtonFunctionMinimizer(GradientBasedFunctionMinimizer):
+    
+    def GetName(self):
+        return "Newton Minimizer"    
+    
+    def computeSearchDirection(self,objective,p):
+        grad = np.zeros(p.data.shape,np.float64)
+        objective.AddGradientTo(p,grad)
         
-    def computeSearchDirection(self):
-        print("computeSearchDirection NewtonFunctionMinimizer")
+        hess_shape = (p.data.shape[0],p.data.shape[0])
+        hess = np.zeros(hess_shape,np.float64)
+        objective.AddHessianTo(p,hess)
+        AddEpsToDiagonal(hess,0.01)
+        dp = np.dot(np.linalg.inv(hess),grad)
+        return dp
+        
         
 #x = GradientDescentFunctionMinimizer()
 #y = x.computeSearchDirection(None,np.array([1,2,3,4]))
