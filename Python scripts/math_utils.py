@@ -91,3 +91,8 @@ def GetTriangleAngles(a,b,c):
     beta = Get_C_OppositeAngle(c,a,b)
     gamma = Get_C_OppositeAngle(a,b,c)
     return (alpha,beta, gamma)
+
+def AddEpsToDiagonal(mat,epsilon = 0.01):
+    d = np.diag(mat)
+    d = d + epsilon
+    np.fill_diagonal(mat,d)
