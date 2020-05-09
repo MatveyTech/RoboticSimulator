@@ -180,8 +180,96 @@ class CompitabilityObj:
         return res_a,M  
     
     
-#   #   #                    P    U    B    L    I    C    S        #####
+    def CalcSecondDerivativeTT(self,curr):
+        links = self.links
+        axes = self.axes
+        nj = curr.nJ
+        res_shape = (nj*curr.nP,nj*curr.nP)
+        res = np.zeros(res_shape,np.float64)
+        for i in range(curr.nP):
+            currTheta = curr.GetTheta(i)
+            jac = CalcJacobian(links,axes,currTheta)  
+            jac_t = np.transpose(jac)
+            jtj = np.dot(jac_t,jac)
+    #        jtj = np.ones((nj,nj),np.float64)
+    #        jtj = (i+1) * jtj
+            ind = i * nj
+            res[ind:ind+nj,ind:ind+nj] = jtj
+            #print(ind)
+        return res
+
+
+    def CalcSecondDerivativeTE(self,curr):
+        links = self.links
+        axes = self.axes
+        nj = curr.nJ
+        ne = curr.nE
+        res_shape = (ne*curr.nP,nj*curr.nP)
+        res = np.zeros(res_shape,np.float64)
+        for i in range(curr.nP):
+            currTheta = curr.GetTheta(i)
+            jac = CalcJacobian(links,axes,currTheta)
+    #        jac = np.ones((ne,nj),np.float64)
+    #        jac = 10*(i+1) * jac * (-1) 
+            ind_row = i * ne
+            ind_col = i * nj
+            res[ind_row:ind_row+ne,ind_col:ind_col+nj] = - jac
+        return res
     
+    
+    def CalcSecondDerivativeET(self,curr):
+        links = self.links
+        axes = self.axes
+        nj = curr.nJ
+        ne = curr.nE
+        res_shape = (nj*curr.nP,ne*curr.nP)
+        res = np.zeros(res_shape,np.float64)
+        for i in range(curr.nP):
+            currTheta = curr.GetTheta(i)
+            jac = CalcJacobian(links,axes,currTheta)
+            minus_jt  = - np.transpose(jac)
+    #        minus_jt = np.ones((nj,ne),np.float64)
+    #        minus_jt = 10* (i+1) * minus_jt + 50
+            ind_row = i * nj
+            ind_col = i * ne
+            res[ind_row:ind_row+nj,ind_col:ind_col+ne] = minus_jt
+        return res
+    
+    def CalcSecondDerivativeEE(self,curr):
+        ne = curr.nE
+        return 2*np.identity(ne*curr.nP,np.float64)
+    
+    
+    def CorrectOneDim(self,hess,nj,ne,npts):
+        lineSize = npts*(nj+ne)
+        tetas = hess[:nj*npts,:]
+        tetas = tetas.reshape((npts,nj,lineSize))
+        
+        ne_base = nj*npts
+        ees = hess[ne_base:ne_base+ne*npts,:]
+        sh = (npts,ne,lineSize)
+        ees = ees.reshape(sh)
+        
+        res = np.empty([0,lineSize])
+        for i in range(npts):
+            res = np.vstack((res,tetas[i]))
+            res = np.vstack((res,ees[i]))
+        return res
+    
+    def CorrectHessian(self,hess,nj,ne,npts):
+        s = 15
+        #print(hess[:,0:s])
+        res = self.CorrectOneDim(hess,nj,ne,npts)
+        #print(res[:,0:s])
+        res_t = np.transpose(res)
+        #print(res_t)
+        res = self.CorrectOneDim(res_t,nj,ne,npts)
+        #print(res[:,0:s])       
+        return res
+        
+        
+    #   #   #                    P    U    B    L    I    C    S        #####
+        
     def __init__(self,nj,npts,links,axes,w=1):
         self.nj = nj
         self.npts = npts
@@ -215,25 +303,53 @@ class CompitabilityObj:
             tgrad.SetTheta(i,grad_t)
             tgrad.SetEE(i,grad_e)
         grad  += self.inner_w * tgrad.data  * 2  * self.weight
-        
-        
+     
+
+    def AddEstimatedHessianTo(self,curr,hess):
+            dp = 1e-5
+            data = curr.data
+            for i in range(curr.shape):
+                C_P = np.zeros(data.shape,np.float64)
+                C_M = np.zeros(data.shape,np.float64)
+                tmpVal = data[i]
+                data[i] = tmpVal + dp
+                self.AddGradientTo(curr,C_P)
+                data[i] = tmpVal - dp
+                self.AddGradientTo(curr,C_M)  
+                data[i] = tmpVal
+                res = (C_P - C_M)/(2*dp)
+                hess[i] += res  
+    
+
     def AddHessianTo(self,curr,hess):
-        dp = 1e-5
-        data = curr.data
-        for i in range(curr.shape):
-            C_P = np.zeros(data.shape,np.float64)
-            C_M = np.zeros(data.shape,np.float64)
-            tmpVal = data[i]
-            data[i] = tmpVal + dp
-            self.AddGradientTo(curr,C_P)
-            data[i] = tmpVal - dp
-            self.AddGradientTo(curr,C_M)  
-            data[i] = tmpVal
-            res = (C_P - C_M)/(2*dp)
-            hess[i] += res
+#        self.AddEstimatedHessianTo(curr,hess)
+#        return
+        tt = self.CalcSecondDerivativeTT(curr)
+        te = self.CalcSecondDerivativeTE(curr)
+        et = self.CalcSecondDerivativeET(curr)
+        ee = self.CalcSecondDerivativeEE(curr)
+        a1 = np.concatenate((tt,et),axis=1)
+        a2 = np.concatenate((te,ee),axis=1)
+        full = np.concatenate((a1,a2))        
+        curr_hess = self.CorrectHessian(full,self.nj,3,self.npts)
+        hess += curr_hess        
+        
+#    def AddHessianTo(self,curr,hess):
+#        dp = 1e-5
+#        data = curr.data
+#        for i in range(curr.shape):
+#            C_P = np.zeros(data.shape,np.float64)
+#            C_M = np.zeros(data.shape,np.float64)
+#            tmpVal = data[i]
+#            data[i] = tmpVal + dp
+#            self.AddGradientTo(curr,C_P)
+#            data[i] = tmpVal - dp
+#            self.AddGradientTo(curr,C_M)  
+#            data[i] = tmpVal
+#            res = (C_P - C_M)/(2*dp)
+#            hess[i] += res
     
-    
-    
+
     
     
     
