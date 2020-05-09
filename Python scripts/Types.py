@@ -63,7 +63,7 @@ class Variables:
     
     def SetTheta(self,i,t):
         if t.shape[0] != self.nJ :
-            raise "Variables class: Bad Tetha dimentions!!!"
+            raise "Variables class: Bad Tetha dimentions!!! T dimensions:{0}, nj dimentions:{1}".format(t.shape[0],self.nJ)
         blockInd = i*self.bS
         self.data[blockInd:blockInd+self.nJ] = t
         self.VerifyThetaInRange()

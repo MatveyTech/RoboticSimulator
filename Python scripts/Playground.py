@@ -55,6 +55,11 @@ ax = np.array([[0,0,0],[0,0,0],[1,1,1]])
 st_point = np.array([10,0,0],dtype='f')
 end_point = np.array([-10,0,0],dtype='f')
 
+li = np.array([[2, 1.5, 2.5],[0,0,0],[0,0,0]],dtype='f')
+ax = np.array([[0,0,0],[0,0,0],[1,1,1]])
+st_point = np.array([1,0,0],dtype='f')
+end_point = np.array([-1,0,0],dtype='f')
+
 m = GradientDescentFunctionMinimizer(1)
 m = NewtonFunctionMinimizer()
 
@@ -65,7 +70,9 @@ obj = TheObjective(st_point,end_point,numT,numP,li,ax,np.array([1,1,1,1],dtype='
 #obj = SmoothnessObj(0,4)
 
 v = Variables(numT,numP)
-v.SetEE(0,np.array([100,20,30],dtype='f'))
+#v.SetTheta(0,np.array([0.5,0.25,0.4],dtype='f'))
+#v.SetEE(0,np.array([4,0.5,0],dtype='f')) when addidng this line search is failefd should check
+#v.SetEE(0,np.array([100,20,30],dtype='f'))
 #v.SetEE(1,np.array([100,200,300]))
 #print(v)
 #gr = np.zeros(v.data.shape)
