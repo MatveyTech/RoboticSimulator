@@ -4,9 +4,11 @@ Created on Thu Apr  9 22:23:11 2020
 
 @author: Matvey Rzhavskiy
 """
-from Kinematics import FK
-from Kinematics import CalcJacobian
+#from Kinematics import FK
+#from Kinematics import calculateGradient
+from Kinematics import CalcJacobian,FK_ALL,calculateGradient,FK,IK_2_ClosedFormula
 from math_utils import norm_2
+from math_utils import normalize
 from Types import Variables
 import numpy as np
 
@@ -197,6 +199,23 @@ class CompitabilityObj:
             res[ind:ind+nj,ind:ind+nj] = jtj
             #print(ind)
         return res
+    
+    def Calc_A_Matrix(self,curr):
+        links = self.links
+        axes = self.axes
+        nj = curr.nJ
+        res_shape = (nj*curr.nP,nj*curr.nP)
+        res = np.zeros(res_shape,np.float64)
+        for i in range(curr.nP):
+            currTheta = curr.GetTheta(i)
+            currEE = curr.GetEE(i)            
+            A,M = self.CalcAandBImproved(links,axes,currEE,currTheta)            
+    #        jtj = np.ones((nj,nj),np.float64)
+    #        jtj = (i+1) * jtj
+            ind = i * nj
+            res[ind:ind+nj,ind:ind+nj] = A
+            #print(ind)
+        return res
 
 
     def CalcSecondDerivativeTE(self,curr):
@@ -325,6 +344,7 @@ class CompitabilityObj:
 #        self.AddEstimatedHessianTo(curr,hess)
 #        return
         tt = self.CalcSecondDerivativeTT(curr)
+        #tt = self.Calc_A_Matrix(curr)
         te = self.CalcSecondDerivativeTE(curr)
         et = self.CalcSecondDerivativeET(curr)
         ee = self.CalcSecondDerivativeEE(curr)

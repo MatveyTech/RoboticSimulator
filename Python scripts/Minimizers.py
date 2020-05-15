@@ -26,6 +26,7 @@ class GradientBasedFunctionMinimizer:
         currentPoint = p.Copy()
         for i in range(0,self.maxiterations):
             searchDirection = self.computeSearchDirection(objective,currentPoint)
+            #print("norm_2(searchDirection):",norm_2(searchDirection))
             if norm_2(searchDirection) < epsilon:
                 optimizationConverged = True
                 break

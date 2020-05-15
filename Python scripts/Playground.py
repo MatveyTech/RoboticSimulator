@@ -66,10 +66,14 @@ m = NewtonFunctionMinimizer()
 numT = 3
 numP = 5
 
-obj = TheObjective(st_point,end_point,numT,numP,li,ax,np.array([1,1,1,1],dtype='f'))
+obj = TheObjective(st_point,end_point,numT,numP,li,ax,np.array([100,100,10,100],dtype='f'))
 #obj = SmoothnessObj(0,4)
 
 v = Variables(numT,numP)
+for i in range(5):
+    v.SetEE(i,np.array([0.5,0.5,0],dtype='f'))
+    v.SetTheta(i,np.array([3,3,3]))
+
 #v.SetTheta(0,np.array([0.5,0.25,0.4],dtype='f'))
 #v.SetEE(0,np.array([4,0.5,0],dtype='f')) when addidng this line search is failefd should check
 #v.SetEE(0,np.array([100,20,30],dtype='f'))
@@ -85,27 +89,30 @@ v = Variables(numT,numP)
 c = False
 p = v
 #p = ps[180]
-#ps = []
+ps = []
 counter = 0
 print (p)
-while c is False and counter<100000:
+while c is False and counter<25:
     counter +=1
     print ("Iteration:",counter)
     #obj.TestGradientWithFD(p)
     #obj.TestHessianWithFD(p)
+    print("Obj value:",obj.ComputeValue(p))
+    searchDirection = m.computeSearchDirection(obj,p)
+    print(Step size:",norm_2(searchDirection))
     p,c = m.minimize(obj,p)  
-    #print(obj.ComputeValue(p))
-    #ps.append(p)
+    
+    ps.append(p)
     #print (p,c)
 print("\n")
 print (p,c)
 res_str = print("\n\033[1;31;47mMinimization method: {0}. Num of iterations: {1}.".format(m.GetName(),counter))
 
 
-#for i in range(p.nP):
-#    t = p.GetTheta(i)
-#    e = p.GetEE(i)
-#    print (FK(li,ax,t)-e)
+for i in range(p.nP):
+    t = p.GetTheta(i)
+    e = p.GetEE(i)
+    print (FK(li,ax,t)-e)
 
 #fk = FK(li,ax, np.array([1.1440029882e+03,  7.8483575105e+02,  5.2133984492e+02]))
 #print (fk)  

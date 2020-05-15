@@ -50,7 +50,8 @@ class StartObj:
         if firstPos.shape[0] != 3 :
             raise "StartObj is working now only with the EE dimention of 3!"
         diff = firstPos - self.ee_start
-        return (norm_2(diff)) * self.weight
+        res = (norm_2(diff)) * self.weight
+        return res
     
     def AddGradientTo(self,curr,grad):
         firstPos = curr.GetEE(0)
