@@ -121,6 +121,17 @@ class TheObjective:
         for obj in self.AllObjectives: 
             obj.AddHessianTo(curr,hess)
             
+    def CalculateGradient(self,p):
+        grad = np.zeros(p.data.shape,np.float64)
+        self.AddGradientTo(p,grad)
+        return grad
+    
+    def CalculateHessian(self,p):
+        hess_shape = (p.shape,p.shape)
+        hess = np.zeros(hess_shape,np.float64)
+        self.AddHessianTo(p,hess)
+        return hess#.reshape(p.shape,p.shape)
+            
     def AddEstimatedGradientTo(self,curr,grad):
         dp = 1e-6
         data = curr.data
