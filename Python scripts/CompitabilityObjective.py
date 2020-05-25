@@ -289,13 +289,14 @@ class CompitabilityObj:
         
     #   #   #                    P    U    B    L    I    C    S        #####
         
-    def __init__(self,nj,npts,links,axes,w=1):
+    def __init__(self,nj,npts,links,axes,useA,w=1):
         self.nj = nj
         self.npts = npts
         self.links = links
         self.axes = axes       
         self.weight = w
         self.inner_w = 1e-2
+        self.UseAMatrix = useA
         
         
     def ComputeValue(self,curr):
@@ -343,8 +344,11 @@ class CompitabilityObj:
     def AddHessianTo(self,curr,hess):
 #        self.AddEstimatedHessianTo(curr,hess)
 #        return
-        tt = self.CalcSecondDerivativeTT(curr)
-        #tt = self.Calc_A_Matrix(curr)
+        if self.UseAMatrix:
+            tt = self.Calc_A_Matrix(curr)
+        else:
+            tt = self.CalcSecondDerivativeTT(curr)  
+              
         te = self.CalcSecondDerivativeTE(curr)
         et = self.CalcSecondDerivativeET(curr)
         ee = self.CalcSecondDerivativeEE(curr)

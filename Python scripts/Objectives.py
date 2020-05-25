@@ -94,11 +94,11 @@ class FinalObj:
 
 
 class TheObjective:
-    def __init__(self,ee_start,ee_final,nj,npts,links,axes,weights):
+    def __init__(self,ee_start,ee_final,nj,npts,links,axes,useA,weights):
         self.StartObjective = StartObj(ee_start,weights[0])
         self.FinalObjective = FinalObj(ee_final,weights[1])
         self.SmoothnessObjective = SmoothnessObj(nj,npts,weights[2])
-        self.CompitabilityObjective  = CompitabilityObj(nj,npts,links,axes,weights[3])
+        self.CompitabilityObjective  = CompitabilityObj(nj,npts,links,axes,useA,weights[3])
         self.AllObjectives = []
         self.AllObjectives.append(self.StartObjective)
         self.AllObjectives.append(self.FinalObjective)
