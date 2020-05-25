@@ -45,7 +45,7 @@ class GradientBasedFunctionMinimizer:
         pi = None
         
         for i in range(0,maxNumOfIterations):
-            newData = curr.data - searchDir * alpha
+            newData = curr.data + searchDir * alpha
             pi = Variables(curr.nJ,curr.nP,newData)
             newObjValue = objective.ComputeValue(pi)
             if newObjValue < initialObjValue:
@@ -66,7 +66,7 @@ class GradientDescentFunctionMinimizer(GradientBasedFunctionMinimizer):
     def computeSearchDirection(self,objective,p):
         grad = np.zeros(p.data.shape,np.float64)
         objective.AddGradientTo(p,grad)
-        return grad
+        return -grad
 
 class NewtonFunctionMinimizer(GradientBasedFunctionMinimizer):
     
@@ -82,7 +82,7 @@ class NewtonFunctionMinimizer(GradientBasedFunctionMinimizer):
         objective.AddHessianTo(p,hess)
         AddEpsToDiagonal(hess,0.01)
         dp = np.dot(np.linalg.inv(hess),grad)
-        return dp
+        return -dp
         
         
 #x = GradientDescentFunctionMinimizer()
