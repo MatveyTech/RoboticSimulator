@@ -15,6 +15,14 @@ smallFloat = 0.001
 def norm_2(x):
     return np.sum(x*x)
 
+def scalar_prod(a,b):
+    if a.shape != b.shape:
+        raise ValueError('The vectors should be of the same shape')
+    return np.sum(a*b)
+
+def isPositiveDefinite(mat):
+    return np.all(np.linalg.eigvals(mat) > 0)
+
 
 
 def CreateRotationMatrix(teta,u):
