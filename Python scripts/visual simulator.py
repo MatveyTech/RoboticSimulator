@@ -20,7 +20,7 @@ HALF_SLATEGREY = (184, 192, 200)
 WHITESMOKE = (245,245,245)
 JOINTSCOLOR = (32,178,170)
 
-squareSize = 1500
+squareSize = 850
 screenW = squareSize
 screenH = squareSize
 scale = 1
@@ -77,7 +77,7 @@ class Robot:
         
     def __init__(self,isSimulation=False):
         
-        self.links = np.array([[200, 150, 250],
+        self.links = np.array([[100, 75, 125],
                        [0,0,0],
                        [0,0,0]])
 
@@ -255,7 +255,8 @@ while True:
     
     if  IsCalculatingPathNow:
         v = EqualPath(robot_start.tetas,robot_final.tetas,num_Of_Points)
-        sim.Move(v)
+        v = Variables(3,10)
+        sim.Move(v.data)
         #print (np.rad2deg(v))
         #break
         sim.Draw(windowSurface)
@@ -271,8 +272,7 @@ while True:
         tm_final.MakeStep()
         robot_final.Move(tm_final.theta)
     robot_final.Draw(windowSurface)
-    
-    
+       
 
         
     pygame.display.update()

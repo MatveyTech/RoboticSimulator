@@ -12,9 +12,10 @@ from Kinematics import *
 from Visualisation import Vis
 import matplotlib.pyplot as plt
 from ThesisMinimizer import ThesisMinimizer
+from math_utils import isPositiveDefinite, norm_2
 
 def WriteTextToFile(filename, text):
-    f = open(filename, 'w')
+    f = open(filename, 'a')
     f.write(text)
     f.close()
 
@@ -196,9 +197,14 @@ def GetInitialValues3(random):
     if random:
         mil = 3.0
         mal = 9.99
-        _l = np.array([[drand(mil,mal),drand(mil,mal),drand(mil,mal)],
+#        _l = np.array([[drand(mil,mal),drand(mil,mal),drand(mil,mal)],
+#                       [0,0,0],
+#                       [0,0,0]])
+        
+        _l = np.array([[5, 5, 5],
                        [0,0,0],
                        [0,0,0]])
+        
         _w=np.array([[0,0,0],
                     [0,0,0],
                     [1,1,1]])
@@ -213,7 +219,8 @@ def GetInitialValues3(random):
         rand_teta_for_target = np.array([drand(0,2*np.pi),drand(0,2*np.pi),drand(0,2*np.pi)],dtype=float)
         #rand_teta_for_target = np.array([drand(0,2*np.pi),0,0],dtype=float)
         
-        _tgt = FK(_l,_w,rand_teta_for_target)
+        #_tgt = FK(_l,_w,rand_teta_for_target)
+        _tgt = np.array([0.5,0.5,0])
 
     else:
 #        _l = np.array([[3.3466,8.9891,8.177],
@@ -230,7 +237,7 @@ def GetInitialValues3(random):
 #        
 #        _tgt = np.array([6.8304,8.0209,0])
 #        
-        _l = np.array([[7.3224, 3.4131, 7.9603],
+        _l = np.array([[5, 5, 5],
                        [0,0,0],
                        [0,0,0]])
 
@@ -241,9 +248,9 @@ def GetInitialValues3(random):
     
         rad10 = np.deg2rad(20)
         #_st_pos = np.array([rad10,rad10,rad10],dtype=float)
-        _st_pos = np.array([3.3176, 2.2951, 4.9843])
+        _st_pos = np.array([-3.1260556476,  2.0357718904, -2.6774722534])
         
-        _tgt = np.array([-17.9041,1.23,0])
+        _tgt = np.array([0.5,0.5,0])
     
     return _l,_w,_st_pos,_tgt
 
@@ -309,9 +316,10 @@ def saveFileResults(newton_p,thesis_p,l,w,tetas,target,fileName):
     
     fig, axs = plt.subplots(2,figsize=(20, 10))
     #fig.suptitle("title")
-    axs[0].plot(range(n),newton_p,color='blue',marker='x',markersize=5,linewidth = 6) 
-    axs[0].plot(range(n),thesis_p,color='red',marker='o',markersize=5, linewidth = 6) 
+    axs[0].plot(range(n),newton_p,color='blue',marker='x',markersize=5,linewidth = 6, label="Newton") 
+    axs[0].plot(range(n),thesis_p,color='red',marker='o',markersize=5, linewidth = 6, label="Thesis") 
     axs[0].set_title('Objective values')
+    axs[0].legend(bbox_to_anchor=(0.5, 0.95), loc='upper left', borderaxespad=0.)
 #    axs[1].plot(range(n),range(n))
 #    axs[1].set_title('Robot initial state')
     
@@ -353,19 +361,22 @@ def NewPlotFunc(newton_p):
     
 
 ############################### I N P U T S #############################
-randomValues=True
+randomValues=False
 useVisualization = False
 max_numOfIterations = 500
 useNewthonMethod=False
 ################################ I N P U T S #############################
+pos_defs = []
+not_pos_defs = []
 
-num_of_tests = 10
-for test_ind in range(0,num_of_tests+1):
-
+num_of_tests = 1
+for test_ind in range(0,num_of_tests):
+    print ('Test Number:{0}'.format(test_ind))
     links,w,st_pos,tgt = GetInitialValues3(random=randomValues)
     
     if randomValues:
         print ("Random calculated links:\n",links)
+        print ("Random calculated links")
         print ("Random calculated starting position:\n",st_pos)
         print ("Random calculated target:\n",tgt)
     else:
@@ -392,15 +403,19 @@ for test_ind in range(0,num_of_tests+1):
     thesis_reached = False
 
 
-    print ('Test Number:{0}'.format(test_ind))
+    
     goodOutputFileName = 'c:/temp/thesis test/test{0}.png'.format(test_ind)
     badOutputFileName = 'c:/temp/thesis test/test{0}.txt'.format(test_ind)
+    pos_def = 0
+    npos_def = 0
     while True:        
         num_of_iterations = num_of_iterations + 1    
-        #print ("-------------------Iteration:",num_of_iterations)   
+        print ("-------------------Iteration:",num_of_iterations)         
+        
            
         J_newton = CalcJacobian(links,w,theta_newton)   
         forwardK_newton = FK(links,w,theta_newton)
+
         
         J_thesis = CalcJacobian(links,w,theta_thesis)   
         forwardK_thesis = FK(links,w,theta_thesis)
@@ -409,7 +424,19 @@ for test_ind in range(0,num_of_tests+1):
         tm = ThesisMinimizer(links,w,theta_thesis,tgt)
         #tm.MakeStep()
         A,M = tm.CalcAandBImproved(links,w,tgt,theta_thesis)
-        
+#        print(links)
+#        print(A)
+#        input()
+#        is_pos_def = isPositiveDefinite(A)
+#        if is_pos_def:
+#            pos_def = pos_def + 1
+#            print ("    POS DEF!")
+#            #WriteTextToFile('c:/temp/thesis test/test{0}_pos_def.txt'.format(test_ind),str(num_of_iterations))
+#        else:
+#            npos_def = npos_def + 1
+#            print ("    NOT POS DEF! Min eig:",np.min(np.linalg.eigvals(A)))
+#            #WriteTextToFile('c:/temp/thesis test/test{0}_NOT_pos_def.txt'.format(test_ind),str(num_of_iterations))
+#            #print("   eigvals:",np.linalg.eigvals(A)) 
     
         gr_newton = np.dot(np.transpose(J_newton),(forwardK_newton-tgt))
         gr_thesis = np.dot(np.transpose(J_thesis),(forwardK_thesis-tgt))
@@ -421,35 +448,34 @@ for test_ind in range(0,num_of_tests+1):
         
         stop_treshold = 0.01
         
-        objective_values_newton.append(np.linalg.norm(forwardK_newton-tgt,2))
-        objective_values_thesis.append(np.linalg.norm(forwardK_thesis-tgt,2))
+#        objective_values_newton.append(np.linalg.norm(forwardK_newton-tgt,2))
+#        objective_values_thesis.append(np.linalg.norm(forwardK_thesis-tgt,2))
+        
+        objective_values_newton.append(norm_2(forwardK_newton-tgt)*0.5)
+        objective_values_thesis.append(norm_2(forwardK_thesis-tgt)*0.5)
         
         if  not newton_reached and p_newton_threshold < stop_treshold:
             print("Newton reached the stop threshold")
-            print("Newton threshold",p_newton_threshold)
-            print("Thesis threshold",p_thesis_threshold)
+#            print("Newton threshold",p_newton_threshold)
+#            print("Thesis threshold",p_thesis_threshold)
             print ("Iteration #", num_of_iterations)
-            print ("Target position:",tgt)
-            print ("Current position:",FK(links,w,theta_newton))
-            print ("Current theta:",np.rad2deg(theta_newton))
-            print("---------------------------------\n")
+#            print ("Target position:",tgt)
+#            print ("Current position:",FK(links,w,theta_newton))
+#            print ("Current theta:",np.rad2deg(theta_newton))
+#            print("---------------------------------\n")
             newton_reached = True
             #break
         
         if  not thesis_reached and p_thesis_threshold < stop_treshold:
             print("Thesis reached the stop threshold")
-            print("Newton threshold",p_newton_threshold)
-            print("Thesis threshold",p_thesis_threshold)
-    #        print("M\n",M)
-    #        print("A\n",A)
-    #        print("np.linalg.pinv(A)\n",np.linalg.pinv(A))
-    #        print("gr_thesis",gr_thesis)
-            
+#            print("Newton threshold",p_newton_threshold)
+#            print("Thesis threshold",p_thesis_threshold)
+#            
             print ("Iteration #", num_of_iterations)
-            print ("Target position:",tgt)
-            print ("Current position:",FK(links,w,theta_thesis))
-            print ("Current theta:",np.rad2deg(theta_thesis))
-            print("\n")
+#            print ("Target position:",tgt)
+#            print ("Current position:",FK(links,w,theta_thesis))
+#            print ("Current theta:",np.rad2deg(theta_thesis))
+#            print("\n")
             thesis_reached = True
             #break
         if newton_reached and thesis_reached:            
@@ -468,20 +494,30 @@ for test_ind in range(0,num_of_tests+1):
         step_newton = None
         step_thesis = None
         try:
-            step_newton = doLineSearch(theta_newton,p_newton,links,w,tgt)
-            step_thesis = doLineSearch(theta_thesis,p_thesis,links,w,tgt)
+            step_newton = tm.doLineSearch(theta_newton,p_newton,links,w,tgt)
+            step_thesis = tm.doLineSearch(theta_thesis,p_thesis,links,w,tgt)
         except:
             WriteTextToFile('c:/temp/thesis test/test{0}_line_search_failed.txt'.format(test_ind),"line_search_failed")
             break
         
-        theta_thesis=tm.MakeStep()        
-        #theta_thesis=(theta_thesis+p_thesis*step_thesis) % (2*np.pi)     
+#        print("Step N",step_newton)
+#        print("P N",p_newton)
+        #break
+        
+        #theta_thesis=tm.MakeStep()        
+        theta_thesis=(theta_thesis+p_thesis*step_thesis) % (2*np.pi)     
         theta_newton=(theta_newton+p_newton*step_newton) % (2*np.pi)
         
     
     #print("Newton value:",CalcObjectiveValue(theta_newton,tgt,links,w))
-
+    pos_defs.append(pos_def)
+    not_pos_defs.append(npos_def)
 print ("Done. Number of iterations: ", num_of_iterations)
+#plt.clf
+#plt.bar(range(num_of_tests), pos_defs,label='Pos def')
+#plt.bar(range(num_of_tests), not_pos_defs,label='Not pos def')
+#plt.legend(bbox_to_anchor=(0.5, 0.95), loc='upper left', borderaxespad=0.)
+#plt.show()
 
 #plotValues(objective_values_newton,objective_values_thesis)
 #if useVisualization:

@@ -7,6 +7,7 @@ Created on Wed Nov  6 10:31:51 2019
 import numpy as np
 from numpy.linalg import norm
 import math
+import random
 
 comparisonFloat = 0.05
 epsilon = 0.00001
@@ -22,6 +23,9 @@ def scalar_prod(a,b):
 
 def isPositiveDefinite(mat):
     return np.all(np.linalg.eigvals(mat) > 0)
+
+def getMinEigenValue(mat):
+    return np.amin(np.linalg.eigvals(mat))
 
 
 
@@ -104,3 +108,17 @@ def AddEpsToDiagonal(mat,epsilon = 0.01):
     d = np.diag(mat)
     d = d + epsilon
     np.fill_diagonal(mat,d)
+    
+def drand(min_value,max_value):
+    return random.uniform(min_value,max_value)
+
+def testSparsityPattern(m1,m2):
+    tolerance = 0.0000000001
+    b1 = np.abs(m1) < tolerance
+    b2 = np.abs(m2) < tolerance
+    
+    return np.array_equal(b1,b2)
+    
+    
+    
+    
