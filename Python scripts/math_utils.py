@@ -13,6 +13,16 @@ comparisonFloat = 0.05
 epsilon = 0.00001
 smallFloat = 0.001
 
+def dist3d(x1,y1,z1,x2,y2,z2):
+    res = np.sqrt( (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1) )
+    return res
+
+def dist3dp(p1,p2):
+    pp1 = p1[1,-1]
+    print (pp1)
+#    res = np.sqrt( (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) + (z2-z1)*(z2-z1) )
+#    return res
+
 def norm_2(x):
     return np.sum(x*x)
 

@@ -15,7 +15,7 @@ from Objectives import SmoothnessObj
 from IKObjective import IK_Obj
 import numpy as np
 from Types import Variables
-from Kinematics import FK
+from Kinematics import FK,IK_2_ClosedFormula
 from math_utils import norm_2, scalar_prod,normalize,isPositiveDefinite
 from math_utils import drand, testSparsityPattern, AddEpsToDiagonal
 import sys
