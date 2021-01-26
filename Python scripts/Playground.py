@@ -13,6 +13,7 @@ from Objectives import StartObj
 from Objectives import FinalObj
 from Objectives import SmoothnessObj
 from IKObjective import IK_Obj
+from IKObjective import IK_Extended_Obj
 import numpy as np
 from Types import Variables
 from Kinematics import FK,IK_2_ClosedFormula
@@ -96,20 +97,24 @@ for i in range(numP):
 
 print ("Initial guess",v)
 st_point = np.array([0.5,0.5,0],dtype='f')
-objN = TheObjective(st_point,end_point,numT,numP,li,ax,False,np.array([100,100,10,100],dtype='f'))
-objT = TheObjective(st_point,end_point,numT,numP,li,ax,True,np.array([100,100,10,100],dtype='f'))
+#objN = TheObjective(st_point,end_point,numT,numP,li,ax,False,np.array([100,100,10,100],dtype='f'))
+#objT = TheObjective(st_point,end_point,numT,numP,li,ax,True,np.array([100,100,10,100],dtype='f'))
 #v = tt
 #v = np.array([100,0,0])
 
 
 #tgt = FK(li,ax,v)
 
-#tgt = np.array([0.5,0.5,0])
-#objN = IK_Obj(li,ax,tgt)
-#objT = IK_Obj(li,ax,tgt,useA=True)
-#m = NewtonFunctionMinimizer(isVarValue=False)
-#v = np.array([5.0485032785, 0.6399702503, 5.2151616457])
-#v = np.array([x,y,z])
+tgt = np.array([0.5,0.5,0])
+objN = IK_Obj(li,ax,tgt)
+objT = IK_Obj(li,ax,tgt,useA=True)
+objTNew = IK_Extended_Obj(numT,numP,li,ax,tgt)
+m = NewtonFunctionMinimizer(isVarValue=False)
+v = np.array([5.0485032785, 0.6399702503, 5.2151616457])
+v = np.array([x,y,z])
+print(v)
+
+print(objTNew.ComputeValue(v))
 
 
 #objN.TestGradientWithFD(v)
@@ -124,35 +129,45 @@ objT = TheObjective(st_point,end_point,numT,numP,li,ax,True,np.array([100,100,10
 #        _l = np.array([[drand(mil,mal),drand(mil,mal),drand(mil,mal)],
 
 
-cT = cN = False
+cTNew = cT = cN = False
 pN = v
 pT = v
+pTNew = v
 #p = ps[180]
 pTs = []
 pNs = []
+pTNews = []
 
 pTvals = []
 pNvals = []
+pTNewvals = []
+
 T_PDfs = []
 N_PDfs = []
+TNew_PDFs = []
 
 sdNs = []
 sdTs = []
+sdTNews = []
 
 T_min_eig_vals = []
 N_min_eig_vals = []
+TNew_min_eig_vals = []
     
 T_grad_sizes = []
 N_grad_sizes = []
+TNew_grad_sizes = []
+
     
 T_numOf_regs = []
 N_numOf_regs = []
+TNew_numOf_regs = []
 
 counter = 0
-numOfIterations = 20
+numOfIterations = 10
 runIterationsAnyway = True
 
-print("Initial value:",objN.ComputeValue(pN))
+print("Initial value:",objTNew.ComputeValue(pN))
 
 while (runIterationsAnyway and counter<numOfIterations) or (cT is False and cN is False and counter<numOfIterations):
     counter +=1
@@ -160,31 +175,45 @@ while (runIterationsAnyway and counter<numOfIterations) or (cT is False and cN i
     print ("Iteration:",counter)
     print ("- - - - - - - - - - - - - - - - -")
     
-    objN.TestGradientWithFD(pN)
+#    objN.TestGradientWithFD(pN)
     #objN.TestHessianWithFD(p)
+    
+    #objTNew.TestGradientWithFD(pTNew)
+
     
     nVal = objN.ComputeValue(pN)
     tVal = objT.ComputeValue(pT)
+    tNewVal = objTNew.ComputeValue(pTNew)
 #    print("pN",pN)
 #    print ("Nval:",nVal)
-#    print ("Tval:",tVal)
+##    print ("Tval:",tVal)
+#    print ("TNewVal:",tNewVal)
     
     NGrad = objN.CalculateGradient(pN)
     TGrad = objT.CalculateGradient(pT)    
+    TNewGrad = objTNew.CalculateGradient(pTNew) 
+    
+#    print ("NGrad:",NGrad)
+#    print ("TNewGrad:",TNewGrad)
     
     
     NSearchDir = m.computeSearchDirection(objN,pN,regFactor=0)
     TSearchDir = m.computeSearchDirection(objT,pT,regFactor=0)
+    TNewSearchDir = m.computeSearchDirection(objTNew,pTNew,regFactor=0)
+    
+#    print ("NSearchDir:",NSearchDir)
+#    print ("TSearchDir:",TSearchDir)
+#    print ("TNewSearchDir:",TNewSearchDir)
     
     NisDirectionDescent = m.isSearchDirectionDescent(NSearchDir,NGrad)
     TisDirectionDescent = m.isSearchDirectionDescent(TSearchDir,TGrad)
+    TNewisDirectionDescent = m.isSearchDirectionDescent(TNewSearchDir,TNewGrad)
     
 #    print(np.linalg.eigvals(objT.CalculateHessian(pT)))
 #    print(scalar_prod(normalize(TSearchDir),normalize(TGrad)))
     
     #regularization now
     TnumOfReg = 0
-    Tfactor = 0
     Tfactor = 10e-5
     while not TisDirectionDescent:  
         TnumOfReg = TnumOfReg + 1
@@ -196,7 +225,6 @@ while (runIterationsAnyway and counter<numOfIterations) or (cT is False and cN i
     
     
     NnumOfReg = 0
-    Nfactor = 0
     Nfactor = 10e-5
     while not NisDirectionDescent:  
         NnumOfReg = NnumOfReg + 1
@@ -204,14 +232,25 @@ while (runIterationsAnyway and counter<numOfIterations) or (cT is False and cN i
         NSearchDir = m.computeSearchDirection(objN,pN,regFactor=Nfactor)
         NisDirectionDescent = m.isSearchDirectionDescent(NSearchDir,NGrad)
         
+    
+    TNewnumOfReg = 0
+    TNewfactor = 10e-5
+    while not TNewisDirectionDescent:  
+        TNewnumOfReg = TNewnumOfReg + 1
+        TNewfactor = TNewfactor * 10
+        TNewSearchDir = m.computeSearchDirection(objTNew,pTNew,regFactor=TNewfactor)
+        TNewisDirectionDescent = m.isSearchDirectionDescent(TNewSearchDir,TNewGrad)
+        
     #print ("N reg num::", NnumOfReg)   
     
     
     NHess = objN.CalculateHessian(pN) #this one may be fifferent fro the one used in computeSearchDirection
     THess = objT.CalculateHessian(pT) #this one may be fifferent fro the one used in computeSearchDirection
+    TNewHess = objTNew.CalculateHessian(pTNew)
     
     AddEpsToDiagonal(THess,Tfactor)
     AddEpsToDiagonal(NHess,Nfactor)
+    AddEpsToDiagonal(TNewHess,TNewfactor)
     
     #print (np.linalg.eigvals(NHess))
     
@@ -221,6 +260,7 @@ while (runIterationsAnyway and counter<numOfIterations) or (cT is False and cN i
     
     NStepSize = norm_2(NSearchDir)
     TStepSize = norm_2(TSearchDir)
+    TNewStepSize = norm_2(TNewSearchDir)
     
     #print("Step N",step_newton)
     #print("P N",NSearchDir)
@@ -254,29 +294,40 @@ while (runIterationsAnyway and counter<numOfIterations) or (cT is False and cN i
     
     T_min_eig_vals.append(getMinEigenValue(objT.CalculateHessian(pT)))
     N_min_eig_vals.append(getMinEigenValue(objN.CalculateHessian(pN)))
+    TNew_min_eig_vals.append(getMinEigenValue(objTNew.CalculateHessian(pTNew)))
     
     pN,cN = m.minimize(objN,pN,Nfactor)  
     #print("minimizing T")
     pT,cT = m.minimize(objT,pT,Tfactor)  
     
+    pTNew, cTNew = m.minimize(objTNew,pTNew,TNewfactor)  
+    
     pTs.append(pT)
     pNs.append(pN)
+    pTNews.append(pTNew)
+    
     pNvals.append(nVal)
     pTvals.append(tVal)
+    pTNewvals.append(tNewVal)
+    
     sdNs.append(NStepSize)
     sdTs.append(TStepSize)
-    
+    sdTNews.append(TNewStepSize)    
     
     
     T_grad_sizes.append(norm_2(TGrad))
     N_grad_sizes.append(norm_2(NGrad))
+    TNew_grad_sizes.append(norm_2(TNewGrad))
+    
     
     T_numOf_regs.append(TnumOfReg)
     N_numOf_regs.append(NnumOfReg)
+    TNew_numOf_regs.append(TNewnumOfReg)
     
     
     T_PDfs.append(not isPositiveDefinite(THess))    
     N_PDfs.append(not isPositiveDefinite(NHess)) 
+    TNew_PDFs.append(not isPositiveDefinite(TNewHess))
 
 #    t = p.GetTheta(i)
 #    e = p.GetEE(i)
@@ -305,6 +356,7 @@ if plot:
     X = np.arange(len(pNvals))
     plt.plot(X, pNvals,label='Newton')
     plt.plot(X, pTvals,label='Thesis')
+    plt.plot(X, pTNewvals,label='Thesis New')
     plt.title("Obj values")
     plt.legend(bbox_to_anchor=(0.5, 0.95), loc='upper left', borderaxespad=0.)
     
@@ -320,6 +372,7 @@ if plot:
     plt.subplot(222)
     plt.plot(X, N_grad_sizes,label='Newton',)
     plt.plot(X, T_grad_sizes,label='Thesis')
+    plt.plot(X, TNew_grad_sizes,label='New Thesis')
     plt.title("Gradient Size")
     plt.legend(bbox_to_anchor=(0.5, 0.95), loc='upper left', borderaxespad=0.)
     
